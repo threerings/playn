@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>forplay</groupId>
+    <artifactId>forplay-project</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <groupId>forplay</groupId>
+  <artifactId>forplay-hello-project</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+  <name>Forplay Hello Project</name>
+  <url>http://code.google.com/a/google.com/p/slingshot</url>
+  <description>Forplay Hello Project</description>
+
+  <issueManagement>
+    <system>Google Code</system>
+    <url>http://code.google.com/a/google.com/p/slingshot/issues/list</url>
+  </issueManagement>
+
+  <modules>
+    <module>core</module> 
+    <module>html</module>
+  </modules>
+</project>

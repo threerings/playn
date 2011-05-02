@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>MP3 Player - Applet Sample</title>
+</head>
+<body bgcolor="#FFFFFF">
+<div align="center">
+  <p><font color="#FF0000"><b><font face="Arial, Helvetica, sans-serif" size="+1">JLayer
+    1.0.1</font></b></font></p>
+  <p>&nbsp;</p>
+  <p><font face="Verdana, Arial, Helvetica, sans-serif" size="-1"><b> - PlayerApplet
+    Sample - </b></font></p>
+  <p><font face="Verdana, Arial, Helvetica, sans-serif" size="-1"><b><br>
+    </b>To play any MP3 file (e.g. : 44Khz, 128Kbps) , you need a browser JavaSound
+    1.0 compliant.<br>
+    e.g : <font color="#0000CC">Mozilla, Netscape 6+,</font> or <font color="#CC0000">Internet
+    Explorer + JDK1.3 plugin (or higher)</font>.</font></p>
+  <p>&nbsp;</p>
+  <p><font face="Verdana, Arial, Helvetica, sans-serif" size="-1" color="#0000CC"><u><font color="#0000FF">Playing</font></u><font color="#0000FF">
+    : test.mp3</font></font></p>
+  <p>&nbsp;</p>
+  <p>
+
+<OBJECT classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"
+WIDTH = "32" HEIGHT = "32"  codebase="http://java.sun.com/products/plugin/1.3/jinstall-13-win32.cab#Version=1,3,0,0">
+<PARAM NAME = CODE VALUE = "javazoom.jl.player.PlayerApplet" >
+<PARAM NAME = ARCHIVE VALUE = "jl1.0.1.jar" >
+
+<PARAM NAME="type" VALUE="application/x-java-applet;version=1.3">
+<PARAM NAME="scriptable" VALUE="false">
+<PARAM NAME = "audioURL" VALUE ="test.mp3">
+<COMMENT>
+<EMBED type="application/x-java-applet;version=1.3"  CODE = "javazoom.jl.player.PlayerApplet" ARCHIVE = "jl1.0.1.jar" WIDTH = "32" HEIGHT = "32" audioURL = "test.mp3"  scriptable=false pluginspage="http://java.sun.com/products/plugin/1.3/plugin-install.html"><NOEMBED></COMMENT>
+
+</NOEMBED></EMBED>
+</OBJECT>
+
+</p>
+  <p>&nbsp;</p>
+  <hr noshade size="1">
+  <p><font face="Verdana, Arial, Helvetica, sans-serif" size="-1" color="#0000CC"><font size="-2"><b>&copy;
+    JavaZOOM 1999-2008</b></font></font></p>
+  </div>
+</body>
+</html>

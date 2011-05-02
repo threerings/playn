@@ -1,0 +1,77 @@
+<project name="VorbisSPI" default="usage" basedir=".">
+
+  <!-- Initializations -->
+  <target name="init">    
+    <echo message="--------------------------------------------------------------"/>  
+    <echo message="------------        BUILDING VORBIS SPI PACKAGE     ----------"/>
+    <echo message=""/>
+    <property name="year" value="1999-2008"/>
+    <property name="jdksource" value="1.3"/>
+    <property name="jdktarget" value="1.3"/> 
+    <property name="jars" value="${basedir}"/>
+    <property name="sources" value="${basedir}/src"/>
+    <property name="sourcestest" value="${basedir}/srctest"/>
+    <property name="classes" value="${basedir}/classes"/>
+    <property name="api" value="${basedir}/docs"/>    
+    <property name="lib" value="${basedir}/lib"/>
+    <property name="oggjar" value="${lib}/jogg-0.0.7.jar"/>
+    <property name="jorbisjar" value="${lib}/jorbis-0.0.15.jar"/>
+    <property name="tritonusjar" value="${lib}/tritonus_share.jar"/>            
+  </target>
+
+  <!-- Build -->
+  <target name="build" depends="init">
+    <echo message="------ Compiling application"/>
+    <javac srcdir="${sources}" destdir="${classes}" includes="**" source="${jdksource}" target="${jdktarget}">
+      <classpath>            
+        <pathelement location="${oggjar}"/>        
+        <pathelement location="${jorbisjar}"/>
+        <pathelement location="${tritonusjar}"/>
+        <pathelement location="${sources}"/>
+      </classpath>
+    </javac>
+    <copy todir="${classes}/META-INF" overwrite="true">
+      <fileset dir="${sources}/META-INF"/>
+    </copy>
+  </target>
+  
+  <!-- Archive -->
+  <target name="dist" depends="build">
+    <echo message="------ Building JAR file"/>
+    <jar jarfile="${jars}/vorbisspi1.0.3.jar" basedir="${classes}">
+      <manifest>
+        <attribute name="Created-By" value="JavaZOOM" />
+      </manifest>    
+    </jar>
+  </target>
+
+  <!-- JavaDoc -->
+  <target name="all" depends="dist">
+     <echo message="------ Running JavaDoc"/>
+     <javadoc packagenames="javazoom.*"
+              sourcepath="${sources}"
+              destdir="${api}"
+              bottom="JavaZOOM ${year}">
+      <classpath>
+        <pathelement location="${classes}"/>
+        <pathelement location="${oggjar}"/>
+        <pathelement location="${jorbisjar}"/>
+        <pathelement location="${tritonusjar}"/>
+        <pathelement location="${sources}"/>
+      </classpath>
+     </javadoc>
+  </target>
+
+  <!-- Usage -->
+  <target name="usage">
+     <echo message="*** VorbisSPI ANT build script ***"/>
+     <echo message="Usage : "/>
+     <echo message="   ant [target]"/>
+     <echo message=""/>     
+     <echo message="   target : "/>     
+     <echo message="            build : Build Application"/>     
+     <echo message="            dist  : Build Application + Archive (JAR)"/>     
+     <echo message="            all   : Build Application + Archive + JavaDoc"/>       
+  </target>
+       
+</project>
