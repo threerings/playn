@@ -16,17 +16,24 @@
 package forplay.sample.peaphysics.core.entities;
 
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
 
-import forplay.core.GroupLayer;
+import forplay.sample.peaphysics.core.PeaWorld;
 
-public abstract class DynamicPhysicsEntity extends PhysicsEntity {
+public abstract class DynamicPhysicsEntity extends Entity implements PhysicsEntity {
   // for calculating interpolation
   private float prevX, prevY, prevA;
-  
-  public DynamicPhysicsEntity(GroupLayer worldLayer, World world) {
-    super(worldLayer, world);
+  private Body body;
+
+  public DynamicPhysicsEntity(PeaWorld peaWorld, World world, float x, float y, float angle) {
+    super(peaWorld, x, y, angle);
+    body = initPhysicsBody(world, x, y, angle);
+    setPos(x, y);
+    setAngle(angle);
   }
+
+  abstract Body initPhysicsBody(World world, float x, float y, float angle);
 
   @Override
   public void paint(float alpha) {
@@ -46,11 +53,39 @@ public abstract class DynamicPhysicsEntity extends PhysicsEntity {
     prevA = body.getAngle();
   }
 
+  public void initPreLoad(final PeaWorld peaWorld) {
+    // attach our layer to the dynamic layer
+    peaWorld.dynamicLayer.add(layer);
+  }
+
+  public void initPostLoad(final PeaWorld peaWorld) {
+  }
+
   public void setLinearVelocity(float x, float y) {
     body.setLinearVelocity(new Vec2(x, y));
   }
 
   public void setAngularVelocity(float w) {
     body.setAngularVelocity(w);
+  }
+
+  @Override
+  public void setPos(float x, float y) {
+    super.setPos(x, y);
+    getBody().setTransform(new Vec2(x, y), getBody().getAngle());
+    prevX = x;
+    prevY = y;
+  }
+
+  @Override
+  public void setAngle(float a) {
+    super.setAngle(a);
+    getBody().setTransform(getBody().getPosition(), a);
+    prevA = a;
+  }
+
+  @Override
+  public Body getBody() {
+    return body;
   }
 }

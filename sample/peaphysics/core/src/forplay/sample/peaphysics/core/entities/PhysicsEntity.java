@@ -15,35 +15,13 @@
  */
 package forplay.sample.peaphysics.core.entities;
 
-import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.World;
 
-import forplay.core.GroupLayer;
-
-public abstract class PhysicsEntity extends Entity {
-  Body body;
-
-  public PhysicsEntity(GroupLayer worldLayer, World world) {
-    super(worldLayer);
-    body = initPhysicsBody(world);
-  }
-
-  abstract Body initPhysicsBody(World world);
-
-  @Override
-  public void paint(float delta) {
-    layer.setTranslation(body.getPosition().x, body.getPosition().y);
-    layer.setRotation(body.getAngle());
-  }
-
-  @Override
-  public void setPos(float x, float y) {
-    body.setTransform(new Vec2(x, y), body.getAngle());
-  }
-
-  @Override
-  public void setAngle(float a) {
-    body.setTransform(body.getPosition(), a);
+public interface PhysicsEntity {
+  
+  public Body getBody();
+  
+  public interface HasContactListener {
+    public void contact(PhysicsEntity other);
   }
 }

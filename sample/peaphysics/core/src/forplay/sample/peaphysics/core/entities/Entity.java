@@ -19,27 +19,34 @@ import static forplay.core.ForPlay.assetManager;
 import static forplay.core.ForPlay.graphics;
 
 import forplay.core.ForPlay;
-import forplay.core.GroupLayer;
 import forplay.core.Image;
 import forplay.core.ImageLayer;
 import forplay.core.ResourceCallback;
+import forplay.sample.peaphysics.core.PeaWorld;
 
 public abstract class Entity {
   ImageLayer layer;
   Image image;
+  float x, y, angle;
 
-  public Entity(final GroupLayer worldLayer) {
+  public Entity(final PeaWorld peaWorld, float px, float py, float pangle) {
+    this.x = px;
+    this.y = py;
+    this.angle = pangle;
     image = assetManager().getImage(getImagePath());
     layer = graphics().createImageLayer(image);
+    initPreLoad(peaWorld);
     image.addCallback(new ResourceCallback<Image>() {
       @Override
       public void done(Image image) {
         // since the image is loaded, we can use its width and height
-        layer.clearWidth();
-        layer.clearHeight();
+        layer.setWidth(image.width());
+        layer.setHeight(image.height());
         layer.setOrigin(image.width() / 2f, image.height() / 2f);
         layer.setScale(getWidth() / image.width(), getHeight() / image.height());
-        worldLayer.add(layer);
+        layer.setTranslation(x, y);
+        layer.setRotation(angle);
+        initPostLoad(peaWorld);
       }
 
       @Override
@@ -49,10 +56,24 @@ public abstract class Entity {
     });
   }
 
-  public void paint(float alpha) {
+  /**
+   * Perform pre-image load initialization (e.g., attaching to PeaWorld layers).
+   * 
+   * @param peaWorld
+   */
+  public abstract void initPreLoad(final PeaWorld peaWorld);
+
+  /**
+   * Perform post-image load initialization (e.g., attaching to PeaWorld layers).
+   * 
+   * @param peaWorld
+   */
+  public abstract void initPostLoad(final PeaWorld peaWorld);
+
+  public void paint(@SuppressWarnings("unused") float alpha) {
   }
 
-  public void update(float delta) {
+  public void update(@SuppressWarnings("unused") float delta) {
   }
 
   public void setPos(float x, float y) {

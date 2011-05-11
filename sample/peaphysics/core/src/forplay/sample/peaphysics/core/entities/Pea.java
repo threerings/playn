@@ -23,17 +23,17 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
-import forplay.core.GroupLayer;
+import forplay.sample.peaphysics.core.PeaWorld;
 
 public class Pea extends DynamicPhysicsEntity {
   public static String TYPE = "Pea";
 
-  public Pea(final GroupLayer worldLayer, World world) {
-    super(worldLayer, world);
+  public Pea(PeaWorld peaWorld, World world, float x, float y, float angle) {
+    super(peaWorld, world, x, y, angle);
   }
 
   @Override
-  Body initPhysicsBody(World world) {
+  Body initPhysicsBody(World world, float x, float y, float angle) {
     FixtureDef fixtureDef = new FixtureDef();
     BodyDef bodyDef = new BodyDef();
     bodyDef.type = BodyType.DYNAMIC;
@@ -41,28 +41,36 @@ public class Pea extends DynamicPhysicsEntity {
     Body body = world.createBody(bodyDef);
 
     CircleShape circleShape = new CircleShape();
-    circleShape.m_radius = getWidth() / 2f;
+    circleShape.m_radius = getRadius();
     fixtureDef.shape = circleShape;
-    fixtureDef.density = 0.5f;
+    fixtureDef.density = 0.4f;
     fixtureDef.friction = 0.1f;
-    fixtureDef.restitution = 0.4f;
+    fixtureDef.restitution = 0.35f;
     circleShape.m_p.set(0, 0);
     body.createFixture(fixtureDef);
+    body.setLinearDamping(0.2f);
+    body.setTransform(new Vec2(x, y), angle);
     return body;
   }
 
   @Override
   float getWidth() {
-    return 1.0f;
+    return 2 * getRadius();
   }
 
   @Override
   float getHeight() {
-    return 1.0f;
+    return 2 * getRadius();
+  }
+
+  float getRadius() {
+    //return 1.50f;
+    return 0.5f;
   }
 
   @Override
   public String getImagePath() {
+    //return "images/chrome.png";
     return "images/pea.png";
   }
 }

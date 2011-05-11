@@ -14,14 +14,19 @@
  * limitations under the License. 
 -->
 <module rename-to='peaphysicsgame'>
-  <inherits name='forplay.ForPlay'/>
+  <inherits name='com.google.gwt.user.User' />
+  <inherits name='forplay.ForPlay' />
+  <!-- <inherits name='forplay.ForPlayFlash'/> -->
+
+  <!-- switch on Flash compiler -->
+  <!-- <inherits name='com.google.gwt.jas.Jas' /> -->
 
   <source path='core'/>
   <source path='html'/>
+  <!-- <source path='flash'/> -->
 
+  <!-- <entry-point class='forplay.sample.peaphysics.flash.PeaPhysicsGameFlash'/> -->
   <entry-point class='forplay.sample.peaphysics.html.PeaPhysicsGameHtml'/>
 
   <public path="resources" />
-
-  <add-linker name="appcachelinker" />
 </module>

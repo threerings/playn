@@ -15,31 +15,34 @@
  */
 package forplay.sample.peaphysics.core;
 
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.DebugDraw;
+import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.Contact;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
-import forplay.core.SurfaceLayer;
-
-import forplay.sample.peaphysics.core.entities.DynamicPhysicsEntity;
-import forplay.sample.peaphysics.core.entities.Entity;
-import forplay.sample.peaphysics.core.entities.PhysicsEntity;
-
-import static forplay.core.ForPlay.*;
+import static forplay.core.ForPlay.graphics;
 
 import forplay.core.CanvasLayer;
 import forplay.core.DebugDrawBox2D;
 import forplay.core.GroupLayer;
+import forplay.sample.peaphysics.core.entities.Entity;
+import forplay.sample.peaphysics.core.entities.PhysicsEntity;
 
-public class PeaWorld {
-  protected GroupLayer dynamicLayer;
-  protected SurfaceLayer staticLayer;
+public class PeaWorld implements ContactListener {
+  public GroupLayer staticLayerBack;
+  public GroupLayer dynamicLayer;
+  public GroupLayer staticLayerFront;
 
   // size of world
   private static int width = 24;
@@ -49,23 +52,26 @@ public class PeaWorld {
   protected World world;
 
   private List<Entity> entities = new ArrayList<Entity>(0);
-  private List<Entity> physicsEntities = new ArrayList<Entity>(0);
-  private List<Entity> dynamicPhysicsEntities = new ArrayList<Entity>(0);
+  private HashMap<Body, PhysicsEntity> bodyEntityLUT = new HashMap<Body, PhysicsEntity>();
+  private Stack<Contact> contacts = new Stack<Contact>();
 
   private static boolean showDebugDraw = false;
   private DebugDrawBox2D debugDraw;
-
-  public PeaWorld(GroupLayer mainLayer) {
-    staticLayer = graphics().createSurfaceLayer(width, height);
-    mainLayer.add(staticLayer);
+  
+  public PeaWorld(GroupLayer scaledLayer) {
+    staticLayerBack = graphics().createGroupLayer();
+    scaledLayer.add(staticLayerBack);
     dynamicLayer = graphics().createGroupLayer();
-    mainLayer.add(dynamicLayer);
-
+    scaledLayer.add(dynamicLayer);
+    staticLayerFront = graphics().createGroupLayer();
+    scaledLayer.add(staticLayerFront);
+    
     // create the physics world
     Vec2 gravity = new Vec2(0.0f, 10.0f);
     world = new World(gravity, true);
     world.setWarmStarting(true);
     world.setAutoClearForces(true);
+    world.setContactListener(this);
 
     // create the ground
     Body ground = world.createBody(new BodyDef());
@@ -106,10 +112,11 @@ public class PeaWorld {
     }
     // the step delta is fixed so box2d isn't affected by framerate
     world.step(0.033f, 10, 10);
+    processContacts();
   }
 
   public void paint(float delta) {
-    if (debugDraw != null) {
+    if (showDebugDraw) {
       debugDraw.getCanvas().canvas().clear();
       world.drawDebugData();
     }
@@ -121,10 +128,49 @@ public class PeaWorld {
   public void add(Entity entity) {
     entities.add(entity);
     if (entity instanceof PhysicsEntity) {
-      physicsEntities.add(entity);
+      PhysicsEntity physicsEntity = (PhysicsEntity) entity;
+      bodyEntityLUT.put(physicsEntity.getBody(), physicsEntity);
     }
-    if (entity instanceof DynamicPhysicsEntity) {
-      dynamicPhysicsEntities.add(entity);
+  }
+
+  // handle contacts out of physics loop
+  public void processContacts() {
+    while (!contacts.isEmpty()) {
+      Contact contact = contacts.pop();
+      
+      // handle collision
+      PhysicsEntity entityA = bodyEntityLUT.get(contact.m_fixtureA.m_body);
+      PhysicsEntity entityB = bodyEntityLUT.get(contact.m_fixtureB.m_body);
+      
+      if (entityA != null && entityB != null) {
+        if (entityA instanceof PhysicsEntity.HasContactListener) {
+          ((PhysicsEntity.HasContactListener) entityA).contact(entityB);
+        }
+        if (entityB instanceof PhysicsEntity.HasContactListener) {
+          ((PhysicsEntity.HasContactListener) entityB).contact(entityA);
+        }
+      }
     }
+  }
+
+  // Box2d's begin contact
+  @Override
+  public void beginContact(Contact contact) {
+    contacts.push(contact);
+  }
+
+  // Box2d's end contact
+  @Override
+  public void endContact(Contact contact) {
+  }
+
+  // Box2d's pre solve
+  @Override
+  public void preSolve(Contact contact, Manifold oldManifold) {
+  }
+
+  // Box2d's post solve
+  @Override
+  public void postSolve(Contact contact, ContactImpulse impulse) {
   }
 }

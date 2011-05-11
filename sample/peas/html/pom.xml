@@ -30,6 +30,8 @@
 
   <properties>
     <gwt.module>forplay.sample.peas.Peas</gwt.module>
+    <gwt.version>2.3.0</gwt.version>
+
     <gwt.name>peas</gwt.name>
   </properties>
 

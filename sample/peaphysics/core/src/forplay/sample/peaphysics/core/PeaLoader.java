@@ -15,6 +15,16 @@
  */
 package forplay.sample.peaphysics.core;
 
+import forplay.sample.peaphysics.core.entities.FakeBlock;
+
+import forplay.sample.peaphysics.core.entities.Portal;
+
+import forplay.sample.peaphysics.core.entities.Cloud3;
+
+import forplay.sample.peaphysics.core.entities.Cloud1;
+
+import forplay.sample.peaphysics.core.entities.BlockSpring;
+
 import forplay.sample.peaphysics.core.entities.BlockGel;
 import forplay.sample.peaphysics.core.entities.BlockLeftRamp;
 import forplay.sample.peaphysics.core.entities.BlockRightRamp;
@@ -30,8 +40,7 @@ import forplay.core.ResourceCallback;
 
 public class PeaLoader {
 
-  public static void CreateWorld(String level, final GroupLayer worldLayer,
-      final ResourceCallback<PeaWorld> callback) {
+  public static void CreateWorld(String level, final GroupLayer worldLayer, final ResourceCallback<PeaWorld> callback) {
     final PeaWorld peaWorld = new PeaWorld(worldLayer);
 
     // load the level
@@ -52,11 +61,11 @@ public class PeaLoader {
           }
         });
 
-        ForPlay.log().info("about to parse, resource is: " + resource);
         // parse the level
         Json.Object document = ForPlay.json().parse(resource);
         
-        ForPlay.log().info("done parsing");
+        // previous Portal (used for linking portals)
+        Portal lastPortal = null;
 
         // parse the entities, adding each asset to the asset watcher
         Json.Array jsonEntities = document.getArray("Entities");
@@ -69,21 +78,36 @@ public class PeaLoader {
 
           Entity entity = null;
           if (Pea.TYPE.equalsIgnoreCase(type)) {
-            entity = new Pea(peaWorld.dynamicLayer, peaWorld.world);
+            entity = new Pea(peaWorld, peaWorld.world, x, y, a);
           } else if (Block.TYPE.equalsIgnoreCase(type)) {
-            entity = new Block(peaWorld.dynamicLayer, peaWorld.world);
+            entity = new Block(peaWorld, peaWorld.world, x, y, a);
           } else if (BlockRightRamp.TYPE.equalsIgnoreCase(type)) {
-            entity = new BlockRightRamp(peaWorld.dynamicLayer, peaWorld.world);
+            entity = new BlockRightRamp(peaWorld, peaWorld.world, x, y, a);
           } else if (BlockLeftRamp.TYPE.equalsIgnoreCase(type)) {
-            entity = new BlockLeftRamp(peaWorld.dynamicLayer, peaWorld.world);
+            entity = new BlockLeftRamp(peaWorld, peaWorld.world, x, y, a);
           } else if (BlockGel.TYPE.equalsIgnoreCase(type)) {
-            entity = new BlockGel(peaWorld.dynamicLayer, peaWorld.world);
+            entity = new BlockGel(peaWorld, peaWorld.world, x, y, a);
+          } else if (BlockSpring.TYPE.equalsIgnoreCase(type)) {
+            entity = new BlockSpring(peaWorld, peaWorld.world, x, y, a);
+          } else if (Cloud1.TYPE.equalsIgnoreCase(type)) {
+            entity = new Cloud1(peaWorld);
+          } else if (Cloud3.TYPE.equalsIgnoreCase(type)) {
+            entity = new Cloud3(peaWorld);
+          } else if (FakeBlock.TYPE.equalsIgnoreCase(type)) {
+            entity = new FakeBlock(peaWorld, x, y, a);
+          } else if (Portal.TYPE.equalsIgnoreCase(type)) {
+            entity = new Portal(peaWorld, peaWorld.world, x, y, a);
+            if (lastPortal == null) {
+              lastPortal = (Portal) entity;
+            } else {
+              lastPortal.other = (Portal) entity;
+              ((Portal) entity).other = lastPortal;
+              lastPortal = null;
+            }
           }
 
           if (entity != null) {
             assetWatcher.add(entity.getImage());
-            entity.setPos(x, y);
-            entity.setAngle(a);
             peaWorld.add(entity);
           }
         }

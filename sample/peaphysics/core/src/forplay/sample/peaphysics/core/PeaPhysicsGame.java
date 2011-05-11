@@ -15,41 +15,39 @@
  */
 package forplay.sample.peaphysics.core;
 
-import forplay.sample.peaphysics.core.entities.Pea;
+import static forplay.core.ForPlay.assetManager;
+import static forplay.core.ForPlay.graphics;
+import static forplay.core.ForPlay.pointer;
 
 import forplay.core.ForPlay;
-
-import forplay.core.ResourceCallback;
-
-import static forplay.core.ForPlay.*;
-
 import forplay.core.Game;
 import forplay.core.GroupLayer;
 import forplay.core.Image;
 import forplay.core.ImageLayer;
 import forplay.core.Pointer;
+import forplay.core.ResourceCallback;
+import forplay.sample.peaphysics.core.entities.Pea;
 
 public class PeaPhysicsGame implements Game, Pointer.Listener {
+  
   // scale difference between screen space (pixels) and world space (physics).
-  static float physUnitPerScreenUnit = 1 / 26.666667f;
+  public static float physUnitPerScreenUnit = 1 / 26.666667f;
 
-  // main layer that holds the world
-  // note: this gets scaled to world space
+  // main layer that holds the world. note: this gets scaled to world space
   GroupLayer worldLayer;
 
-  // when initialized, this will become non-null
+  // main world
   PeaWorld world = null;
-  
-  float dragStartX, dragStartY;
+  boolean worldLoaded = false;
 
   @Override
   public void init() {
+    // load and show our background image
     Image bgImage = assetManager().getImage("images/bg.png");
     ImageLayer bgLayer = graphics().createImageLayer(bgImage);
     graphics().rootLayer().add(bgLayer);
 
-    pointer().setListener(this);
-
+    // create our world layer (scaled to "world space")
     worldLayer = graphics().createGroupLayer();
     worldLayer.setScale(1f / physUnitPerScreenUnit);
     graphics().rootLayer().add(worldLayer);
@@ -58,6 +56,7 @@ public class PeaPhysicsGame implements Game, Pointer.Listener {
       @Override
       public void done(PeaWorld resource) {
         world = resource;
+        worldLoaded = true;
       }
 
       @Override
@@ -65,47 +64,29 @@ public class PeaPhysicsGame implements Game, Pointer.Listener {
         ForPlay.log().error("Error loading pea world: " + err.getMessage());
       }
     });
+
+    // hook up our pointer listener
+    pointer().setListener(this);
   }
 
   @Override
-  public void onPointerDrag(int x, int y) {
-  }
-
-  @Override
-  public void onPointerEnd(int x, int y) {
-    if (world != null) {
-      Pea pea = new Pea(world.dynamicLayer, world.world);
-      pea.setPos(physUnitPerScreenUnit * x, physUnitPerScreenUnit * y);
-      pea.setLinearVelocity(physUnitPerScreenUnit * (x - dragStartX), physUnitPerScreenUnit * (y - dragStartY));
-      pea.update(0f);
+  public void onPointerStart(int x, int y) {
+    if (worldLoaded) {
+      Pea pea = new Pea(world, world.world, physUnitPerScreenUnit * x, physUnitPerScreenUnit * y, 0);
       world.add(pea);
     }
   }
 
   @Override
-  public void onPointerMove(int x, int y) {
-  }
-
-  @Override
-  public void onPointerStart(int x, int y) {
-    dragStartX = x;
-    dragStartY = y;
-  }
-
-  @Override
-  public void onPointerScroll(int velocity) {
-  }
-
-  @Override
   public void paint(float alpha) {
-    if (world != null) {
+    if (worldLoaded) {
       world.paint(alpha);
     }
   }
 
   @Override
   public void update(float delta) {
-    if (world != null) {
+    if (worldLoaded) {
       world.update(delta);
     }
   }
@@ -113,5 +94,21 @@ public class PeaPhysicsGame implements Game, Pointer.Listener {
   @Override
   public int updateRate() {
     return 25;
+  }
+
+  @Override
+  public void onPointerScroll(int velocity) {
+  }
+  
+  @Override
+  public void onPointerDrag(int x, int y) {
+  }
+
+  @Override
+  public void onPointerEnd(int x, int y) {
+  }
+
+  @Override
+  public void onPointerMove(int x, int y) {
   }
 }
