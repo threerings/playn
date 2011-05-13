@@ -13,14 +13,7 @@
   <packaging>pom</packaging>
   <version>1.0</version>
   <name>Forplay Demos Project</name>
-  <url>http://code.google.com/a/google.com/p/slingshot</url>
   <description>Forplay Demos</description>
-
-  <issueManagement>
-    <system>Google Code</system>
-    <url>http://code.google.com/a/google.com/p/slingshot/issues/list</url>
-  </issueManagement>
-
   <modules>
     <module>hello</module>  
     <module>cute</module>
