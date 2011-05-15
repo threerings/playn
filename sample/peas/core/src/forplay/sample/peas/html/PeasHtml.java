@@ -15,8 +15,9 @@
  */
 package forplay.sample.peas.html;
 
-import forplay.core.ForPlay;
 import forplay.html.HtmlAssetManager;
+
+import forplay.core.ForPlay;
 import forplay.html.HtmlGame;
 import forplay.html.HtmlPlatform;
 import forplay.sample.peas.core.Peas;

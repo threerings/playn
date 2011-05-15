@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The ForPlay Authors
+ * Copyright 2011 The ForPlay Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,21 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package forplay.sample.peas.flash;
+package forplay.sample.peas.core.entities;
 
-import forplay.flash.FlashAssetManager;
+import org.jbox2d.dynamics.Body;
 
-import forplay.core.ForPlay;
-import forplay.flash.FlashGame;
-import forplay.flash.FlashPlatform;
-import forplay.sample.peas.core.Peas;
-
-public class PeasFlash extends FlashGame {
-
-  @Override
-  public void start() {
-    FlashAssetManager assets = FlashPlatform.register().assetManager();
-    assets.setPathPrefix("peaphysicsgame/");
-    ForPlay.run(new Peas());
+public interface PhysicsEntity {
+  
+  public Body getBody();
+  
+  public interface HasContactListener {
+    public void contact(PhysicsEntity other);
   }
 }

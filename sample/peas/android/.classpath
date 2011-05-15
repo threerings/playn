@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/peas"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/forplay"/>
-	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="src" path="forplay-android_src"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/peas"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

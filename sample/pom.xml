@@ -18,6 +18,5 @@
     <module>hello</module>  
     <module>cute</module>
     <module>peas</module>
-    <module>peaphysics</module>
   </modules>
 </project>

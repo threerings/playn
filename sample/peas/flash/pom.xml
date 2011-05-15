@@ -4,14 +4,14 @@
   
   <parent>
     <groupId>forplay</groupId>
-    <artifactId>forplay-peas-project</artifactId>
+    <artifactId>forplay-peaphysics-project</artifactId>
     <version>1.0</version>
   </parent>
 
   <groupId>forplay</groupId>
-  <artifactId>forplay-peas-flash</artifactId>
+  <artifactId>forplay-peaphysics-flash</artifactId>
   <packaging>war</packaging>
-  <name>Forplay Peas Flash</name>
+  <name>Forplay PeaPhysics Flash</name>
 
   <dependencies>
     <dependency>
@@ -29,8 +29,8 @@
   </dependencies>
 
   <properties>
-    <gwt.module>forplay.sample.peas.PeasFlash</gwt.module>
-    <gwt.name>peas</gwt.name>
+    <gwt.module>forplay.sample.peaphysics.PeaPhysicsGameFlash</gwt.module>
+    <gwt.name>peaphysicsflash</gwt.name>
   </properties>
 
   <build>

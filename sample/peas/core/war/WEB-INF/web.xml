@@ -7,14 +7,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	<!-- TODO: Add <servlet> tags for each servlet here. -->
 	<!-- TODO: Add <servlet-mapping> tags for each <servlet> here. -->
 	<!-- TODO: Optionally add a <welcome-file-list> tag to display a welcome file. -->
-
-  <mime-mapping>    
-    <extension>manifest</extension>        
-    <mime-type>text/cache-manifest</mime-type>        
-  </mime-mapping>
-
-  <!-- Default page to serve -->
-  <welcome-file-list>
-    <welcome-file>Peas.html</welcome-file>
-  </welcome-file-list>
+	<welcome-file-list>
+	  <welcome-file>PeaPhysicsGame.html</welcome-file>
+	</welcome-file-list>
 </web-app>

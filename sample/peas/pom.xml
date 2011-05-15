@@ -9,16 +9,15 @@
   </parent>
 
   <groupId>forplay</groupId>
-  <artifactId>forplay-peas-project</artifactId>
+  <artifactId>forplay-peaphysics-project</artifactId>
   <packaging>pom</packaging>
   <version>1.0</version>
-  <name>Forplay Peas Project</name>
-  <description>Forplay Peas Project</description>
-
+  <name>Forplay Pea Physics Project</name>
+  <description>Forplay Pea Physics Project</description>
 
   <modules>
     <module>core</module> 
-    <module>html</module>
+    <module>html</module> 
     <module>flash</module>
   </modules>
 </project>

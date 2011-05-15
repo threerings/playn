@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 The ForPlay Authors
+ * Copyright 2011 The ForPlay Authors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,106 +15,100 @@
  */
 package forplay.sample.peas.core;
 
-import static forplay.core.ForPlay.*;
+import static forplay.core.ForPlay.assetManager;
+import static forplay.core.ForPlay.graphics;
+import static forplay.core.ForPlay.pointer;
 
+import forplay.core.ForPlay;
 import forplay.core.Game;
-import forplay.core.Keyboard;
+import forplay.core.GroupLayer;
+import forplay.core.Image;
+import forplay.core.ImageLayer;
 import forplay.core.Pointer;
-import forplay.sample.peas.core.PeaWorld.Pea;
+import forplay.core.ResourceCallback;
+import forplay.sample.peas.core.entities.Pea;
 
-public class Peas implements Game, Keyboard.Listener, Pointer.Listener {
+public class Peas implements Game, Pointer.Listener {
+  
+  // scale difference between screen space (pixels) and world space (physics).
+  public static float physUnitPerScreenUnit = 1 / 26.666667f;
 
-  private Sky sky;
-  private PeaWorld world;
+  // main layer that holds the world. note: this gets scaled to world space
+  GroupLayer worldLayer;
+
+  // main world
+  PeaWorld world = null;
+  boolean worldLoaded = false;
 
   @Override
   public void init() {
-    keyboard().setListener(this);
-    pointer().setListener(this);
+    // load and show our background image
+    Image bgImage = assetManager().getImage("images/bg.png");
+    ImageLayer bgLayer = graphics().createImageLayer(bgImage);
+    graphics().rootLayer().add(bgLayer);
 
-    graphics().setSize(800, 600);
+    // create our world layer (scaled to "world space")
+    worldLayer = graphics().createGroupLayer();
+    worldLayer.setScale(1f / physUnitPerScreenUnit);
+    graphics().rootLayer().add(worldLayer);
 
-    sky = new Sky(graphics().rootLayer());
-    world = new PeaWorld(graphics().rootLayer());
-    testWorld();
-  }
-
-  private void testWorld() {
-    int[][] tiles = new int[][] {
-        new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        new int[] {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        new int[] {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-        new int[] {1, 0, 0, 0, 2, 5, 0, 0, 0, 0, 1},
-        new int[] {1, 0, 0, 0, 2, 2, 2, 3, 1, 0, 1},
-        new int[] {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        new int[] {1, 0, 0, 3, 0, 0, 0, 0, 1, 0, 1},
-        new int[] {1, 0, 2, 1, 5, 0, 0, 2, 1, 0, 1},
-        new int[] {1, 0, 1, 1, 1, 5, 0, 0, 0, 0, 1},
-        new int[] {1, 0, 1, 1, 1, 0, 0, 0, 1, 2, 1},
-        new int[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
-
-    for (int y = 0; y < 11; ++y) {
-      for (int x = 0; x < 11; ++x) {
-        world.setTileIndex(x, y, tiles[y][x]);
+    PeaLoader.CreateWorld("levels/level1.json", worldLayer, new ResourceCallback<PeaWorld>() {
+      @Override
+      public void done(PeaWorld resource) {
+        world = resource;
+        worldLoaded = true;
       }
-    }
-  }
 
-  @Override
-  public void onPointerEnd(int x, int y) {
-    makePea();
-  }
+      @Override
+      public void error(Throwable err) {
+        ForPlay.log().error("Error loading pea world: " + err.getMessage());
+      }
+    });
 
-  @Override
-  public void onPointerMove(int x, int y) {
+    // hook up our pointer listener
+    pointer().setListener(this);
   }
 
   @Override
   public void onPointerStart(int x, int y) {
+    if (worldLoaded) {
+      Pea pea = new Pea(world, world.world, physUnitPerScreenUnit * x, physUnitPerScreenUnit * y, 0);
+      world.add(pea);
+    }
   }
 
   @Override
-  public void onPointerDrag(int x, int y) {
+  public void paint(float alpha) {
+    if (worldLoaded) {
+      world.paint(alpha);
+    }
+  }
+
+  @Override
+  public void update(float delta) {
+    if (worldLoaded) {
+      world.update(delta);
+    }
+  }
+
+  @Override
+  public int updateRate() {
+    return 25;
   }
 
   @Override
   public void onPointerScroll(int velocity) {
   }
-
+  
   @Override
-  public void onKeyDown(int buttonCode) {
-    if (buttonCode == 27) {
-      makePea();
-    }
+  public void onPointerDrag(int x, int y) {
   }
 
   @Override
-  public void onKeyUp(int buttonCode) {
+  public void onPointerEnd(int x, int y) {
   }
 
   @Override
-  public void update(float delta) {
-    float deltaS = (float) (delta / 1000);
-    sky.update(deltaS);
-    world.update(deltaS);
-  }
-
-  @Override
-  public void paint(float alpha) {
-    // Only the world needs to be painted. Everything else is layer-based.
-    world.paint();
-  }
-
-  private void makePea() {
-    Pea p = world.addPea(0, 0);
-    p.x = random() * 700; p.y = 0;
-    p.vx = random() * 200 - 100; p.vy = 0;
-    p.ax = p.ay = 0;
-    p.update(0);
-  }
-
-  @Override
-  public int updateRate() {
-    return 33;
+  public void onPointerMove(int x, int y) {
   }
 }

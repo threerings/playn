@@ -4,12 +4,12 @@
   
   <parent>
     <groupId>forplay</groupId>
-    <artifactId>forplay-peas-project</artifactId>
+    <artifactId>forplay-peaphysics-project</artifactId>
     <version>1.0</version>
   </parent>
 
   <groupId>forplay</groupId>
-  <artifactId>forplay-peas-core</artifactId>
+  <artifactId>forplay-peaphysics-core</artifactId>
   <name>Forplay Peas Core</name>
 
   <dependencies>

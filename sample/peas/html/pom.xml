@@ -4,14 +4,14 @@
   
   <parent>
     <groupId>forplay</groupId>
-    <artifactId>forplay-peas-project</artifactId>
+    <artifactId>forplay-peaphysics-project</artifactId>
     <version>1.0</version>
   </parent>
 
   <groupId>forplay</groupId>
-  <artifactId>forplay-peas-html</artifactId>
+  <artifactId>forplay-peaphysics-html</artifactId>
   <packaging>war</packaging>
-  <name>Forplay Peas Html</name>
+  <name>Forplay PeaPhysics Html</name>
 
   <dependencies>
     <dependency>
@@ -29,10 +29,10 @@
   </dependencies>
 
   <properties>
-    <gwt.module>forplay.sample.peas.Peas</gwt.module>
+    <gwt.module>forplay.sample.peaphysics.PeaPhysicsGame</gwt.module>
     <gwt.version>2.3.0</gwt.version>
 
-    <gwt.name>peas</gwt.name>
+    <gwt.name>peaphysics</gwt.name>
   </properties>
 
   <build>
