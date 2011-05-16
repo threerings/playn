@@ -29,10 +29,10 @@
   </dependencies>
 
   <properties>
-    <gwt.module>forplay.sample.peaphysics.PeaPhysicsGame</gwt.module>
+    <gwt.module>forplay.sample.peas.Peas</gwt.module>
     <gwt.version>2.3.0</gwt.version>
 
-    <gwt.name>peaphysics</gwt.name>
+    <gwt.name>peas</gwt.name>
   </properties>
 
   <build>

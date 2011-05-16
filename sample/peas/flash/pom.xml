@@ -29,8 +29,8 @@
   </dependencies>
 
   <properties>
-    <gwt.module>forplay.sample.peaphysics.PeaPhysicsGameFlash</gwt.module>
-    <gwt.name>peaphysicsflash</gwt.name>
+    <gwt.module>forplay.sample.peas.PeasFlash</gwt.module>
+    <gwt.name>peasflash</gwt.name>
   </properties>
 
   <build>
