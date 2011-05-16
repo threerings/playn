@@ -13,21 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package forplay.sample.peas.flash;
+package forplay.sample.hello.android;
 
-import forplay.flash.FlashAssetManager;
-
+import android.os.Bundle;
+import forplay.android.GameActivity;
 import forplay.core.ForPlay;
-import forplay.flash.FlashGame;
-import forplay.flash.FlashPlatform;
-import forplay.sample.peas.core.Peas;
+import forplay.sample.hello.core.HelloGame;
 
-public class PeasFlash extends FlashGame {
+public class HelloGameActivity extends GameActivity {
 
   @Override
-  public void start() {
-    FlashAssetManager assets = FlashPlatform.register().assetManager();
-    assets.setPathPrefix("peas/");
-    ForPlay.run(new Peas());
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    ForPlay.run(new HelloGame());
   }
 }

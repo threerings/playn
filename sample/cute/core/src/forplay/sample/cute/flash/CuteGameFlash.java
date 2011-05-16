@@ -13,21 +13,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package forplay.sample.peas.flash;
-
-import forplay.flash.FlashAssetManager;
+package forplay.sample.cute.flash;
 
 import forplay.core.ForPlay;
+import forplay.flash.FlashAssetManager;
 import forplay.flash.FlashGame;
 import forplay.flash.FlashPlatform;
-import forplay.sample.peas.core.Peas;
+import forplay.sample.cute.core.CuteGame;
 
-public class PeasFlash extends FlashGame {
+public class CuteGameFlash extends FlashGame {
 
   @Override
   public void start() {
     FlashAssetManager assets = FlashPlatform.register().assetManager();
-    assets.setPathPrefix("peas/");
-    ForPlay.run(new Peas());
+    assets.setPathPrefix("cute/");
+    ForPlay.run(new CuteGame());
   }
 }

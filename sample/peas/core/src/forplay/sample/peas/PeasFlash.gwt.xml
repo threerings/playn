@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
 -->
-<module rename-to='peas'>
-  <inherits name='com.google.gwt.user.User' />
+<module rename-to='peasflash'>
   <inherits name='forplay.ForPlayFlash'/>
 
-  <!-- switch on Flash compiler -->
-  <inherits name='com.google.gwt.jas.Jas' /> 
-
   <source path='core'/>
-  <source path='html'/>
   <source path='flash'/>
 
-  <entry-point class='forplay.sample.peas.flash.PeasFlash'/>
-
   <public path="resources" />
+
+  <entry-point class='forplay.sample.peas.flash.PeasFlash'/>
 </module>

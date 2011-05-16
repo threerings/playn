@@ -14,14 +14,12 @@
  * limitations under the License. 
 -->
 <module rename-to='peas'>
-  <inherits name='com.google.gwt.user.User' />
   <inherits name='forplay.ForPlay' />
-  <!-- <inherits name='forplay.ForPlayFlash'/> -->
 
   <source path='core'/>
   <source path='html'/>
 
-  <entry-point class='forplay.sample.peas.html.PeasHtml'/>
-
   <public path="resources" />
+
+  <entry-point class='forplay.sample.peas.html.PeasHtml'/>
 </module>

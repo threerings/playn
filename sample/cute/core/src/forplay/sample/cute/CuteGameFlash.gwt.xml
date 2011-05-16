@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
 -->
-<!DOCTYPE html>
-<html manifest="cutegame/appcache.nocache.manifest">
-  <head>
-    <title>Peas</title>
-  </head>
-  <body bgcolor='black'>
-    <script src="peas/peas.nocache.js"></script>
-  </body>
-</html>
+<module rename-to='cutegameflash'>
+  <inherits name='forplay.ForPlayFlash'/>
+
+  <source path='core'/>
+  <source path='flash'/>
+
+  <public path="resources" />
+
+  <entry-point class='forplay.sample.cute.flash.CuteGameFlash'/>
+</module>
