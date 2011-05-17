@@ -15,6 +15,9 @@
  */
 package forplay.sample.hello.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static forplay.core.ForPlay.*;
 
 import forplay.core.Game;
@@ -24,29 +27,25 @@ import forplay.core.ImageLayer;
 import forplay.core.Pointer;
 
 public class HelloGame implements Game, Pointer.Listener {
-  // scale difference between screen space (pixels) and world space (physics).
-  static float physUnitPerScreenUnit = 1 / 40f;
-
-  // main layer that holds the world
-  // note: this gets scaled to world space
-  GroupLayer worldLayer;
-
-  float dragStartX, dragStartY;
-  PeaWorld world;
+  GroupLayer peaLayer;
+  List<Pea> peas = new ArrayList<Pea>(0);
 
   @Override
   public void init() {
+    // create and add background image layer
     Image bgImage = assetManager().getImage("images/bg.png");
     ImageLayer bgLayer = graphics().createImageLayer(bgImage);
     graphics().rootLayer().add(bgLayer);
 
+    // create a group layer to hold the peas
+    peaLayer = graphics().createGroupLayer();
+    graphics().rootLayer().add(peaLayer);
+
+    // preload the pea image into the asset manager cache
+    assetManager().getImage(Pea.IMAGE);
+
+    // add a listener for pointer (mouse, touch) input
     pointer().setListener(this);
-
-    worldLayer = graphics().createGroupLayer();
-    worldLayer.setScale(1f / physUnitPerScreenUnit);
-    graphics().rootLayer().add(worldLayer);
-
-    world = new PeaWorld(worldLayer);
   }
 
   @Override
@@ -55,10 +54,8 @@ public class HelloGame implements Game, Pointer.Listener {
 
   @Override
   public void onPointerEnd(int x, int y) {
-    Pea pea = world.addPea();
-    pea.setPos(physUnitPerScreenUnit * x, physUnitPerScreenUnit * y);
-    pea.setVel(physUnitPerScreenUnit * (x - dragStartX), physUnitPerScreenUnit * (y - dragStartY));
-    pea.update(0f);
+    Pea pea = new Pea(peaLayer, x, y);
+    peas.add(pea);
   }
 
   @Override
@@ -67,8 +64,6 @@ public class HelloGame implements Game, Pointer.Listener {
 
   @Override
   public void onPointerStart(int x, int y) {
-    dragStartX = x;
-    dragStartY = y;
   }
 
   @Override
@@ -77,12 +72,16 @@ public class HelloGame implements Game, Pointer.Listener {
 
   @Override
   public void paint(float alpha) {
-    world.paint(alpha);
+    // layers automatically paint themselves (and their children). The rootlayer
+    // will paint itself, the background, and the pea group layer automatically
+    // so no need to do anything here!
   }
 
   @Override
   public void update(float delta) {
-    world.update(delta);
+    for (Pea pea : peas) {
+      pea.update(delta);
+    }
   }
 
   @Override
