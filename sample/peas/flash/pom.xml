@@ -46,11 +46,57 @@
         </configuration>
       </plugin>
 
+      <!-- download and unpack flex4sdk -->
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <version>2.2</version>
+         <executions>
+           <execution>
+             <id>unpack</id>
+             <phase>validate</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>com.adobe.flex</groupId>
+                   <artifactId>flex-sdk</artifactId>
+                   <version>4.1.0.16076_mpl</version>
+                   <type>zip</type>
+                   <overWrite>false</overWrite>
+                   <outputDirectory>${project.build.directory}/flex4sdk</outputDirectory>
+                 </artifactItem>
+               </artifactItems>
+             </configuration>
+           </execution>
+         </executions>
+       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <!-- Dependency plugin discards file permissions so we need to set them back manually -->
+                <chmod file="${project.build.directory}/flex4sdk/bin/mxmlc" perm="ugo+rx"/>
+	     </tasks>
+            </configuration>
+          </execution> 
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
 	<configuration>
-	  <extraJvmArg>-Dflexsdk.home=${env.HOME}/flex4sdk</extraJvmArg>
+	  <extraJvmArgs>-Dflexsdk.home=${project.build.directory}/flex4sdk</extraJvmArgs>
 	</configuration>
       </plugin>
 
