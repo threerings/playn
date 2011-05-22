@@ -70,7 +70,7 @@ public class Peas implements Game, Pointer.Listener {
   }
 
   @Override
-  public void onPointerStart(int x, int y) {
+  public void onPointerStart(float x, float y) {
     if (worldLoaded) {
       Pea pea = new Pea(world, world.world, physUnitPerScreenUnit * x, physUnitPerScreenUnit * y, 0);
       world.add(pea);
@@ -95,20 +95,12 @@ public class Peas implements Game, Pointer.Listener {
   public int updateRate() {
     return 25;
   }
-
-  @Override
-  public void onPointerScroll(int velocity) {
-  }
   
   @Override
-  public void onPointerDrag(int x, int y) {
+  public void onPointerDrag(float x, float y) {
   }
 
   @Override
-  public void onPointerEnd(int x, int y) {
-  }
-
-  @Override
-  public void onPointerMove(int x, int y) {
+  public void onPointerEnd(float x, float y) {
   }
 }

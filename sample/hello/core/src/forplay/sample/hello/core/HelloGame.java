@@ -18,6 +18,10 @@ package forplay.sample.hello.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import forplay.core.ForPlay;
+
+import forplay.core.Mouse;
+
 import static forplay.core.ForPlay.*;
 
 import forplay.core.Game;
@@ -49,25 +53,17 @@ public class HelloGame implements Game, Pointer.Listener {
   }
 
   @Override
-  public void onPointerDrag(int x, int y) {
+  public void onPointerDrag(float x, float y) {
   }
 
   @Override
-  public void onPointerEnd(int x, int y) {
+  public void onPointerEnd(float x, float y) {
     Pea pea = new Pea(peaLayer, x, y);
     peas.add(pea);
   }
 
   @Override
-  public void onPointerMove(int x, int y) {
-  }
-
-  @Override
-  public void onPointerStart(int x, int y) {
-  }
-
-  @Override
-  public void onPointerScroll(int velocity) {
+  public void onPointerStart(float x, float y) {
   }
 
   @Override
