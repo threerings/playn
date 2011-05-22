@@ -116,28 +116,18 @@ public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
   }
 
   @Override
-  public void onPointerEnd(int x, int y) {
+  public void onPointerEnd(float x, float y) {
     touchVectorX = touchVectorY = 0;
   }
 
   @Override
-  public void onPointerDrag(int x, int y) {
+  public void onPointerDrag(float x, float y) {
     touchMove(x, y);
   }
 
   @Override
-  public void onPointerStart(int x, int y) {
+  public void onPointerStart(float x, float y) {
     touchMove(x, y);
-  }
-
-  @Override
-  public void onPointerMove(int x, int y) {
-    // ignore
-  }
-
-  @Override
-  public void onPointerScroll(int velocity) {
-    // ignore
   }
 
   @Override
