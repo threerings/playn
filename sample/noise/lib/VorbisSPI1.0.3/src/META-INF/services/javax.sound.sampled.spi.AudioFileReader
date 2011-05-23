@@ -1,0 +1,2 @@
+# for the vorbis decoder
+javazoom.spi.vorbis.sampled.file.VorbisAudioFileReader

@@ -1,0 +1,143 @@
+ MP3SPI 1.9.4
+ JavaZOOM 1999-2005
+
+ Project Homepage :
+   http://www.javazoom.net/mp3spi/mp3spi.html 
+
+ JAVA and MP3 online Forums :
+   http://www.javazoom.net/services/forums/index.jsp
+-----------------------------------------------------
+
+11/04/2005: MP3SPI 1.9.4
+------------------------
+- RIFF/MP3 header support added.
+- FLAC and MAC headers denied.
+- Skip bug fixed for 320kbps files.
+- ID3v2.x support improved :
+   + size computation bug fixed.
+   + "mp3.id3tag.publisher" (TPUB/TPB) added.
+   + "mp3.id3tag.orchestra" (TPE2/TP2) added.
+   + "mp3.id3tag.length" (TLEN/TLE) added.
+- Mark limit increased.
+
+
+08/15/2005: MP3SPI 1.9.3
+------------------------
+- ID3v2.x support improved.
+- ISO-8859-1 support improved for Icecast meta-data.
+
+
+01/03/2005: MP3SPI 1.9.2
+------------------------
+- ID3v2.x support improved :
+   + "mp3.id3tag.composer" property added.
+   + "mp3.id3tag.grouping" property added.
+   + "mp3.id3tag.disc" property added.
+   + "mp3.id3tag.encoded" property added.
+   + "mp3.id3tag.v2.version" property added.
+      '2' means ID3v2.2, '3' means ID3v2.3, '4' means ID3v2.4.
+   + ID3v1 "year" property moved to "date" property.
+   + ID3v2.2 support added.
+   + ID3v2.4 TDRC support added for "date" property.
+- String encoding bug fix in chopSubstring method.
+- Optional "mp3spi.weak" System property added to skip some audio controls.
+- J2SE 1.5 support.
+- JLayer 1.0 included :
+  Changes are :
+    + VBRI frame header (Fraunhofer VBR) support added.
+    + Frame controls improved. It fixes ArrayIndexOutOfBound bugs.
+    + CPU usage < 1%, RAM usage < 12MB under P4/2Ghz under JRE 1.5.0.
+- Tritonus library updated.
+  It fixes the 3h22m52s stream closing bug.
+
+
+05/03/2004: MP3SPI 1.9.1
+------------------------
+ - Shoutcast stream meta-data (title, url) added. See DecodedMpegAudioInputStream :
+     mp3.shoutcast.metadata.key [String], Shoutcast meta key with matching value. 
+     For instance : 
+      mp3.shoutcast.metadata.StreamTitle=Current song playing in stream. 
+      mp3.shoutcast.metadata.StreamUrl=Url info.
+
+ - Icecast 2.0 icy-metaint support added.
+
+
+04/05/2004: MP3SPI 1.9
+----------------------
+ - Shoutcast ICY meta-data support added.
+   (jicylib classes included).
+ - ID3v1 support added.
+ - Audio parameters could be read through AudioFileFormat.properties() and 
+   AudioFormat.properties(). Here are all audio parameters provided by MP3 SPI : 
+     AudioFormat parameters  :
+     ~~~~~~~~~~~~~~~~~~~~~~
+     - bitrate : [Integer], bitrate in bits per seconds, average bitrate for VBR enabled stream.
+     - vbr : [Boolean], VBR flag
+
+     AudioFileFormat parameters :
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     + Standard parameters :
+       - duration : [Long], duration in microseconds. 
+       - title : [String], Title of the stream. 
+       - author : [String], Name of the artist of the stream. 
+       - album : [String], Name of the album of the stream. 
+       - date : [String], The date (year) of the recording or release of the stream. 
+       - copyright : [String], Copyright message of the stream. 
+       - comment : [String], Comment of the stream.
+
+     + Extended MP3 parameters :
+       - mp3.version.mpeg : [String], mpeg version : 1,2 or 2.5 
+       - mp3.version.layer : [String], layer version 1, 2 or 3 
+       - mp3.version.encoding : [String], mpeg encoding : MPEG1, MPEG2-LSF, MPEG2.5-LSF 
+       - mp3.channels : [Integer], number of channels 1 : mono, 2 : stereo. 
+       - mp3.frequency.hz : [Integer], sampling rate in hz. 
+       - mp3.bitrate.nominal.bps : [Integer], nominal bitrate in bps. 
+       - mp3.length.bytes : [Integer], length in bytes. 
+       - mp3.length.frames : [Integer], length in frames. 
+       - mp3.framesize.bytes : [Integer], framesize of the first frame. 
+                                          framesize is not constant for VBR streams. 
+       - mp3.framerate.fps : [Float], framerate in frames per seconds. 
+       - mp3.header.pos : [Integer], position of first audio header (or ID3v2 size). 
+       - mp3.vbr : [Boolean], vbr flag. 
+       - mp3.vbr.scale : [Integer], vbr scale. 
+       - mp3.crc : [Boolean], crc flag. 
+       - mp3.original : [Boolean], original flag. 
+       - mp3.copyright : [Boolean], copyright flag. 
+       - mp3.padding : [Boolean], padding flag. 
+       - mp3.mode : [Integer], mode 0:STEREO 1:JOINT_STEREO 2:DUAL_CHANNEL 3:SINGLE_CHANNEL 
+       - mp3.id3tag.genre : [String], ID3 tag (v1 or v2) genre. 
+       - mp3.id3tag.track : [String], ID3 tag (v1 or v2) track info. 
+       - mp3.id3tagv2 : [InputStream], ID3v2 frames. 
+       - mp3.shoutcast.metadata.key : [String], Shoutcast meta key with matching value. 
+           For instance : 
+            mp3.shoutcast.metadata.icy-irc=#shoutcast 
+            mp3.shoutcast.metadata.icy-metaint=8192 
+            mp3.shoutcast.metadata.icy-genre=Trance Techno Dance 
+            mp3.shoutcast.metadata.icy-url=http://www.di.fm 
+           and so on ... 
+
+     DecodedMpegAudioInputStream parameters :
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     - mp3.frame : [Long], current frame position. 
+     - mp3.frame.bitrate : [Integer], bitrate of the current frame. 
+     - mp3.frame.size.bytes : [Integer], size in bytes of the current frame. 
+     - mp3.position.byte : [Long], current position in bytes in the stream. 
+     - mp3.position.microseconds : [Long], elapsed microseconds. 
+     - mp3.equalizer : float[32], interactive equalizer array, 
+                                values could be in [-1.0, +1.0]. 
+
+
+02/01/2004: MP3SPI 1.8
+----------------------
+ Initial official release. It targets J2SE 1.3 and J2SE 1.4.
+
+ It includes a workaround to get audio properties (duration, title, author, bitrate, 
+ vbr, ...) that will be available in JDK 1.5. It provides "static" MP3 format properties
+ such as (mp3.version.mpeg, mp3.version.layer, mp3.id3tagv2, ...). The mp3.id3tagv2
+ property allows to get all ID3v2 frames. MP3SPI also provides "dynamic" MP3 properties
+ for each frame played such as (mp3.frame , mp3.frame.bitrate, mp3.frame.size.bytes, 
+ mp3.equalizer, ...). The mp3.equalizer property allows to have equalizer feature.
+
+Notes :
+-----
+ MP3SPI needs JLayer and Tritonus libraries to work.

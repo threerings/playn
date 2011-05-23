@@ -1,0 +1,113 @@
+<project name="mp3spi" default="usage" basedir=".">
+
+  <!-- Initializations -->
+  <target name="init">    
+    <echo message="----------------------------------------------------------"/>  
+    <echo message="------------        BUILDING MP3SPI PACKAGE     ----------"/>
+    <echo message=""/>
+    <property name="year" value="1999-2005"/>
+    <property name="jars" value="${basedir}"/>
+    <property name="sources" value="${basedir}/src"/>
+    <property name="classes" value="${basedir}/classes"/>
+    <property name="lib" value="${basedir}/lib"/>
+    <property name="tritonuslib" value="${lib}/tritonus_share.jar"/>
+    <property name="javalayerlib" value="${lib}/jl1.0.jar"/>
+    <property name="mp3spilib" value="${jars}/mp3spi1.9.4.jar"/>
+    <property name="api" value="${basedir}/doc"/>    
+    <property name="sourcestest" value="${basedir}/srctest"/>
+    <property name="classestest" value="${basedir}/classestest"/>
+    <mkdir dir="${classestest}"/>
+    <mkdir dir="${classes}"/>
+    <mkdir dir="${api}"/>    
+  </target>
+
+  <!-- Build -->
+  <target name="build" depends="init">
+    <echo message="------ Compiling application"/>
+    <javac srcdir="${sources}" destdir="${classes}" includes="**">
+          <classpath>
+            <pathelement location="${classes}"/>
+            <pathelement location="${tritonuslib}"/>
+            <pathelement location="${javalayerlib}"/>
+      </classpath>
+    </javac>
+    <copy todir="${classes}">
+       <fileset dir="${sources}" >
+           <include name="META-INF/services/javax.sound.sampled.spi.AudioFileReader"/>
+           <include name="META-INF/services/javax.sound.sampled.spi.FormatConversionProvider"/>
+       </fileset>
+     </copy>
+  </target>
+
+  <!-- Archive -->
+  <target name="dist" depends="build">
+    <echo message="------ Building Jar file"/>
+    <jar jarfile="${mp3spilib}" basedir="${classes}">
+          <manifest>
+            <attribute name="Created-By" value="JavaZOOM" />
+          </manifest>    
+    </jar>
+  </target>
+
+  <!-- JavaDoc -->
+  <target name="all" depends="dist">
+     <echo message="------ Running JavaDoc"/>
+     <javadoc packagenames="javazoom.*"
+              sourcepath="${sources}"
+              destdir="${api}"
+              bottom="JavaZOOM ${year}"
+              author="false">
+      <classpath>
+        <pathelement location="${classes}"/>
+        <pathelement location="${tritonuslib}"/>
+        <pathelement location="${javalayerlib}"/>
+      </classpath>
+     </javadoc>
+  </target>
+
+
+  <!-- BuildTest -->
+  <target name="buildtest" depends="init,dist">
+    <echo message="------ Compiling application"/>
+    <javac srcdir="${sourcestest}" destdir="${classestest}" includes="**">
+          <classpath>
+            <pathelement location="${classestest}"/>
+            <pathelement location="${junitlib}"/>
+            <pathelement location="${mp3spilib}"/>
+            <pathelement location="${tritonuslib}"/>
+      </classpath>
+    </javac>
+    <copy todir="${classestest}">
+       <fileset dir="${sourcestest}" >
+           <include name="test.mp3.properties"/>
+       </fileset>
+     </copy>
+  </target>
+
+  <target name="test" depends="buildtest">
+    <junit printsummary="yes">
+      <formatter type="plain"/>
+      <classpath>
+        <pathelement location="${classestest}"/>
+        <pathelement location="${mp3spilib}"/>
+        <pathelement location="${tritonuslib}"/>
+        <pathelement location="${javalayerlib}"/>
+      </classpath>
+      <test name="AllSPITests" outfile="junit-result"/>
+    </junit>
+  </target>
+
+  <!-- Usage -->
+  <target name="usage">
+     <echo message="*** MP3SPI ANT build script ***"/>
+     <echo message="Usage : "/>
+     <echo message="   ant [target]"/>
+     <echo message=""/>     
+     <echo message="   target : "/>     
+     <echo message="            build : Build Application"/>     
+     <echo message="            dist  : Build Application + Archive (JAR)"/>     
+     <echo message="            all   : Build Application + Archive + JavaDoc"/>       
+     <echo message="            test  : Run jUnit tests"/>       
+  </target>
+       
+</project>
