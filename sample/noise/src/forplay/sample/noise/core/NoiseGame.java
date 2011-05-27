@@ -31,6 +31,7 @@ public class NoiseGame implements Game {
       // - Java Platform will search for freesoundproject_28917__junggle__btn107.wav
       // - HTML Platform will search for freesoundproject_28917__junggle__btn107.mp3
       sounds[i] = ForPlay.assetManager().getSound("freesoundproject_28917__junggle__btn107");
+      sounds[i].setVolume(.8f);
     }
 
     bgSound = ForPlay.assetManager().getSound("freesoundproject_12742__Leady__reverse_fill_effect");
@@ -43,18 +44,9 @@ public class NoiseGame implements Game {
     count++;
 
     // ForPlay.log().info("update(" + count + ")");
-    if (count < 3) {
+    if (count <= 3) {
       playSound(count % sounds.length);
-    } else {
-      try {
-        int i = 0;
-        playSound(i);
-      } catch (Throwable e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
     }
-    // sound.stop();
   }
 
   private void playSound(int idx) {
