@@ -8,7 +8,7 @@
     <version>1.0</version>
   </parent>
 
-  <groupId>forplays</groupId>
+  <groupId>forplay</groupId>
   <artifactId>forplay-hello-core</artifactId>
   <name>Forplay Hello Core</name>
 

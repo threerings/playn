@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project name="cute" default="compile">
+  <property name="java.classname" value="forplay.sample.cute.java.CuteGameJava"/>
+  <property name="html.classname" value="forplay.sample.cute.CuteGame"/>
+  <property name="html.index" value="CuteGame.html"/>
+  <import file="../../build-common.xml"/>
+</project>

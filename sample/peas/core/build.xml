@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project name="peas" default="compile">
+  <property name="java.classname" value="forplay.sample.peas.java.PeasJava"/>
+  <property name="html.classname" value="forplay.sample.peas.Peas"/>
+  <property name="html.index" value="Peas.html"/>
+  <import file="../../build-common.xml"/>
+</project>

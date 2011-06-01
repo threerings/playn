@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project name="hello" default="compile">
+  <property name="java.classname" value="forplay.sample.hello.java.HelloGameJava"/>
+  <property name="html.classname" value="forplay.sample.hello.HelloGame"/>
+  <property name="html.index" value="HelloGame.html"/>
+  <import file="../../build-common.xml"/>
+</project>
