@@ -70,10 +70,10 @@ public abstract class Entity {
    */
   public abstract void initPostLoad(final PeaWorld peaWorld);
 
-  public void paint(@SuppressWarnings("unused") float alpha) {
+  public void paint(float alpha) {
   }
 
-  public void update(@SuppressWarnings("unused") float delta) {
+  public void update(float delta) {
   }
 
   public void setPos(float x, float y) {

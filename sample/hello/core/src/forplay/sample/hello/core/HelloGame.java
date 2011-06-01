@@ -18,10 +18,6 @@ package forplay.sample.hello.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import forplay.core.ForPlay;
-
-import forplay.core.Mouse;
-
 import static forplay.core.ForPlay.*;
 
 import forplay.core.Game;
