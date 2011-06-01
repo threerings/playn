@@ -16,6 +16,12 @@
 <module rename-to='cutegame'>
   <inherits name='forplay.ForPlay'/>
 
+  <!--
+    Optionally, enable gwt-log's advanced logging features:
+    
+      <inherits name="forplay.logging.Enhanced" />
+  -->
+
   <source path='core'/>
   <source path='html'/>
 
