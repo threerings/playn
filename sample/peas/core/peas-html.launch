@@ -15,7 +15,7 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="com.google.gwt.eclipse.core.moduleClasspathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.google.gwt.dev.DevMode"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-remoteUI &quot;${gwt_remote_ui_server_port}:${unique_id}&quot; -startupUrl Peas.html -logLevel INFO -codeServerPort 9997 -port 8888 -war &quot;${project_loc:/peas}/war&quot; forplay.sample.peas.PeasFlash forplay.sample.peas.Peas"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-server com.google.appengine.tools.development.gwt.AppEngineLauncher -remoteUI &quot;${gwt_remote_ui_server_port}:${unique_id}&quot; -startupUrl Peas.html -logLevel INFO -codeServerPort 9997 -port 8888 -war &quot;${project_loc:/peas}/war&quot; forplay.sample.peas.PeasFlash forplay.sample.peas.Peas"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="peas"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m -XstartOnFirstThread"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-javaagent:/opt/appengine-java-sdk-1.5.0.1/lib/agent/appengine-agent.jar -Xmx512m -XstartOnFirstThread -Xbootclasspath/p:/opt/appengine-java-sdk-1.5.0.1/lib/override/appengine-dev-jdk-overrides.jar"/>
 </launchConfiguration>
