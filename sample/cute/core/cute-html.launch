@@ -15,7 +15,7 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="com.google.gwt.eclipse.core.moduleClasspathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.google.gwt.dev.DevMode"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-startupUrl CuteGame.html -war &quot;${project_loc:/cute}/war&quot; -remoteUI &quot;${gwt_remote_ui_server_port}:${unique_id}&quot; -logLevel INFO -codeServerPort 9997 -port 8888 forplay.sample.cute.CuteGame forplay.sample.cute.CuteGameFlash"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-server com.google.appengine.tools.development.gwt.AppEngineLauncher -startupUrl CuteGame.html -war &quot;${project_loc:/cute}/war&quot; -remoteUI &quot;${gwt_remote_ui_server_port}:${unique_id}&quot; -logLevel INFO -codeServerPort 9997 -port 8888 forplay.sample.cute.CuteGame forplay.sample.cute.CuteGameFlash"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="cute"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XstartOnFirstThread -Xmx512m"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-javaagent:/opt/appengine-java-sdk-1.5.0.1/lib/agent/appengine-agent.jar -XstartOnFirstThread -Xmx512m -Xbootclasspath/p:/opt/appengine-java-sdk-1.5.0.1/lib/override/appengine-dev-jdk-overrides.jar"/>
 </launchConfiguration>

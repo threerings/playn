@@ -41,6 +41,8 @@ public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
 
   @Override
   public void init() {
+    graphics().setSize(800, 600);
+
     gameLayer = graphics().createSurfaceLayer(graphics().width(), graphics().height());
     graphics().rootLayer().add(gameLayer);
 
@@ -101,14 +103,14 @@ public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
   }
 
   private void initStuff() {
-    catGirl = new CuteObject(assetManager().getImage("images/Character Cat Girl.png"));
+    catGirl = new CuteObject(assetManager().getImage("images/character_cat_girl.png"));
     catGirl.setPos(2, 2, 1);
     catGirl.r = 0.3;
     world.addObject(catGirl);
 
     stars = new CuteObject[NUM_STARS];
     for (int i = 0; i < NUM_STARS; ++i) {
-      stars[i] = new CuteObject(assetManager().getImage("images/Star.png"));
+      stars[i] = new CuteObject(assetManager().getImage("images/star.png"));
       stars[i].setPos(Math.random() * world.worldWidth(), Math.random()
           * world.worldHeight(), 10);
       world.addObject(stars[i]);
@@ -230,19 +232,20 @@ public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
     }
 
     catGirl.setAcceleration(0, 0, 0);
+
     if (catGirl.isResting()) {
       // Keyboard control.
       if (controlLeft) {
-        catGirl.ax -= 0.01;
+        catGirl.ax = -1.0;
       }
       if (controlRight) {
-        catGirl.ax += 0.01;
+        catGirl.ax = 1.0;
       }
       if (controlUp) {
-        catGirl.ay -= 0.01;
+        catGirl.ay = -1.0;
       }
       if (controlDown) {
-        catGirl.ay += 0.01;
+        catGirl.ay = 1.0;
       }
 
       // Mouse Control.
@@ -251,32 +254,33 @@ public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
 
       // Jump Control.
       if (controlJump) {
-        catGirl.az = 0.2;
+        catGirl.vz = 0.2;
         controlJump = false;
       }
     }
 
-    world.setViewOrigin(catGirl.x, catGirl.y, catGirl.z);
     world.updatePhysics(delta / 1000);
   }
 
   @Override
-  public void paint(float delta) {
+  public void paint(float alpha) {
     if (world == null) {
       return;
     }
 
+    world.setViewOrigin(catGirl.x(alpha), catGirl.y(alpha), catGirl.z(alpha));
+
     Surface surface = gameLayer.surface();
     surface.clear();
-    world.paint(surface);
+    world.paint(surface, alpha);
   }
 
   private void touchMove(float x, float y) {
     float cx = graphics().screenWidth() / 2;
     float cy = graphics().screenHeight() / 2;
 
-    touchVectorX = (x - cx) * 0.01f / cx;
-    touchVectorY = (y - cy) * 0.01f / cy;
+    touchVectorX = (x - cx) * 1.0f / cx;
+    touchVectorY = (y - cy) * 1.0f / cy;
   }
 
   private void addTile(int x, int y, int type) {
@@ -322,6 +326,6 @@ public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
 
   @Override
   public int updateRate() {
-    return 0;
+    return 33;
   }
 }

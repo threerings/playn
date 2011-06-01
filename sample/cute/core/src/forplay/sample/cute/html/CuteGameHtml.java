@@ -16,6 +16,7 @@
 package forplay.sample.cute.html;
 
 import forplay.core.ForPlay;
+import forplay.html.HtmlAssetManager;
 import forplay.html.HtmlGame;
 import forplay.html.HtmlPlatform;
 import forplay.sample.cute.core.CuteGame;
@@ -24,7 +25,8 @@ public class CuteGameHtml extends HtmlGame {
 
   @Override
   public void start() {
-    HtmlPlatform.register();
+    HtmlAssetManager assets = HtmlPlatform.register().assetManager();
+    assets.setPathPrefix("cutegame/");
     ForPlay.run(new CuteGame());
   }
 }

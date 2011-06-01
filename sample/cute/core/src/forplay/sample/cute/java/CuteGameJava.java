@@ -16,13 +16,15 @@
 package forplay.sample.cute.java;
 
 import forplay.core.ForPlay;
+import forplay.java.JavaAssetManager;
 import forplay.java.JavaPlatform;
 import forplay.sample.cute.core.CuteGame;
 
 public class CuteGameJava {
 
   public static void main(String[] args) {
-    JavaPlatform.register();
+    JavaAssetManager assets = JavaPlatform.register().assetManager();
+    assets.setPathPrefix("src/forplay/sample/cute/resources");
     ForPlay.run(new CuteGame());
   }
 }

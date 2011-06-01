@@ -17,7 +17,6 @@ package forplay.sample.cute.core;
 
 import static forplay.core.ForPlay.*;
 
-import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
 import forplay.core.Image;
@@ -38,19 +37,19 @@ public class CuteWorld {
     }
   }
 
-  private static final String[] tileNames = new String[] { "Brown Block",
-      "Dirt Block", "Grass Block", "Plain Block", "Stone Block", "Wall Block",
-      "Water Block", "Wood Block",
+  private static final String[] tileNames = new String[] { "block_brown",
+      "block_dirt", "block_grass", "block_plain", "block_stone", "block_wall",
+      "block_water", "block_wood",
 
-      "Ramp North", "Ramp East", "Ramp South", "Ramp West",
+      "ramp_north", "ramp_east", "ramp_south", "ramp_west",
 
-      "Roof North", "Roof North East", "Roof East", "Roof South East",
-      "Roof South", "Roof South West", "Roof West", "Roof North West", };
+      "roof_north", "roof_northeast", "roof_east", "roof_southeast",
+      "roof_south", "roof_southwest", "roof_west", "roof_northwest", };
 
-  private static final String[] shadowNames = new String[] { "Shadow East",
-      "Shadow North East", "Shadow North", "Shadow North West", "Shadow West",
-      "Shadow South West", "Shadow South", "Shadow South East",
-      "Shadow Side West" };
+  private static final String[] shadowNames = new String[] { "shadow_east",
+      "shadow_northeast", "shadow_north", "shadow_northwest", "shadow_west",
+      "shadow_southwest", "shadow_south", "shadow_southeast",
+      "shadow_side_west" };
 
   private static final int SHADOW_EAST = 0;
   private static final int SHADOW_NORTHEAST = 1;
@@ -69,9 +68,9 @@ public class CuteWorld {
   private static final int TILE_IMAGE_HEIGHT = 170;
   private static final int OBJECT_BASE = 30;
 
-  private static final double GRAVITY = -0.5;
-  private static final double RESTITUTION = 0.2;
-  private static final double FRICTION = 0.9;
+  private static final double GRAVITY = -10.0;
+  private static final double RESTITUTION = 0.4;
+  private static final double FRICTION = 10.0;
 
   private static final int MAX_STACK_HEIGHT = 8;
   private static final Stack EMPTY_STACK;
@@ -142,7 +141,7 @@ public class CuteWorld {
     stack.tiles = newTiles;
   }
 
-  public void paint(Surface surf) {
+  public void paint(Surface surf, float alpha) {
     int startX = (int) pixelToWorldX(surf, 0);
     int endX = (int) pixelToWorldX(surf, surf.width());
     if (startX < 0)
@@ -192,7 +191,7 @@ public class CuteWorld {
             paintShadow(surf, tx, ty, px, py);
           } else if (tz >= stack.height()) {
             // Paint the objects in this stack.
-            paintObjects(surf, stack, tz);
+            paintObjects(surf, stack, tz, alpha);
           }
         }
       }
@@ -421,9 +420,17 @@ public class CuteWorld {
     if (pastBottom && hs - o.z < 0.5) {
       floor = max(floor, hs);
     }
+
     if (o.z + dz < floor) {
       dz = floor - o.z;
       o.vz = -o.vz * RESTITUTION;
+
+      if (o.vz < 0.01) {
+        o.vz = 0;
+      }
+      o.resting = true;
+    } else {
+      o.resting = o.vz == 0;
     }
 
     o.z = o.z + dz;
@@ -437,11 +444,11 @@ public class CuteWorld {
     }
   }
 
-  private void paintObjects(Surface surf, Stack stack, int tz) {
+  private void paintObjects(Surface surf, Stack stack, int tz, float alpha) {
     for (CuteObject o : stack.objects) {
       if ((int) o.z == tz) {
-        int px = worldToPixelX(surf, o.x);
-        int py = worldToPixelY(surf, o.y, o.z);
+        int px = worldToPixelX(surf, o.x(alpha));
+        int py = worldToPixelY(surf, o.y(alpha), o.z(alpha));
         int baseX = o.img.width() / 2;
         int baseY = o.img.height() - OBJECT_BASE;
         surf.drawImage(o.img, px - baseX, py - baseY);
@@ -534,23 +541,25 @@ public class CuteWorld {
       return;
     }
     o.lastUpdated = updateCounter;
+    o.saveOldPos();
 
     // Gravity & friction.
     if (o.z > (double) o.stack.height()) {
       o.az += delta * GRAVITY;
     }
 
-    o.resting = abs(o.vz) < 0.01;
     if (o.resting) {
-      o.vx *= FRICTION;
-      o.vy *= FRICTION;
-      o.vz = 0;
+      o.vx -= o.vx * FRICTION * delta;
+      o.vy -= o.vy * FRICTION * delta;
+      if (o.vz < 0) {
+        o.vz = 0;
+      }
     }
 
     // Update velocity
-    o.vx += o.ax;
-    o.vy += o.ay;
-    o.vz += o.az;
+    o.vx += o.ax * delta;
+    o.vy += o.ay * delta;
+    o.vz += o.az * delta;
 
     // Update position and handle collisions.
     moveBy(o, o.vx, o.vy, o.vz);

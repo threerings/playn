@@ -21,6 +21,7 @@ import forplay.sample.cute.core.CuteWorld.Stack;
 public class CuteObject {
 
   public Image img;
+  public double oldx, oldy, oldz;
   public double x, y, z;
   public double vx, vy, vz;
   public double ax, ay, az;
@@ -54,5 +55,23 @@ public class CuteObject {
     this.vx = vx;
     this.vy = vy;
     this.vz = vz;
+  }
+
+  public void saveOldPos() {
+    this.oldx = x;
+    this.oldy = y;
+    this.oldz = z;
+  }
+
+  public double x(double alpha) {
+    return x * alpha + oldx * (1.0f - alpha);
+  }
+
+  public double y(double alpha) {
+    return y * alpha + oldy * (1.0f - alpha);
+  }
+
+  public double z(double alpha) {
+    return z * alpha + oldz * (1.0f - alpha);
   }
 }
