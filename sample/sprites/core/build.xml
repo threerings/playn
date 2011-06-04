@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project name="sprites" default="compile">
+  <property name="java.classname" value="forplay.sample.sprites.java.SpritesGameJava"/>
+  <property name="html.classname" value="forplay.sample.sprites.SpritesGame"/>
+  <property name="html.index" value="SpritesGame.html"/>
+  <import file="../../build-common.xml"/>
+</project>
