@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>forplay</groupId>
+    <groupId>com.googlecode.forplay</groupId>
     <artifactId>forplay-peaphysics-project</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>forplay</groupId>
+  <groupId>com.googlecode.forplay</groupId>
   <artifactId>forplay-peaphysics-flash</artifactId>
   <packaging>war</packaging>
   <name>Forplay PeaPhysics Flash</name>
@@ -22,7 +22,7 @@
     </dependency>
 
     <dependency>
-      <groupId>forplay</groupId>
+      <groupId>com.googlecode.forplay</groupId>
       <artifactId>core</artifactId>
       <version>${coreversion}</version>
     </dependency>
