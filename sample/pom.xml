@@ -5,13 +5,13 @@
   <parent>
     <groupId>forplay</groupId>
     <artifactId>forplay-project</artifactId>
-    <version>1.0</version>
+    <version>1.0-SNAPSHOT</version>
   </parent>
 
   <groupId>forplay</groupId>
   <artifactId>forplay-demos</artifactId>
   <packaging>pom</packaging>
-  <version>1.0</version>
+  <version>1.0-SNAPSHOT</version>
   <name>Forplay Demos Project</name>
   <description>Forplay Demos</description>
   <modules>
