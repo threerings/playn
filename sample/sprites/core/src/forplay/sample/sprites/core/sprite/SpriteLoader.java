@@ -15,12 +15,12 @@
  */
 package forplay.sample.sprites.core.sprite;
 
-import forplay.core.AssetWatcher;
-
 import static forplay.core.ForPlay.assetManager;
 import static forplay.core.ForPlay.graphics;
 import static forplay.core.ForPlay.json;
 
+import forplay.core.Asserts;
+import forplay.core.AssetWatcher;
 import forplay.core.Image;
 import forplay.core.Json;
 import forplay.core.ResourceCallback;
@@ -174,7 +174,7 @@ public class SpriteLoader {
     // parse image urls, if necessary
     if (images == null || images.length == 0) {
       Json.Array urls = document.getArray("urls");
-      assert urls != null : "no urls provided for sprite images";
+      Asserts.checkNotNull(urls, "No urls provided for sprite images");
       images = new Image[urls.length()];
       for (int i = 0; i < urls.length(); i++) {
         images[i] = assetManager().getImage(urls.getString(i));
@@ -187,7 +187,7 @@ public class SpriteLoader {
       Json.Object jsonSpriteImage = spriteImages.getObject(i);
       String id = jsonSpriteImage.getString("id");
       int imageId = jsonSpriteImage.getInt("url"); // will return 0 if not specified
-      assert imageId >= 0 && imageId < images.length : "url must be an index into the urls array";
+      Asserts.checkElementIndex(imageId, images.length, "URL must be an index into the URLs array");
       int x = jsonSpriteImage.getInt("x");
       int y = jsonSpriteImage.getInt("y");
       int width = jsonSpriteImage.getInt("w");

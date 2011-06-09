@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import forplay.core.Asserts;
 import forplay.core.ImageLayer;
 import forplay.core.ResourceCallback;
 
@@ -104,7 +105,7 @@ public class Sprite {
    * The index is an integer between 0 and the number of sprites (@see {@link #numSprites()})
    */
   public void setSprite(int index) {
-    assert index >= 0 && index < spriteImages.size() : "invalid sprite index";
+    Asserts.checkElementIndex(index, spriteImages.size(), "Invalid sprite index");
     if (index != currentId) {
       current = spriteImages.get(index);
       currentId = index;
@@ -116,9 +117,7 @@ public class Sprite {
    * Set the current sprite via the sprite's id.
    */
   public void setSprite(String id) {
-    Integer index = spriteIdMap.get(id);
-    assert index != null && index >= 0 && index < spriteImages.size() : "invalid sprite id";
-    setSprite(index);
+    setSprite(Asserts.checkNotNull(spriteIdMap.get(id), "Invalid sprite id"));
   }
 
   /**
