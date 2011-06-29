@@ -35,6 +35,11 @@
     <copy todir="${webapp.dir}">
       <fileset dir="war" includes="**"/>
     </copy>
+    <!-- we need to resolve this for the GWT classpath to avoid a bunch of warnings -->
+    <artifact:dependencies sourcesFileSetId="validation.sources.fileset">
+      <dependency groupId="javax.validation" artifactId="validation-api" version="1.0.0.GA"/>
+    </artifact:dependencies>
+    <pathconvert property="validation.source.jar" refid="validation.sources.fileset"/>
   </target>
 
   <target name="clean" description="Cleans out all build results.">
@@ -54,6 +59,8 @@
   <target name="compile-html" depends="-prep-webapp,compile" description="Compiles HTML game.">
     <java fork="true" maxmemory="1024M" failonerror="true" classname="com.google.gwt.dev.Compiler">
       <classpath>
+        <pathelement location="${javax.validation:validation-api:jar}"/>
+        <pathelement location="${validation.source.jar}"/>
         <pathelement path="${src.dir}"/>
         <pathelement path="../html/${src.dir}"/>
         <pathelement location="${classes.dir}"/>
@@ -79,7 +86,7 @@
     <echo>Browse to http://localhost:8080/${ant.project.name}/${html.index}</echo>
     <echo>=================================================================</echo>
     <jetty tempDirectory="${target.dir}/jetty-temp">
-      <webApp name="html-server" warfile="${target.dir}/webapp" contextpath="/${ant.project.name}" />
+      <webApp name="html-server" warfile="${target.dir}/webapp" contextpath="/${ant.project.name}"/>
     </jetty>
   </target>
 
@@ -87,6 +94,8 @@
           description="Runs game in GWT development mode.">
     <java fork="true" classname="com.google.gwt.dev.DevMode">
       <classpath>
+        <pathelement location="${javax.validation:validation-api:jar}"/>
+        <pathelement location="${validation.source.jar}"/>
         <pathelement path="${src.dir}"/>
         <pathelement path="../html/${src.dir}"/>
         <pathelement location="${classes.dir}"/>
