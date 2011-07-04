@@ -25,6 +25,7 @@ public class CuteActivity extends GameActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    platform().assetManager().setPathPrefix("forplay/sample/cute/resources");
     ForPlay.run(new CuteGame());
   }
 }

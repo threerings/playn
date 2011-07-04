@@ -25,6 +25,7 @@ public class HelloGameActivity extends GameActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    platform().assetManager().setPathPrefix("forplay/sample/hello/resources");
     ForPlay.run(new HelloGame());
   }
 }

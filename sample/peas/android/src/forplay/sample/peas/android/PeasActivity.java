@@ -25,6 +25,7 @@ public class PeasActivity extends GameActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    platform().assetManager().setPathPrefix("forplay/sample/peas/resources");
     ForPlay.run(new Peas());
   }
 }
