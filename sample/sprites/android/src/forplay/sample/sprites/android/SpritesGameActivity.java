@@ -25,6 +25,7 @@ public class SpritesGameActivity extends GameActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    platform().assetManager().setPathPrefix("forplay/sample/sprites/resources");
     ForPlay.run(new SpritesGame());
   }
 }
