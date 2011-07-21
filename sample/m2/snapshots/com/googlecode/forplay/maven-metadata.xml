@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>forplay-hello-core-archetype</name>
+      <prefix>forplay-hello-core-archetype</prefix>
+      <artifactId>forplay-hello-core-archetype</artifactId>
+    </plugin>
+  </plugins>
+</metadata>
