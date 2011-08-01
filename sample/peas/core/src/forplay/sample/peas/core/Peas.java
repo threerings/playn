@@ -28,7 +28,7 @@ import forplay.core.Pointer;
 import forplay.core.ResourceCallback;
 import forplay.sample.peas.core.entities.Pea;
 
-public class Peas implements Game, Pointer.Listener {
+public class Peas implements Game {
   
   // scale difference between screen space (pixels) and world space (physics).
   public static float physUnitPerScreenUnit = 1 / 26.666667f;
@@ -66,16 +66,18 @@ public class Peas implements Game, Pointer.Listener {
     });
 
     // hook up our pointer listener
-    pointer().setListener(this);
+    pointer().setListener(new Pointer.Adapter() {
+      @Override
+      public void onPointerStart(Pointer.Event event) {
+        if (worldLoaded) {
+          Pea pea = new Pea(world, world.world, physUnitPerScreenUnit * event.x(),
+                            physUnitPerScreenUnit * event.y(), 0);
+          world.add(pea);
+        }
+      }
+    });
   }
 
-  @Override
-  public void onPointerStart(float x, float y) {
-    if (worldLoaded) {
-      Pea pea = new Pea(world, world.world, physUnitPerScreenUnit * x, physUnitPerScreenUnit * y, 0);
-      world.add(pea);
-    }
-  }
 
   @Override
   public void paint(float alpha) {
@@ -96,11 +98,4 @@ public class Peas implements Game, Pointer.Listener {
     return 25;
   }
   
-  @Override
-  public void onPointerDrag(float x, float y) {
-  }
-
-  @Override
-  public void onPointerEnd(float x, float y) {
-  }
 }

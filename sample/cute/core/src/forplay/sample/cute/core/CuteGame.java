@@ -25,7 +25,7 @@ import forplay.core.Pointer;
 import forplay.core.Surface;
 import forplay.core.SurfaceLayer;
 
-public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
+public class CuteGame implements Game, Keyboard.Listener {
 
   private static final int NUM_STARS = 10;
 
@@ -47,7 +47,20 @@ public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
     graphics().rootLayer().add(gameLayer);
 
     keyboard().setListener(this);
-    pointer().setListener(this);
+    pointer().setListener(new Pointer.Listener() {
+      @Override
+      public void onPointerEnd(Pointer.Event event) {
+        touchVectorX = touchVectorY = 0;
+      }
+      @Override
+      public void onPointerDrag(Pointer.Event event) {
+        touchMove(event.x(), event.y());
+      }
+      @Override
+      public void onPointerStart(Pointer.Event event) {
+        touchMove(event.x(), event.y());
+      }
+    });
 
     // TODO(jgw): Until net is filled in everywhere, create a simple grass world.
 
@@ -118,23 +131,8 @@ public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
   }
 
   @Override
-  public void onPointerEnd(float x, float y) {
-    touchVectorX = touchVectorY = 0;
-  }
-
-  @Override
-  public void onPointerDrag(float x, float y) {
-    touchMove(x, y);
-  }
-
-  @Override
-  public void onPointerStart(float x, float y) {
-    touchMove(x, y);
-  }
-
-  @Override
-  public void onKeyDown(int buttonCode) {
-    switch (buttonCode) {
+  public void onKeyDown(Keyboard.Event event) {
+    switch (event.keyCode()) {
       case Keyboard.KEY_SPACE:
         controlJump = true;
         break;
@@ -147,7 +145,7 @@ public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
       case '6':
       case '7':
       case '8':
-        addTile((int) catGirl.x, (int) catGirl.y, buttonCode - '1');
+        addTile((int) catGirl.x, (int) catGirl.y, event.keyCode() - '1');
         break;
 
       case 'W':
@@ -208,8 +206,8 @@ public class CuteGame implements Game, Keyboard.Listener, Pointer.Listener {
   }
 
   @Override
-  public void onKeyUp(int buttonCode) {
-    switch (buttonCode) {
+  public void onKeyUp(Keyboard.Event event) {
+    switch (event.keyCode()) {
       case Keyboard.KEY_LEFT:
         controlLeft = false;
         break;

@@ -26,7 +26,7 @@ import forplay.core.Image;
 import forplay.core.ImageLayer;
 import forplay.core.Pointer;
 
-public class SpritesGame implements Game, Pointer.Listener {
+public class SpritesGame implements Game {
   GroupLayer peaLayer;
   List<Pea> peas = new ArrayList<Pea>(0);
 
@@ -42,21 +42,13 @@ public class SpritesGame implements Game, Pointer.Listener {
     graphics().rootLayer().add(peaLayer);
 
     // add a listener for pointer (mouse, touch) input
-    pointer().setListener(this);
-  }
-
-  @Override
-  public void onPointerDrag(float x, float y) {
-  }
-
-  @Override
-  public void onPointerEnd(float x, float y) {
-    Pea pea = new Pea(peaLayer, x, y);
-    peas.add(pea);
-  }
-
-  @Override
-  public void onPointerStart(float x, float y) {
+    pointer().setListener(new Pointer.Adapter() {
+      @Override
+      public void onPointerEnd(Pointer.Event event) {
+        Pea pea = new Pea(peaLayer, event.x(), event.y());
+        peas.add(pea);
+      }
+    });
   }
 
   @Override
