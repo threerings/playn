@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/forplay-server"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/forplay"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/playn-server"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/playn"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/cute"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

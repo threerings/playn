@@ -3,14 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>com.googlecode.forplay</groupId>
-    <artifactId>forplay-hello-project</artifactId>
+    <groupId>com.googlecode.playn</groupId>
+    <artifactId>playn-hello-project</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.googlecode.forplay</groupId>
-  <artifactId>forplay-hello-core</artifactId>
-  <name>Forplay Hello Core</name>
+  <groupId>com.googlecode.playn</groupId>
+  <artifactId>playn-hello-core</artifactId>
+  <name>Playn Hello Core</name>
 
   <dependencies>
     <dependency>
@@ -21,7 +21,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.forplay</groupId>
+      <groupId>com.googlecode.playn</groupId>
       <artifactId>core</artifactId>
       <version>${coreversion}</version>
     </dependency>

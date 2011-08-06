@@ -3,8 +3,8 @@
 <stringAttribute key="com.google.gdt.eclipse.suiteMainTypeProcessor.PREVIOUSLY_SET_MAIN_TYPE_NAME" value="com.google.gwt.dev.DevMode"/>
 <booleanAttribute key="com.google.gdt.eclipse.suiteWarArgumentProcessor.IS_WAR_FROM_PROJECT_PROPERTIES" value="false"/>
 <listAttribute key="com.google.gwt.eclipse.core.ENTRY_POINT_MODULES">
-<listEntry value="forplay.sample.peas.Peas"/>
-<listEntry value="forplay.sample.peas.PeasFlash"/>
+<listEntry value="playn.sample.peas.Peas"/>
+<listEntry value="playn.sample.peas.PeasFlash"/>
 </listAttribute>
 <stringAttribute key="com.google.gwt.eclipse.core.URL" value="Peas.html"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
@@ -15,7 +15,7 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="com.google.gwt.eclipse.core.moduleClasspathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.google.gwt.dev.DevMode"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-server com.google.appengine.tools.development.gwt.AppEngineLauncher -remoteUI &quot;${gwt_remote_ui_server_port}:${unique_id}&quot; -startupUrl Peas.html -logLevel INFO -codeServerPort 9997 -port 8888 -war &quot;${project_loc:/peas}/war&quot; forplay.sample.peas.PeasFlash forplay.sample.peas.Peas"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-server com.google.appengine.tools.development.gwt.AppEngineLauncher -remoteUI &quot;${gwt_remote_ui_server_port}:${unique_id}&quot; -startupUrl Peas.html -logLevel INFO -codeServerPort 9997 -port 8888 -war &quot;${project_loc:/peas}/war&quot; playn.sample.peas.PeasFlash playn.sample.peas.Peas"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="peas"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-javaagent:/opt/appengine-java-sdk-1.5.0.1/lib/agent/appengine-agent.jar -Xmx512m -XstartOnFirstThread -Xbootclasspath/p:/opt/appengine-java-sdk-1.5.0.1/lib/override/appengine-dev-jdk-overrides.jar"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-javaagent:/home/philip/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.5.2.r36v201107211953/appengine-java-sdk-1.5.2/lib/agent/appengine-agent.jar -Xmx512m -Xbootclasspath/p:/opt/appengine-java-sdk-1.5.0.1/lib/override/appengine-dev-jdk-overrides.jar"/>
 </launchConfiguration>

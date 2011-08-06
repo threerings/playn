@@ -3,15 +3,15 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>com.googlecode.forplay</groupId>
-    <artifactId>forplay-sprites-project</artifactId>
+    <groupId>com.googlecode.playn</groupId>
+    <artifactId>playn-sprites-project</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.googlecode.forplay</groupId>
-  <artifactId>forplay-sprites-html</artifactId>
+  <groupId>com.googlecode.playn</groupId>
+  <artifactId>playn-sprites-html</artifactId>
   <packaging>war</packaging>
-  <name>Forplay Sprites Html</name>
+  <name>Playn Sprites Html</name>
 
   <dependencies>
     <dependency>
@@ -22,14 +22,14 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.forplay</groupId>
+      <groupId>com.googlecode.playn</groupId>
       <artifactId>core</artifactId>
       <version>${coreversion}</version>
     </dependency>
   </dependencies>
 
   <properties>
-    <gwt.module>forplay.sample.sprites.SpritesGame</gwt.module>
+    <gwt.module>playn.sample.sprites.SpritesGame</gwt.module>
     <gwt.name>sprites</gwt.name>
   </properties>
 

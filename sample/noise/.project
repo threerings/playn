@@ -3,7 +3,7 @@
 	<name>noise</name>
 	<comment></comment>
 	<projects>
-		<project>forplay</project>
+		<project>playn</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

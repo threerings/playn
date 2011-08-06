@@ -3,17 +3,17 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.googlecode.forplay</groupId>
-    <artifactId>forplay-project</artifactId>
+    <groupId>com.googlecode.playn</groupId>
+    <artifactId>playn-project</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.googlecode.forplay</groupId>
-  <artifactId>forplay-demos</artifactId>
+  <groupId>com.googlecode.playn</groupId>
+  <artifactId>playn-demos</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Forplay Demos Project</name>
-  <description>Forplay Demos</description>
+  <name>Playn Demos Project</name>
+  <description>Playn Demos</description>
   <modules>
     <module>hello</module>  
     <module>cute</module>
