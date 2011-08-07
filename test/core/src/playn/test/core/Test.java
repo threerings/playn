@@ -17,16 +17,15 @@ package playn.test.core;
 
 import static playn.core.PlayN.assetManager;
 import static playn.core.PlayN.graphics;
-import static playn.core.PlayN.keyboard;
-import static playn.core.PlayN.pointer;
 import playn.core.Game;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
-import playn.core.Keyboard;
+import playn.core.PlayN;
 import playn.core.Pointer;
+import playn.core.Pointer.Event;
 
-public class Test implements Game, Keyboard.Listener, Pointer.Listener {
+public class Test implements Game {
 
   GroupLayer groupLayer;
   ImageLayer bgLayer;
@@ -34,8 +33,6 @@ public class Test implements Game, Keyboard.Listener, Pointer.Listener {
 
   @Override
   public void init() {
-    pointer().setListener(this);
-    keyboard().setListener(this);
 
     Image background = assetManager().getImage("images/background.png");
     Image catgirl = assetManager().getImage("images/girlcat.png");
@@ -69,6 +66,13 @@ public class Test implements Game, Keyboard.Listener, Pointer.Listener {
     layer1.transform().translate(256, 0);
     layer2.transform().translate(256, 256);
     layer3.transform().translate(0, 256);
+
+    PlayN.pointer().setListener(new Pointer.Adapter() {
+      @Override
+      public void onPointerStart(Event event) {
+        doStuff();
+      }
+    });
   }
 
   private void doStuff() {
@@ -98,27 +102,6 @@ public class Test implements Game, Keyboard.Listener, Pointer.Listener {
 
   @Override
   public void paint(float alpha) {
-  }
-
-  @Override
-  public void onPointerStart(float x, float y) {
-    doStuff();
-  }
-
-  @Override
-  public void onPointerEnd(float x, float y) {
-  }
-
-  @Override
-  public void onPointerDrag(float x, float y) {
-  }
-
-  @Override
-  public void onKeyDown(int keyCode) {
-  }
-
-  @Override
-  public void onKeyUp(int keyCode) {
   }
 
   @Override
