@@ -61,6 +61,7 @@
       <classpath>
         <pathelement location="${javax.validation:validation-api:jar}"/>
         <pathelement location="${validation.source.jar}"/>
+        <pathelement path="../../../core/${src.dir}"/>
         <pathelement path="${src.dir}"/>
         <pathelement path="../html/${src.dir}"/>
         <pathelement location="${classes.dir}"/>
@@ -96,6 +97,7 @@
       <classpath>
         <pathelement location="${javax.validation:validation-api:jar}"/>
         <pathelement location="${validation.source.jar}"/>
+        <pathelement path="../../../core/${src.dir}"/>
         <pathelement path="${src.dir}"/>
         <pathelement path="../html/${src.dir}"/>
         <pathelement location="${classes.dir}"/>
