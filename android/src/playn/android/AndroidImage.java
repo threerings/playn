@@ -28,101 +28,97 @@ import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ResourceCallback;
 
+/**
+ * Android implementation of CanvasImage class. Prioritizes the SoftReference to
+ * the bitmap, and only holds a hard reference if the game has requested that a
+ * Canvas be created.
+ */
 class AndroidImage implements CanvasImage {
-  
-  // TODO: Hack to deal with low memory devices
-  static List<Bitmap> mru = new ArrayList<Bitmap>();
-  static List<Bitmap> prevMru;
-  
-  private Bitmap bitmap;
-  private SoftReference<Bitmap> bitmapRef;
-  private AndroidCanvas canvas;
-  private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
-  private int width, height;
-  private String path;
 
-  public AndroidImage(String path, Bitmap bitmap) {
-    this.path = path;
-    bitmapRef = new SoftReference<Bitmap>(bitmap);
-    width = bitmap.getWidth();
-    height = bitmap.getHeight();
-  }
+	private SoftReference<Bitmap> bitmapRef;
+	private AndroidCanvas canvas;
+	private Bitmap canvasBitmap;
+	private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
+	private int width, height;
+	private String path;
 
-  public AndroidImage(int w, int h, boolean alpha) {
-    bitmap = Bitmap.createBitmap(w, h, alpha ? AndroidPlatform.instance.preferredBitmapConfig
-        : Bitmap.Config.RGB_565);
-    canvas = new AndroidCanvas(new android.graphics.Canvas(bitmap));
-  }
+	public AndroidImage(String path, Bitmap bitmap) {
+		this.path = path;
+		bitmapRef = new SoftReference<Bitmap>(bitmap);
+		width = bitmap.getWidth();
+		height = bitmap.getHeight();
+	}
 
-  public AndroidImage(String url) {
-    AsyncTask<String, Void, Bitmap> execute = new AndroidAssetManager.DownloaderTask<Bitmap>() {
-      @Override
-      public Bitmap download(String url) {
-        return AndroidAssetManager.downloadBitmap(url);
-      }
+	public AndroidImage(int w, int h, boolean alpha) {
+		Bitmap newBitmap = Bitmap.createBitmap(w, h,
+				alpha ? AndroidPlatform.instance.preferredBitmapConfig
+						: Bitmap.Config.RGB_565);
+		bitmapRef = new SoftReference<Bitmap>(newBitmap);
+		width = w;
+		height = h;
+	}
 
-      @Override
-      protected void onPostExecute(Bitmap data) {
-        super.onPostExecute(data);
-        runCallbacks(data != null);
-      }
-    };
-    execute.execute(url);
-  }
+	public void addCallback(ResourceCallback<Image> callback) {
+		callbacks.add(callback);
+		if (isReady()) {
+			runCallbacks(true);
+		}
+	}
 
-  public void addCallback(ResourceCallback<Image> callback) {
-    callbacks.add(callback);
-    if (isReady()) {
-      runCallbacks(true);
-    }
-  }
+	public Canvas canvas() {
+		if (canvas == null) {
+			canvasBitmap = getBitmap();
+			canvas = new AndroidCanvas(
+					new android.graphics.Canvas(canvasBitmap));
+		}
+		bitmapRef = null;
+		return canvas;
+	}
 
-  public Canvas canvas() {
-    return canvas;
-  }
+	public int height() {
+		return height;
+	}
 
-  public int height() {
-    return bitmap == null ? height : bitmap.getHeight();
-  }
+	public boolean isReady() {
+		return bitmapRef != null || canvas != null;
+	}
 
-  public boolean isReady() {
-    return bitmap != null || bitmapRef != null;
-  }
+	public void replaceWith(Image image) {
+		Asserts.checkArgument(image instanceof AndroidImage);
+		bitmapRef = new SoftReference<Bitmap>(
+				((AndroidImage) image).getBitmap());
+		canvas = null;
+	}
 
-  public void replaceWith(Image image) {
-    Asserts.checkArgument(image instanceof AndroidImage);
-    bitmap = ((AndroidImage) image).bitmap;
-  }
+	public int width() {
+		return width;
+	}
 
-  public int width() {
-    return bitmap == null ? width : bitmap.getWidth();
-  }
+	public Bitmap getBitmap() {
+		if (canvasBitmap != null) {
+			return canvasBitmap;
+		}
+		if (bitmapRef != null) {
+			Bitmap bm = bitmapRef.get();
+			if (bm == null && path != null) {
+				// Log.i("playn", "Bitmap " + path + " fell out of memory");
+				bitmapRef = new SoftReference<Bitmap>(
+						bm = AndroidPlatform.instance.assetManager()
+								.doGetBitmap(path));
+			}
+			return bm;
+		}
+		return null;
+	}
 
-  Bitmap getBitmap() {
-    if (bitmap != null)
-      return bitmap;
-    if (bitmapRef != null) {
-      Bitmap bm = bitmapRef.get();
-      if (bm == null) {
-        Log.i("playn", "Bitmap " + path + " fell out of memory");
-        bitmapRef = new SoftReference<Bitmap>(
-            bm = ((AndroidAssetManager) AndroidPlatform.instance.assetManager()).doGetBitmap(path));
-      }
-      mru.add(bm);
-      return bm;
-    }
-
-    return null;
-  }
-
-  private void runCallbacks(boolean success) {
-    for (ResourceCallback<Image> cb : callbacks) {
-      if (success) {
-        cb.done(this);
-      } else {
-        cb.error(new Exception("Error loading image"));
-      }
-    }
-    callbacks.clear();
-  }
+	private void runCallbacks(boolean success) {
+		for (ResourceCallback<Image> cb : callbacks) {
+			if (success) {
+				cb.done(this);
+			} else {
+				cb.error(new Exception("Error loading image"));
+			}
+		}
+		callbacks.clear();
+	}
 }

@@ -15,7 +15,6 @@
  */
 package playn.sample.hello.android;
 
-import android.os.Bundle;
 import playn.android.GameActivity;
 import playn.core.PlayN;
 import playn.sample.hello.core.HelloGame;
@@ -23,8 +22,7 @@ import playn.sample.hello.core.HelloGame;
 public class HelloGameActivity extends GameActivity {
 
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  public void main(){
     platform().assetManager().setPathPrefix("playn/sample/hello/resources");
     PlayN.run(new HelloGame());
   }
