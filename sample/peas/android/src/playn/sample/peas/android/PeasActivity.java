@@ -15,7 +15,6 @@
  */
 package playn.sample.peas.android;
 
-import android.os.Bundle;
 import playn.android.GameActivity;
 import playn.core.PlayN;
 import playn.sample.peas.core.Peas;
@@ -23,8 +22,7 @@ import playn.sample.peas.core.Peas;
 public class PeasActivity extends GameActivity {
 
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  public void main(){
     platform().assetManager().setPathPrefix("playn/sample/peas/resources");
     PlayN.run(new Peas());
   }
