@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>playn-hello</artifactId>
-  <name>Playn Hello Sample</name>
+  <name>PlayN Hello Sample</name>
 
   <properties>
     <gwt.module>playn.sample.hello.HelloGame</gwt.module>

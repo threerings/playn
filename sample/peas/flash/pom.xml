@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>playn-peaphysics-flash</artifactId>
-  <name>Playn Peas Flash Sample</name>
+  <name>PlayN Peas Flash Sample</name>
   <packaging>war</packaging>
 
   <properties>

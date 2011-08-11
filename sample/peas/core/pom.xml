@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>playn-peaphysics</artifactId>
-  <name>Playn Peas Sample</name>
+  <name>PlayN Peas Sample</name>
 
   <properties>
     <gwt.module>playn.sample.peas.Peas</gwt.module>

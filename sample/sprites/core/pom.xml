@@ -10,7 +10,7 @@
 
   <groupId>com.googlecode.playn</groupId>
   <artifactId>playn-sprites-core</artifactId>
-  <name>Playn Sprites Core</name>
+  <name>PlayN Sprites Core</name>
 
   <dependencies>
     <dependency>
