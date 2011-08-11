@@ -17,6 +17,8 @@
     <module>hello/core</module>
     <module>cute/core</module>
     <module>peas/core</module>
+<!-- disabled until we can fix the m2eclipse errors caused by this pom
     <module>peas/flash</module>
+-->
   </modules>
 </project>
