@@ -15,8 +15,8 @@
  */
 package playn.android;
 
-import android.graphics.BitmapShader;
 import playn.core.Pattern;
+import android.graphics.BitmapShader;
 
 class AndroidPattern implements Pattern {
 

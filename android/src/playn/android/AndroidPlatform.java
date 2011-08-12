@@ -15,30 +15,28 @@
  */
 package playn.android;
 
-import java.util.ArrayList;
-
+import playn.core.Game;
+import playn.core.Json;
+import playn.core.Mouse;
+import playn.core.Platform;
+import playn.core.PlayN;
+import playn.core.Touch;
+import playn.java.JavaJson;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.net.Uri;
-import playn.core.PlayN;
-import playn.core.Game;
-import playn.core.Json;
-import playn.core.Mouse;
-import playn.core.Platform;
-import playn.core.Touch;
-import playn.core.Platform.Type;
-import playn.java.JavaJson;
 
 public class AndroidPlatform implements Platform {
 
   static AndroidPlatform instance;
+  private static AndroidGL20 gfx;
 
-  public static void register(GameActivity activity) {
+  public static void register(AndroidGL20 _gfx, GameActivity activity) {
+    gfx = _gfx;
     PlayN.setPlatform(new AndroidPlatform(activity));
   }
 
@@ -64,7 +62,7 @@ public class AndroidPlatform implements Platform {
     instance = this;
     this.activity = activity;
     audio = new AndroidAudio();
-    graphics = new AndroidGraphics();
+    graphics = new AndroidGraphics(gfx);
     json = new JavaJson();
     keyboard = new AndroidKeyboard();
     log = new AndroidLog();
@@ -192,17 +190,17 @@ public class AndroidPlatform implements Platform {
     return Type.ANDROID;
   }
 
-  void draw(Canvas c, float delta) {
-    //Run the game's custom painting code.
-    //Separate from layers painting themselves.
-    if (game != null) {
-      game.paint(delta);
-
-      AndroidCanvas surf = new AndroidCanvas(c);
-      surf.clear();
-      graphics.rootLayer.paint(surf);
-    }
-  }
+//  void draw(Canvas c, float delta) {
+//    //Run the game's custom painting code.
+//    //Separate from layers painting themselves.
+//    if (game != null) {
+//      game.paint(delta);
+//
+//      AndroidCanvas surf = new AndroidCanvas(c);
+//      surf.clear();
+//      graphics.rootLayer.paint(surf);
+//    }
+//  }
 
   void update(float delta) {
     if (game != null) {

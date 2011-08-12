@@ -17,22 +17,19 @@ package playn.android;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.graphics.Canvas;
 import android.util.Log;
-import android.view.View;
 
-public abstract class GameLoop implements Runnable {
+public class GameLoop implements Runnable {
   private static final int MAX_DELTA = 100;
 
   private AtomicBoolean running = new AtomicBoolean();
-
+  private AndroidGraphics graphics;
+  
   private long timeOffset = System.currentTimeMillis();
 
   private int updateRate;
   private int accum;
-  private int lastTime;
-  private final View view;
-
+  private int lastTime;  
   private int lastStats;
   private int updateCount;
   private int updateTime;
@@ -45,8 +42,8 @@ public abstract class GameLoop implements Runnable {
 
   private float paintAlpha;
 
-  public GameLoop(View view) {
-    this.view = view;
+  public GameLoop() {
+    graphics = AndroidPlatform.instance.graphics();
   }
 
   public void start() {
@@ -57,12 +54,11 @@ public abstract class GameLoop implements Runnable {
       this.updateRate = AndroidPlatform.instance.game.updateRate();
       running.set(true);
       runQueueStart = lastTime = time();
-      view.post(this);
     }
   }
 
   public void pause() {
-    Log.i("playn", "Halting game loop");
+    Log.i("playn", "Pausing game loop");
     running.set(false);
   }
 
@@ -70,7 +66,7 @@ public abstract class GameLoop implements Runnable {
     // The thread can be stopped between runs.
     if (!running.get())
       return;
-
+    
     runCount++;
 
     int now = time();
@@ -82,20 +78,7 @@ public abstract class GameLoop implements Runnable {
     runQueueTime += now - runQueueStart;
 
     if (now - lastStats > 10000) {
-      if (paintCount > 0)
-        Log.i("playn", "Stats: paints = " + paintCount + " " + ((float) paintTime / paintCount)
-            + "ms (" + ((float) paintCount / (now - lastStats) * 1000) + "/s) lag = "
-            + ((float) paintLagTime / paintCount) + "ms");
-      if (updateCount > 0)
-        Log.i("playn", "Stats: updates = " + updateCount + " "
-            + ((float) updateTime / updateCount) + "ms ("
-            + ((float) updateCount / (now - lastStats) * 1000) + "/s)");
-      Log.i("playn", "Stats: runs = " + runCount + " run lag = "
-          + ((float) runQueueTime / runCount) + "ms (" + runCount / ((float) now - lastStats)
-          * 1000 + "/s)");
-      paintCount = updateCount = runCount = 0;
-      paintTime = paintLagTime = updateTime = 0;
-      lastStats = now;
+      updateStats(now);
     }
 
     boolean isPaintDirty = false;
@@ -121,19 +104,23 @@ public abstract class GameLoop implements Runnable {
       paintQueueStart = time();
       paint();
     }
+  }
 
-    // A stop request can occur during this run, in which case we must not
-    // try to schedule a new loop.
-    if (running.get()) {
-      runQueueStart = time();
-
-      // Did we spend so much time in this method that we're due for another
-      // update?
-      if (updateRate > 0 && runQueueStart - now > updateRate)
-        view.post(this);
-      else
-        view.postDelayed(this, 1);
-    }
+  private void updateStats(int now) {
+    if (paintCount > 0)
+      Log.i("playn", "Stats: paints = " + paintCount + " " + ((float) paintTime / paintCount)
+          + "ms (" + ((float) paintCount / (now - lastStats) * 1000) + "/s) lag = "
+          + ((float) paintLagTime / paintCount) + "ms");
+    if (updateCount > 0)
+      Log.i("playn", "Stats: updates = " + updateCount + " "
+          + ((float) updateTime / updateCount) + "ms ("
+          + ((float) updateCount / (now - lastStats) * 1000) + "/s)");
+    Log.i("playn", "Stats: runs = " + runCount + " run lag = "
+        + ((float) runQueueTime / runCount) + "ms (" + runCount / ((float) now - lastStats)
+        * 1000 + "/s)");
+    paintCount = updateCount = runCount = 0;
+    paintTime = paintLagTime = updateTime = 0;
+    lastStats = now;
   }
 
   private int time() {
@@ -142,14 +129,20 @@ public abstract class GameLoop implements Runnable {
     // int range.
     return (int) (System.currentTimeMillis() - timeOffset);
   }
-
-  protected abstract void paint();
-
-  void paint(Canvas c) {
-    double start = time();
-    paintLagTime += start - paintQueueStart;
-    AndroidPlatform.instance.draw(c, paintAlpha);
-    paintTime += time() - start;
-    paintCount++;
+  
+  public boolean running() {
+    return running.get();
   }
+
+  protected void paint() {
+//    graphics.updateLayers();
+  }
+
+//  void paint(Canvas c) {
+//    double start = time();
+//    paintLagTime += start - paintQueueStart;
+//    AndroidPlatform.instance.draw(c, paintAlpha);
+//    paintTime += time() - start;
+//    paintCount++;
+//  }
 }

@@ -21,29 +21,32 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import playn.core.PlayN;
-import playn.core.Game;
+import android.widget.LinearLayout;
 
 /**
- * TODO: pause/unpause TODO: save/restore state
+ * TODO: save/restore state
  */
 public abstract class GameActivity extends Activity {
   private final int REQUIRED_CONFIG_CHANGES = ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_KEYBOARD_HIDDEN;
   
-  private GameView gameView;
+  private GameViewGL gameView;
+  private LinearLayout viewLayout;
   private WakeLock wakeLock;
   private Context context;
   
+  /**
+   * The entry-point into a PlayN game.  Developers should
+   * implement main() to call platform().assetManager().setPathPrefix()
+   * and PlayN.run().
+   */
   public abstract void main();
   
   @Override
@@ -51,27 +54,43 @@ public abstract class GameActivity extends Activity {
     super.onCreate(savedInstanceState);
     
     context = getApplicationContext();
+    
+    //Build the AndroidPlatform and register this activity.
+    AndroidGL20 gfx;
+    if (isHoneycombOrLater()) {
+      gfx = new AndroidGL20();
+    }else {
+      //Provide our own native bindings for some missing methods.
+      gfx = new AndroidGL20Native();
+    }
 
-    if (supportsHardwareAcceleration()) {
+    //Build a View to hold the surface view and report changes to the screen size.
+    viewLayout = new AndroidViewLayout(this);
+    gameView = new GameViewGL(gfx, this, context);
+    viewLayout.addView((View)gameView);
+
+    //Build the Window and View
+    if (isHoneycombOrLater()) {
       // Use the raw constant rather than the flag to avoid blowing up on
       // earlier Android
       int flagHardwareAccelerated = 0x1000000;
-
       getWindow().setFlags(flagHardwareAccelerated, flagHardwareAccelerated);
-      gameView = new GameViewDraw(this, context);
-      Log.i("playn", "Using hardware-acceleration-friendly game loop");
-    } else {
-      gameView = new GameViewSurface(this, context);
-      Log.i("playn", "Using software-acceleration-friendly game loop");
     }
+
 
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
     LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-    getWindow().setContentView((View) gameView, params);
-    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    getWindow().setContentView(viewLayout, params);
+    
+    //Default to landscape orientation.
+    if (usePortraitOrientation()) {
+      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    }else {
+      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
 
+    //Check that the Wake Lock permissions are set correctly.
     try {
       PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
       wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK
@@ -84,6 +103,7 @@ public abstract class GameActivity extends Activity {
           "Unable to acquire wake lock. Please add <uses-permission android:name=\"android.permission.WAKE_LOCK\" /> to the manifest.").show();
     }
     
+    //Make sure the AndroidManifest.xml is set up correctly.
     try {
       ActivityInfo info = this.getPackageManager().getActivityInfo(new ComponentName(context, this.getPackageName() + "." + this.getLocalClassName()), 0);
         if ((info.configChanges & REQUIRED_CONFIG_CHANGES) != REQUIRED_CONFIG_CHANGES) {
@@ -92,11 +112,25 @@ public abstract class GameActivity extends Activity {
             "Please add the following line to the Activity manifest: " +
             "      android:configChanges=\"keyboardHidden|orientation\"").show();
         }
-      
     }catch (NameNotFoundException e) {
         Log.w("GameActivity", "Cannot access game AndroidManifest.xml file.");
     }
-    
+  }
+  
+  /**
+   * Determines whether or not a game should run in portrait orientation or not.
+   * Defaults to false.  Override this method to return true to use portrait.
+   * @return Whether or not the game will run in portrait orientation
+   */
+  public boolean usePortraitOrientation() {
+    return false;
+  }
+  
+  public LinearLayout viewLayout() {
+    return viewLayout;
+  }
+  public GameViewGL gameView() {
+    return gameView;
   }
 
   protected AndroidPlatform platform() {
@@ -107,7 +141,7 @@ public abstract class GameActivity extends Activity {
     return context;
   }
 
-  private boolean supportsHardwareAcceleration() {
+  protected boolean isHoneycombOrLater() {
     return android.os.Build.VERSION.SDK_INT >= 11;
   }
 
@@ -116,13 +150,6 @@ public abstract class GameActivity extends Activity {
     super.onDestroy();
     wakeLock.release();
     platform().audio().destroy();
-  }
-
-  @Override
-  public void onConfigurationChanged(Configuration newConfig) {
-    super.onConfigurationChanged(newConfig);
-    AndroidGraphics graphics = (AndroidGraphics) PlayN.graphics();
-    if (graphics != null) graphics.refreshScreenMetrics();
   }
 
   @Override
@@ -140,7 +167,7 @@ public abstract class GameActivity extends Activity {
   protected void onResume() {
     Log.i("playn", "onResume");
     gameView.notifyVisibilityChanged(View.VISIBLE);
-    platform().audio().resume();
+    if (platform() != null) platform().audio().resume();
     wakeLock.acquire();
     super.onResume();
 
@@ -148,43 +175,34 @@ public abstract class GameActivity extends Activity {
   }
 
   @Override
-  protected void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    // TODO
-  }
-
-  @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
     platform().keyboard().onKeyDown(event.getEventTime(), keyCode);
+    //Don't prevent volume controls from propagating to the system.
+    if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+      return false;
+    }
     return true;
   }
 
   @Override
   public boolean onKeyUp(int keyCode, KeyEvent event) {
     platform().keyboard().onKeyUp(event.getEventTime(), keyCode);
+    if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+      return false;
+    }
     return true;
   }
   
-  /**
-   *  Called automatically to handle touch events.
-   *  Automatically passes through the parsed MotionEvent
-   *  to AndroidTouch.Listener and AndroidPointer.Listener 
-   *  instances.
-   */
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    return AndroidPlatform.instance.touchEventHandler().onMotionEvent(event);
-  }
 
-  public void onLayout(boolean changed, int left, int top, int right, int bottom) {
-    int displayWidth = right - left;
-    int displayHeight = bottom - top;
-    
-    /*
-     * TODO: Pass the width and height here into AndroidGraphics as the display
-     * width/height (this is the only way to take into account the size of the
-     * Honeycomb bezel). This requires the game activity lifecycle to be
-     * reworked, so it is currently not implemented.
-     */
-  }
+//  public void onLayout(boolean changed, int left, int top, int right, int bottom) {
+//    int displayWidth = right - left;
+//    int displayHeight = bottom - top;
+//    
+//    /*
+//     * TODO: Pass the width and height here into AndroidGraphics as the display
+//     * width/height (this is the only way to take into account the size of the
+//     * Honeycomb bezel). This requires the game activity lifecycle to be
+//     * reworked, so it is currently not implemented.
+//     */
+//  }
 }

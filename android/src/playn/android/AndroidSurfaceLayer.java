@@ -15,9 +15,8 @@
  */
 package playn.android;
 
-import playn.core.Asserts;
-
 import static playn.core.PlayN.graphics;
+import playn.core.Asserts;
 import playn.core.CanvasSurface;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
@@ -27,7 +26,8 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
   private AndroidImage img;
   private Surface surface;
 
-  AndroidSurfaceLayer(int width, int height) {
+  AndroidSurfaceLayer(AndroidGL20 gfx, int width, int height) {
+    super(gfx);
     img = (AndroidImage) graphics().createImage(width, height);
     surface = new CanvasSurface(img.canvas());
   }
@@ -44,16 +44,16 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
     return surface;
   }
 
-  @Override
-  void paint(AndroidCanvas canvas) {
-    if (!visible()) return;
-
-    canvas.save();
-    transform(canvas);
-    canvas.setAlpha(canvas.alpha() * alpha);
-    canvas.drawImage(img, 0, 0);
-    canvas.restore();
-  }
+//  @Override
+//  void paint(AndroidCanvas canvas) {
+//    if (!visible()) return;
+//
+//    canvas.save();
+//    transform(canvas);
+//    canvas.setAlpha(canvas.alpha() * alpha);
+//    canvas.drawImage(img, 0, 0);
+//    canvas.restore();
+//  }
 
   @Override
   public float width() {

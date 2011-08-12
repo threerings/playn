@@ -19,14 +19,12 @@ import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
-import android.util.Log;
 import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ResourceCallback;
+import android.graphics.Bitmap;
 
 /**
  * Android implementation of CanvasImage class. Prioritizes the SoftReference to

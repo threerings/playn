@@ -15,8 +15,8 @@
  */
 package playn.android;
 
-import android.graphics.Shader;
 import playn.core.Gradient;
+import android.graphics.Shader;
 
 class AndroidGradient implements Gradient {
 

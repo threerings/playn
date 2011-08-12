@@ -18,6 +18,7 @@ package playn.android;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.Transform;
 
 class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
@@ -29,10 +30,12 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   private AndroidImage image;
 
-  AndroidImageLayer() {
+  AndroidImageLayer(AndroidGL20 gfx) {
+    super(gfx);
   }
-
-  AndroidImageLayer(AndroidImage image) {
+  
+  AndroidImageLayer(AndroidGL20 gfx, AndroidImage image) {
+    this(gfx);
     this.image = image;
   }
 
@@ -118,27 +121,31 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
   }
 
   @Override
-  void paint(AndroidCanvas canvas) {
-    if (!visible()) return;
-
-    canvas.save();
-    transform(canvas);
-    canvas.setAlpha(canvas.alpha() * alpha);
-
-    float dw = widthSet ? width : image.width();
-    float dh = heightSet ? height : image.height();
-
-    if (repeatX || repeatY) {
-      // TODO(jgw): something to make this repeat properly.
-      canvas.drawImage(image, 0, 0, dw, dh);
-    } else if (sourceRectSet) {
-      canvas.drawImage(image, 0, 0, dw, dh, sx, sy, sw, sh);
-    } else {
-      canvas.drawImage(image, 0, 0);
-    }
-
-    canvas.restore();
-  }
+  //TODO (jonagill): Actually be able to paint ImageLayers
+  public void paint(Transform parentTransform, float parentAlpha) { }
+  
+//  @Override
+//  void paint(AndroidCanvas canvas) {
+//    if (!visible()) return;
+//
+//    canvas.save();
+//    transform(canvas);
+//    canvas.setAlpha(canvas.alpha() * alpha);
+//
+//    float dw = widthSet ? width : image.width();
+//    float dh = heightSet ? height : image.height();
+//
+//    if (repeatX || repeatY) {
+//      // TODO(jgw): something to make this repeat properly.
+//      canvas.drawImage(image, 0, 0, dw, dh);
+//    } else if (sourceRectSet) {
+//      canvas.drawImage(image, 0, 0, dw, dh, sx, sy, sw, sh);
+//    } else {
+//      canvas.drawImage(image, 0, 0);
+//    }
+//
+//    canvas.restore();
+//  }
 
   @Override
   public float width() {

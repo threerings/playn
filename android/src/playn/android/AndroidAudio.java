@@ -23,10 +23,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
 import playn.core.Audio;
 import playn.core.Sound;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnBufferingUpdateListener;
 
 class AndroidAudio implements Audio {
 

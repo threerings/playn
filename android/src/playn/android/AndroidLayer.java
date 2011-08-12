@@ -15,12 +15,18 @@
  */
 package playn.android;
 
-import playn.core.AbstractLayer;
 import playn.core.Canvas;
+import playn.core.Transform;
+import playn.core.gl.LayerGL;
 
-public abstract class AndroidLayer extends AbstractLayer {
+public abstract class AndroidLayer extends LayerGL {
 
-  abstract void paint(AndroidCanvas canvas);
+  protected final AndroidGL20 gfx;
+  
+  protected AndroidLayer(AndroidGL20 gfx) {
+    super();
+    this.gfx = gfx;
+  }
 
   void transform(Canvas canvas) {
     canvas.translate(originX, originY);
@@ -28,4 +34,11 @@ public abstract class AndroidLayer extends AbstractLayer {
         transform.m11(), transform.tx() - originX, transform.ty() - originY);
     canvas.translate(-originX, -originY);
   }
+  
+  @Override
+  //TODO (jonagill): Actually be able to paint SurfaceLayers
+  public void paint(Transform parentTransform, float parentAlpha) { }
+  
+//  public abstract void paint(Transform parentTransform, float parentAlpha);
+//abstract void paint(AndroidCanvas canvas);
 }

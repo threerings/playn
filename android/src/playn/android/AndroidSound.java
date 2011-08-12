@@ -1,8 +1,8 @@
 package playn.android;
 
+import playn.core.Sound;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import playn.core.Sound;
 
 public class AndroidSound implements Sound, OnCompletionListener {
   

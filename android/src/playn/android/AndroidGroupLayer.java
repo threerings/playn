@@ -20,11 +20,16 @@ import playn.core.GroupLayer;
 import playn.core.GroupLayerImpl;
 import playn.core.Layer;
 import playn.core.ParentLayer;
+import playn.core.Transform;
 
 class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer {
 
   private GroupLayerImpl<AndroidLayer> impl = new GroupLayerImpl<AndroidLayer>();
 
+  public AndroidGroupLayer(AndroidGL20 gfx) {
+    super(gfx);
+  }
+  
   @Override
   public Layer get(int index) {
     return impl.children.get(index);
@@ -87,15 +92,19 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer 
   }
 
   @Override
-  void paint(AndroidCanvas surf) {
-    if (!visible()) return;
-
-    surf.save();
-    transform(surf);
-    surf.setAlpha(surf.alpha() * alpha);
-    for (AndroidLayer child : impl.children) {
-      child.paint(surf);
-    }
-    surf.restore();
-  }
+  //TODO (jonagill): Actually be able to paint GroupLayers
+  public void paint(Transform parentTransform, float parentAlpha) { }
+  
+//  @Override
+//  void paint(AndroidCanvas surf) {
+//    if (!visible()) return;
+//
+//    surf.save();
+//    transform(surf);
+//    surf.setAlpha(surf.alpha() * alpha);
+//    for (AndroidLayer child : impl.children) {
+//      child.paint(surf);
+//    }
+//    surf.restore();
+//  }
 }

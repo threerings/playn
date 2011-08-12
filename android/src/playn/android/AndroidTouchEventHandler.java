@@ -15,9 +15,11 @@
  */
 package playn.android;
 
-import android.view.MotionEvent;
+import playn.core.Graphics;
 import playn.core.Pointer;
 import playn.core.Touch;
+import android.util.Log;
+import android.view.MotionEvent;
 
 /**
  * Class for taking MotionEvents from GameActivity.onMotionEvent() and parsing
@@ -25,6 +27,8 @@ import playn.core.Touch;
  */
 class AndroidTouchEventHandler {
   boolean inTouchSequence = false;
+  private float xScreenOffset = 0;
+  private float yScreenOffset = 0;
 
   /**
    * Default Android touch behavior. Parses the immediate MotionEvent and passes
@@ -71,6 +75,7 @@ class AndroidTouchEventHandler {
    * @return The processed array of individual AndroidTouchEvents.
    */
   private Touch.Event[] parseMotionEvent(MotionEvent event) {
+    calculateOffsets();
     int eventPointerCount = event.getPointerCount();
     Touch.Event[] touches = new Touch.Event[eventPointerCount];
     double time = event.getEventTime();
@@ -78,8 +83,8 @@ class AndroidTouchEventHandler {
     int id;
     for (int t = 0; t < eventPointerCount; t++) {
       int pointerIndex = t;
-      x = event.getX(pointerIndex);
-      y = event.getY(pointerIndex);
+      x = event.getX(pointerIndex) + xScreenOffset;
+      y = event.getY(pointerIndex) + yScreenOffset;
       pressure = event.getPressure(pointerIndex);
       size = event.getSize(pointerIndex);
       id = event.getPointerId(pointerIndex);
@@ -87,4 +92,11 @@ class AndroidTouchEventHandler {
     }
     return touches;
   }
+  
+  public void calculateOffsets() {
+    Graphics graphics = AndroidPlatform.instance.graphics();
+    xScreenOffset = -(graphics.screenWidth() - graphics.width())/2;
+    yScreenOffset = -(graphics.screenHeight() - graphics.height())/2;
+  }
+
 }

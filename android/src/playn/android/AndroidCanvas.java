@@ -17,16 +17,16 @@ package playn.android;
 
 import java.util.LinkedList;
 
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.PorterDuff;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import playn.core.Asserts;
 import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.RectF;
 
 class AndroidCanvas implements playn.core.Canvas {
   private static Matrix m = new Matrix();
