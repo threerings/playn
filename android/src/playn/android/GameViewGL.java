@@ -12,7 +12,7 @@ import android.view.SurfaceHolder;
 
 public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder.Callback {
 
-  public final AndroidGL20 gfx;
+  public final AndroidGL20 gl20;
   private final SurfaceHolder holder;
   private GameLoop loop;
   private final GameActivity activity;
@@ -21,9 +21,9 @@ public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder
   public  boolean gameSizeSet = false;  //Set by AndroidGraphics
  
   
-  public GameViewGL(AndroidGL20 _gfx, GameActivity activity, Context context) {
+  public GameViewGL(AndroidGL20 _gl20, GameActivity activity, Context context) {
     super(context);
-    this.gfx = _gfx;
+    this.gl20 = _gl20;
     this.activity = activity;
     holder = getHolder();
     holder.addCallback(this);
@@ -76,12 +76,12 @@ public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder
   private class AndroidRendererGL implements Renderer {    
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-      gfx.glClearColor(0,0,1,1);
+      gl20.glClearColor(0,0,1,1);
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-      gfx.glViewport(0, 0, width, height);
+      gl20.glViewport(0, 0, width, height);
       Log.i("playn", "Surface dimensions changed to ( " + width + " , " + height + ")");
     }
 
@@ -89,9 +89,9 @@ public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder
     public void onDrawFrame(GL10 gl) {
       //Wait until onDrawFrame to make sure all the metrics
       //are in place at this point.
-      gfx.glClear(GL2ES2.GL_COLOR_BUFFER_BIT | GL2ES2.GL_DEPTH_BUFFER_BIT);
+      gl20.glClear(GL2ES2.GL_COLOR_BUFFER_BIT | GL2ES2.GL_DEPTH_BUFFER_BIT);
       if (!gameInitialized) {
-        AndroidPlatform.register(gfx, activity);
+        AndroidPlatform.register(gl20, activity);
         activity.main();
         loop = new GameLoop();
         loop.start();

@@ -91,20 +91,13 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer 
     impl.depthChanged(this, layer, oldDepth);
   }
 
+  //TODO(jonagill) Test this -- copied verbatim from HTMLGroupLayerGL
   @Override
-  //TODO (jonagill): Actually be able to paint GroupLayers
-  public void paint(Transform parentTransform, float parentAlpha) { }
-  
-//  @Override
-//  void paint(AndroidCanvas surf) {
-//    if (!visible()) return;
-//
-//    surf.save();
-//    transform(surf);
-//    surf.setAlpha(surf.alpha() * alpha);
-//    for (AndroidLayer child : impl.children) {
-//      child.paint(surf);
-//    }
-//    surf.restore();
-//  }
+  public void paint(Transform parentTransform, float parentAlpha) {
+    if (!visible()) return;
+
+    for (AndroidLayer child : impl.children) {
+      child.paint(localTransform(parentTransform), parentAlpha * alpha);
+    }
+  }
 }

@@ -15,6 +15,9 @@
  */
 package playn.android;
 
+import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.webgl.client.WebGLTexture;
+
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ImageLayer;
@@ -64,9 +67,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
     Asserts.checkArgument(height > 0, "Height must be > 0");
 
     heightSet = true;
-    if (this.height != height) {
-      this.height = height;
-    }
+    this.height = height;
   }
 
   @Override
@@ -115,37 +116,35 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
     Asserts.checkArgument(width > 0, "Width must be > 0");
 
     widthSet = true;
-    if (this.width != width) {
-      this.width = width;
-    }
+    this.width = width;
   }
 
-  @Override
   //TODO (jonagill): Actually be able to paint ImageLayers
-  public void paint(Transform parentTransform, float parentAlpha) { }
-  
-//  @Override
-//  void paint(AndroidCanvas canvas) {
-//    if (!visible()) return;
-//
-//    canvas.save();
-//    transform(canvas);
-//    canvas.setAlpha(canvas.alpha() * alpha);
-//
-//    float dw = widthSet ? width : image.width();
-//    float dh = heightSet ? height : image.height();
-//
-//    if (repeatX || repeatY) {
-//      // TODO(jgw): something to make this repeat properly.
-//      canvas.drawImage(image, 0, 0, dw, dh);
-//    } else if (sourceRectSet) {
-//      canvas.drawImage(image, 0, 0, dw, dh, sx, sy, sw, sh);
-//    } else {
-//      canvas.drawImage(image, 0, 0);
-//    }
-//
-//    canvas.restore();
-//  }
+  @Override
+  public void paint(Transform parentTransform, float parentAlpha) {
+    if (!visible()) return;
+
+    // TODO(jgw): Assert exclusive source-rect vs. repeat.
+
+    int tex = image.ensureTexture(gfx, repeatX, repeatY);
+    if (tex != 0) {
+      ImageElement elem = img.img;
+
+      Transform xform = localTransform(parentTransform);
+      float childAlpha = parentAlpha * alpha;
+
+      float width = widthSet ? this.width : elem.getWidth();
+      float height = heightSet ? this.height : elem.getHeight();
+
+      if (sourceRectSet) {
+        gfx.drawTexture(tex, img.width(), img.height(), xform, 0, 0, width, height, sx, sy, sw, sh,
+            childAlpha);
+      } else {
+        gfx.drawTexture(tex, img.width(), img.height(), xform, width, height, repeatX, repeatY,
+            childAlpha);
+      }
+    }
+  }
 
   @Override
   public float width() {
@@ -174,6 +173,6 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   @Override
   public float scaledHeight() {
-    return transform().scaleY() * height();
+    return transform.scaleY() * height();
   }
 }

@@ -25,6 +25,7 @@ import javax.media.opengl.GLUniformData;
 
 import android.opengl.GLES20;
 
+//Built in GameViewGL, passed through to a lot of classes
 public class AndroidGL20 implements GL2ES2 {
 
   @Override

@@ -56,17 +56,17 @@ public abstract class GameActivity extends Activity {
     context = getApplicationContext();
     
     //Build the AndroidPlatform and register this activity.
-    AndroidGL20 gfx;
+    AndroidGL20 gl20;
     if (isHoneycombOrLater()) {
-      gfx = new AndroidGL20();
+      gl20 = new AndroidGL20();
     }else {
       //Provide our own native bindings for some missing methods.
-      gfx = new AndroidGL20Native();
+      gl20 = new AndroidGL20Native();
     }
 
     //Build a View to hold the surface view and report changes to the screen size.
     viewLayout = new AndroidViewLayout(this);
-    gameView = new GameViewGL(gfx, this, context);
+    gameView = new GameViewGL(gl20, this, context);
     viewLayout.addView((View)gameView);
 
     //Build the Window and View

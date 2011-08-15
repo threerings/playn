@@ -33,10 +33,10 @@ import android.net.Uri;
 public class AndroidPlatform implements Platform {
 
   static AndroidPlatform instance;
-  private static AndroidGL20 gfx;
+  private static AndroidGL20 gl20;
 
-  public static void register(AndroidGL20 _gfx, GameActivity activity) {
-    gfx = _gfx;
+  public static void register(AndroidGL20 _gl20, GameActivity activity) {
+    gl20 = _gl20;
     PlayN.setPlatform(new AndroidPlatform(activity));
   }
 
@@ -62,7 +62,7 @@ public class AndroidPlatform implements Platform {
     instance = this;
     this.activity = activity;
     audio = new AndroidAudio();
-    graphics = new AndroidGraphics(gfx);
+    graphics = new AndroidGraphics(gl20);
     json = new JavaJson();
     keyboard = new AndroidKeyboard();
     log = new AndroidLog();
