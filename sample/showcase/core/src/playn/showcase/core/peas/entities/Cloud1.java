@@ -1,21 +1,21 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.sample.peas.core.entities;
+package playn.showcase.core.peas.entities;
 
-import playn.sample.peas.core.PeaWorld;
+import playn.showcase.core.peas.PeaWorld;
 
 public class Cloud1 extends Entity {
   public static String TYPE = "Cloud1";
@@ -30,7 +30,7 @@ public class Cloud1 extends Entity {
   public void update(float delta) {
     x += delta * getVelocity();
     layer.setTranslation(x, y);
-    
+
     if (x > getWidth() + getMaximumWidth()) {
       x = -getWidth();
       y = (float) (Math.random() * getMaximumHeight());
@@ -67,8 +67,8 @@ public class Cloud1 extends Entity {
   }
 
   @Override
-  String getImagePath() {
-    return "images/Cloud1.png";
+  String getImageName() {
+    return "Cloud1.png";
   }
 
   @Override

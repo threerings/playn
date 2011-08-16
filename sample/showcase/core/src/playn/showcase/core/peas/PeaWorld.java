@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.sample.peas.core;
+package playn.showcase.core.peas;
 
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
@@ -36,8 +36,9 @@ import static playn.core.PlayN.graphics;
 import playn.core.CanvasLayer;
 import playn.core.DebugDrawBox2D;
 import playn.core.GroupLayer;
-import playn.sample.peas.core.entities.Entity;
-import playn.sample.peas.core.entities.PhysicsEntity;
+
+import playn.showcase.core.peas.entities.Entity;
+import playn.showcase.core.peas.entities.PhysicsEntity;
 
 public class PeaWorld implements ContactListener {
   public GroupLayer staticLayerBack;
@@ -91,8 +92,8 @@ public class PeaWorld implements ContactListener {
 
     if (showDebugDraw) {
       CanvasLayer canvasLayer =
-          graphics().createCanvasLayer((int) (width / Peas.physUnitPerScreenUnit),
-              (int) (height / Peas.physUnitPerScreenUnit));
+          graphics().createCanvasLayer((int) (width / PeasDemo.physUnitPerScreenUnit),
+              (int) (height / PeasDemo.physUnitPerScreenUnit));
       graphics().rootLayer().add(canvasLayer);
       debugDraw = new DebugDrawBox2D();
       debugDraw.setCanvas(canvasLayer);
@@ -101,7 +102,7 @@ public class PeaWorld implements ContactListener {
       debugDraw.setFillAlpha(75);
       debugDraw.setStrokeWidth(2.0f);
       debugDraw.setFlags(DebugDraw.e_shapeBit | DebugDraw.e_jointBit | DebugDraw.e_aabbBit);
-      debugDraw.setCamera(0, 0, 1f / Peas.physUnitPerScreenUnit);
+      debugDraw.setCamera(0, 0, 1f / PeasDemo.physUnitPerScreenUnit);
       world.setDebugDraw(debugDraw);
     }
   }

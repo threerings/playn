@@ -1,19 +1,19 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.sample.peas.core.entities;
+package playn.showcase.core.peas.entities;
 
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -28,7 +28,7 @@ import org.jbox2d.dynamics.joints.MouseJointDef;
 import static playn.core.PlayN.graphics;
 
 import playn.core.ImageLayer;
-import playn.sample.peas.core.PeaWorld;
+import playn.showcase.core.peas.PeaWorld;
 
 public class BlockSpring extends Entity implements PhysicsEntity {
   public static String TYPE = "BlockSpring";
@@ -39,7 +39,7 @@ public class BlockSpring extends Entity implements PhysicsEntity {
 
   public BlockSpring(PeaWorld peaWorld, World world, float x, float y, float angle) {
     super(peaWorld, x, y, angle);
-    
+
     // add the spring joint
     MouseJointDef mjd = new MouseJointDef();
     mjd.bodyA = world.getBodyList();
@@ -49,7 +49,7 @@ public class BlockSpring extends Entity implements PhysicsEntity {
     mjd.maxForce = 40f * getBody().getMass();
     mjd.dampingRatio = 0.2f;
     mj = (MouseJoint) world.createJoint(mjd);
-    
+
     setPos(x, y);
     setAngle(angle);
   }
@@ -61,7 +61,7 @@ public class BlockSpring extends Entity implements PhysicsEntity {
   @Override
   public void initPostLoad(final PeaWorld peaWorld) {
     layerBase = graphics().createImageLayer(layer.image());
-    
+
     // set our layer base settings/source
     layerBase.setWidth(layer.image().width());
     layerBase.setHeight(30);
@@ -75,10 +75,10 @@ public class BlockSpring extends Entity implements PhysicsEntity {
     layer.setSourceRect(0, 0, 71, 31);
     layer.setOrigin(image.width() / 2f, image.height() / 2f);
     layer.setScale(getWidth() / image.width(), getHeight() / image.height());
-    
+
     peaWorld.dynamicLayer.add(layerBase);
     peaWorld.dynamicLayer.add(layer);
-    
+
     setPos(x, y);
     setAngle(angle);
   }
@@ -156,8 +156,8 @@ public class BlockSpring extends Entity implements PhysicsEntity {
   }
 
   @Override
-  public String getImagePath() {
-    return "images/Block-Spring.png";
+  public String getImageName() {
+    return "Block-Spring.png";
   }
 
   @Override

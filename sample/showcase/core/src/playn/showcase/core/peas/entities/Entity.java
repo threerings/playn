@@ -1,19 +1,19 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.sample.peas.core.entities;
+package playn.showcase.core.peas.entities;
 
 import static playn.core.PlayN.assetManager;
 import static playn.core.PlayN.graphics;
@@ -22,7 +22,8 @@ import playn.core.PlayN;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.ResourceCallback;
-import playn.sample.peas.core.PeaWorld;
+
+import playn.showcase.core.peas.PeaWorld;
 
 public abstract class Entity {
   ImageLayer layer;
@@ -33,7 +34,7 @@ public abstract class Entity {
     this.x = px;
     this.y = py;
     this.angle = pangle;
-    image = assetManager().getImage(getImagePath());
+    image = assetManager().getImage("peas/images/" + getImageName());
     layer = graphics().createImageLayer(image);
     initPreLoad(peaWorld);
     image.addCallback(new ResourceCallback<Image>() {
@@ -58,14 +59,14 @@ public abstract class Entity {
 
   /**
    * Perform pre-image load initialization (e.g., attaching to PeaWorld layers).
-   * 
+   *
    * @param peaWorld
    */
   public abstract void initPreLoad(final PeaWorld peaWorld);
 
   /**
    * Perform post-image load initialization (e.g., attaching to PeaWorld layers).
-   * 
+   *
    * @param peaWorld
    */
   public abstract void initPostLoad(final PeaWorld peaWorld);
@@ -88,8 +89,8 @@ public abstract class Entity {
 
   abstract float getHeight();
 
-  abstract String getImagePath();
-  
+  abstract String getImageName();
+
   public Image getImage() {
     return image;
   }

@@ -22,6 +22,7 @@ import playn.core.Game;
 import playn.core.Keyboard;
 import playn.core.PlayN;
 
+import playn.showcase.core.peas.PeasDemo;
 import playn.showcase.core.sprites.SpritesDemo;
 
 /**
@@ -35,6 +36,7 @@ public class Showcase implements Game
   public List<Demo> demos = new ArrayList<Demo>(); {
     // add your demo here to enable it in the showcase
     demos.add(new SpritesDemo());
+    demos.add(new PeasDemo());
   }
 
   public void activateDemo(Demo demo) {

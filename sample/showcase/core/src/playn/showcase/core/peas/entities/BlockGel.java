@@ -1,19 +1,19 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.sample.peas.core.entities;
+package playn.showcase.core.peas.entities;
 
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -23,12 +23,12 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
-import playn.sample.peas.core.PeaWorld;
+import playn.showcase.core.peas.PeaWorld;
 
 public class BlockGel extends Block {
   @SuppressWarnings("hiding")
   public static String TYPE = "BlockGel";
-  
+
   public BlockGel(PeaWorld peaWorld, World world, float x, float y, float angle) {
     super(peaWorld, world, x, y, angle);
   }
@@ -57,7 +57,7 @@ public class BlockGel extends Block {
   }
 
   @Override
-  public String getImagePath() {
-    return "images/Block-Gel.png";
+  public String getImageName() {
+    return "Block-Gel.png";
   }
 }

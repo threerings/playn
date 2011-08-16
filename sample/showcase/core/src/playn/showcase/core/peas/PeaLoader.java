@@ -13,24 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.sample.peas.core;
-
-
-
-
-
-
-import playn.sample.peas.core.entities.Block;
-import playn.sample.peas.core.entities.BlockGel;
-import playn.sample.peas.core.entities.BlockLeftRamp;
-import playn.sample.peas.core.entities.BlockRightRamp;
-import playn.sample.peas.core.entities.BlockSpring;
-import playn.sample.peas.core.entities.Cloud1;
-import playn.sample.peas.core.entities.Cloud3;
-import playn.sample.peas.core.entities.Entity;
-import playn.sample.peas.core.entities.FakeBlock;
-import playn.sample.peas.core.entities.Pea;
-import playn.sample.peas.core.entities.Portal;
+package playn.showcase.core.peas;
 
 import playn.core.AssetWatcher;
 import playn.core.PlayN;
@@ -38,9 +21,22 @@ import playn.core.GroupLayer;
 import playn.core.Json;
 import playn.core.ResourceCallback;
 
+import playn.showcase.core.peas.entities.Block;
+import playn.showcase.core.peas.entities.BlockGel;
+import playn.showcase.core.peas.entities.BlockLeftRamp;
+import playn.showcase.core.peas.entities.BlockRightRamp;
+import playn.showcase.core.peas.entities.BlockSpring;
+import playn.showcase.core.peas.entities.Cloud1;
+import playn.showcase.core.peas.entities.Cloud3;
+import playn.showcase.core.peas.entities.Entity;
+import playn.showcase.core.peas.entities.FakeBlock;
+import playn.showcase.core.peas.entities.Pea;
+import playn.showcase.core.peas.entities.Portal;
+
 public class PeaLoader {
 
-  public static void CreateWorld(String level, final GroupLayer worldLayer, final ResourceCallback<PeaWorld> callback) {
+  public static void CreateWorld(String level, final GroupLayer worldLayer,
+      final ResourceCallback<PeaWorld> callback) {
     final PeaWorld peaWorld = new PeaWorld(worldLayer);
 
     // load the level
