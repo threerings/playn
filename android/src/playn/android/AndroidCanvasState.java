@@ -22,6 +22,9 @@ import android.graphics.Paint.Style;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Xfermode;
+import playn.core.Canvas;
+import playn.core.Canvas.*;
+
 
 class AndroidCanvasState {
 

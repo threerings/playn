@@ -18,15 +18,15 @@ package playn.android;
 import playn.core.Asserts;
 import playn.core.GroupLayer;
 import playn.core.GroupLayerImpl;
+import playn.core.InternalTransform;
 import playn.core.Layer;
 import playn.core.ParentLayer;
-import playn.core.Transform;
 
 class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer {
 
   private GroupLayerImpl<AndroidLayer> impl = new GroupLayerImpl<AndroidLayer>();
 
-  public AndroidGroupLayer(AndroidGL20 gfx) {
+  public AndroidGroupLayer(AndroidGraphics gfx) {
     super(gfx);
   }
   
@@ -93,7 +93,7 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer 
 
   //TODO(jonagill) Test this -- copied verbatim from HTMLGroupLayerGL
   @Override
-  public void paint(Transform parentTransform, float parentAlpha) {
+  public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
     for (AndroidLayer child : impl.children) {

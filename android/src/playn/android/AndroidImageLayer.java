@@ -15,13 +15,11 @@
  */
 package playn.android;
 
-import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.webgl.client.WebGLTexture;
-
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ImageLayer;
-import playn.core.Transform;
+import playn.core.InternalTransform;
+import android.graphics.Bitmap;
 
 class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
@@ -33,11 +31,11 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   private AndroidImage image;
 
-  AndroidImageLayer(AndroidGL20 gfx) {
+  AndroidImageLayer(AndroidGraphics gfx) {
     super(gfx);
   }
   
-  AndroidImageLayer(AndroidGL20 gfx, AndroidImage image) {
+  AndroidImageLayer(AndroidGraphics gfx, AndroidImage image) {
     this(gfx);
     this.image = image;
   }
@@ -121,26 +119,26 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
   //TODO (jonagill): Actually be able to paint ImageLayers
   @Override
-  public void paint(Transform parentTransform, float parentAlpha) {
+  public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
     // TODO(jgw): Assert exclusive source-rect vs. repeat.
 
     int tex = image.ensureTexture(gfx, repeatX, repeatY);
     if (tex != 0) {
-      ImageElement elem = img.img;
+      Bitmap bitmap = image.getBitmap();
 
-      Transform xform = localTransform(parentTransform);
+      InternalTransform xform = localTransform(parentTransform);
       float childAlpha = parentAlpha * alpha;
 
-      float width = widthSet ? this.width : elem.getWidth();
-      float height = heightSet ? this.height : elem.getHeight();
+      float width = widthSet ? this.width : bitmap.getWidth();
+      float height = heightSet ? this.height : bitmap.getHeight();
 
       if (sourceRectSet) {
-        gfx.drawTexture(tex, img.width(), img.height(), xform, 0, 0, width, height, sx, sy, sw, sh,
+        gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, 0, 0, width, height, sx, sy, sw, sh,
             childAlpha);
       } else {
-        gfx.drawTexture(tex, img.width(), img.height(), xform, width, height, repeatX, repeatY,
+        gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, width, height, repeatX, repeatY,
             childAlpha);
       }
     }

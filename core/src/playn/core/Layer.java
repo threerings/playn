@@ -15,8 +15,6 @@
  */
 package playn.core;
 
-import pythagoras.f.Transform;
-
 /**
  * Layer is the base element for all rendering in PlayN
  * <p>
@@ -53,7 +51,7 @@ public interface Layer {
   /**
    * Returns the layer's transformation matrix.
    */
-  Transform transform();
+  InternalTransform transform();
 
   /**
    * Returns true if this layer is visible (i.e. it is being rendered).

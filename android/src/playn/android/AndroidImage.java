@@ -30,7 +30,7 @@ import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ResourceCallback;
-import playn.core.Transform;
+import playn.core.StockInternalTransform;
 import playn.core.gl.GLUtil;
 import android.graphics.Bitmap;
 
@@ -173,53 +173,53 @@ class AndroidImage implements CanvasImage {
   }
 
   private void scaleTexture(AndroidGraphics gfx, boolean repeatX, boolean repeatY) {
-    if (pow2tex != 0) {
-      return;
-    }
-
-    // Ensure that 'tex' is loaded. We use it below.
-    loadTexture(gfx);
-
-    // GL requires pow2 on axes that repeat.
-    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
-
-    // Don't scale if it's already a power of two.
-    if ((width == 0) && (height == 0)) {
-      pow2tex = tex;
-      return;
-    }
-
-    // width/height == 0 => already a power of two.
-    if (width == 0) {
-      width = width();
-    }
-    if (height == 0) {
-      height = height();
-    }
-
-    // Create the pow2 texture.
-    pow2tex = gfx.createTexture(repeatX, repeatY);
-    AndroidGL20 gl20 = gfx.gl20;
-    gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
-    gl20.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
-
-    // Point a new framebuffer at it.
-    int[] fbufBuffer = new int[1];
-    gl20.glGenFramebuffers(1, fbufBuffer, 0);
-    int fbuf = fbufBuffer[0];
-    gfx.bindFramebuffer(fbuf, width, height);
-    gl20.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pow2tex, 0);
-    //TODO(jonagill): No mip-mapping?
-
-    // Render the scaled texture into the framebuffer.
-    // (rebind the texture because gfx.bindFramebuffer() may have bound it when flushing)
-    gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
-    gfx.drawTexture(tex, width(), height(), Transform.IDENTITY, 0, height, width, -height, false,
-        false, 1);
-    gfx.flush();
-    gfx.bindFramebuffer();
-
-    gl20.glDeleteFramebuffers(1, new int[] {fbuf}, 0);
+//    if (pow2tex != 0) {
+//      return;
+//    }
+//
+//    // Ensure that 'tex' is loaded. We use it below.
+//    loadTexture(gfx);
+//
+//    // GL requires pow2 on axes that repeat.
+//    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
+//
+//    // Don't scale if it's already a power of two.
+//    if ((width == 0) && (height == 0)) {
+//      pow2tex = tex;
+//      return;
+//    }
+//
+//    // width/height == 0 => already a power of two.
+//    if (width == 0) {
+//      width = width();
+//    }
+//    if (height == 0) {
+//      height = height();
+//    }
+//
+//    // Create the pow2 texture.
+//    pow2tex = gfx.createTexture(repeatX, repeatY);
+//    AndroidGL20 gl20 = gfx.gl20;
+//    gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
+//    gl20.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
+//
+//    // Point a new framebuffer at it.
+//    int[] fbufBuffer = new int[1];
+//    gl20.glGenFramebuffers(1, fbufBuffer, 0);
+//    int fbuf = fbufBuffer[0];
+//    gfx.bindFramebuffer(fbuf, width, height);
+//    gl20.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pow2tex, 0);
+//    //TODO(jonagill): No mip-mapping?
+//
+//    // Render the scaled texture into the framebuffer.
+//    // (rebind the texture because gfx.bindFramebuffer() may have bound it when flushing)
+//    gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
+//    gfx.drawTexture(tex, width(), height(), StockInternalTransform.IDENTITY, 0, height, width, -height, false,
+//        false, 1);
+//    gfx.flush();
+//    gfx.bindFramebuffer();
+//
+//    gl20.glDeleteFramebuffers(1, new int[] {fbuf}, 0);
   }
   
   
