@@ -27,15 +27,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 
-import playn.core.AbstractAssetManager;
-import playn.core.Image;
-import playn.core.ResourceCallback;
-import playn.core.Sound;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import playn.core.AbstractAssetManager;
+import playn.core.Image;
+import playn.core.ResourceCallback;
+import playn.core.Sound;
 
 public class AndroidAssetManager extends AbstractAssetManager {
 

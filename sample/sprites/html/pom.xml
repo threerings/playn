@@ -11,7 +11,7 @@
   <groupId>com.googlecode.playn</groupId>
   <artifactId>playn-sprites-html</artifactId>
   <packaging>war</packaging>
-  <name>Playn Sprites Html</name>
+  <name>PlayN Sprites Html</name>
 
   <dependencies>
     <dependency>

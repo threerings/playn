@@ -15,8 +15,6 @@
  */
 package playn.android;
 
-import playn.core.Canvas;
-import playn.core.Canvas.Composite;
 import android.graphics.Paint;
 import android.graphics.Paint.Cap;
 import android.graphics.Paint.Join;
@@ -103,7 +101,7 @@ class AndroidCanvasState {
     } else {
       paint.setColor(fillColor);
       // Android reuses the A bits of color for alpha so we have to compute the real alpha here 
-      if (alpha <= 254f / 255f)
+      if (alpha < 1)
         paint.setAlpha((int) (alpha * (fillColor >>> 24)));
     }
     return paint;
@@ -113,7 +111,7 @@ class AndroidCanvasState {
     paint.setStyle(Style.STROKE);
     paint.setColor(strokeColor);
     // Android reuses the A bits of color for alpha so we have to compute the real alpha here 
-    if (alpha <= 254f / 255f)
+    if (alpha < 1)
       paint.setAlpha((int) (alpha * (strokeColor >>> 24)));
     paint.setXfermode(convertComposite(composite));
     return paint;
