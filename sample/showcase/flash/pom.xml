@@ -10,13 +10,13 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>playn-peaphysics-flash</artifactId>
-  <name>PlayN Peas Flash Sample</name>
+  <artifactId>playn-showcase-flash</artifactId>
+  <name>PlayN Showcase Flash</name>
   <packaging>war</packaging>
 
   <properties>
-    <gwt.module>playn.sample.peas.PeasFlash</gwt.module>
-    <gwt.name>peasflash</gwt.name>
+    <gwt.module>playn.showcase.flash.ShowcaseFlash</gwt.module>
+    <gwt.name>showcaseflash</gwt.name>
   </properties>
 
   <dependencies>
