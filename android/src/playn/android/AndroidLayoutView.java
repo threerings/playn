@@ -6,8 +6,8 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.widget.LinearLayout;
 
-public class AndroidViewLayout extends LinearLayout {
-  public AndroidViewLayout(Activity activity) {
+public class AndroidLayoutView extends LinearLayout {
+  public AndroidLayoutView(Activity activity) {
     super(activity);
     setBackgroundColor(0xFF000000);
     setGravity(Gravity.CENTER);

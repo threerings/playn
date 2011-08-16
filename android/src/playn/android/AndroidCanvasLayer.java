@@ -20,13 +20,13 @@ import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
-import playn.core.Transform;
+import playn.core.InternalTransform;
 
 class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
 
   private CanvasImage canvas;
 
-  AndroidCanvasLayer(AndroidGL20 gfx, int width, int height, boolean alpha) {
+  AndroidCanvasLayer(AndroidGraphics gfx, int width, int height, boolean alpha) {
     super(gfx);
     canvas = ((AndroidGraphics)graphics()).createImage(width, height, alpha);
   }
@@ -44,7 +44,7 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
 
   @Override
   //TODO (jonagill): Actually be able to paint CanvasLayers
-  public void paint(Transform parentTransform, float parentAlpha) { }
+  public void paint(InternalTransform parentTransform, float parentAlpha) { }
   
 //  @Override
 //  void paint(AndroidCanvas surf) {

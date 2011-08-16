@@ -23,7 +23,6 @@ import static com.google.gwt.webgl.client.WebGLRenderingContext.UNSIGNED_BYTE;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ResourceCallback;
-import playn.core.Transform;
 import playn.core.gl.GLUtil;
 
 import com.google.gwt.dom.client.CanvasElement;

@@ -26,7 +26,7 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
   private AndroidImage img;
   private Surface surface;
 
-  AndroidSurfaceLayer(AndroidGL20 gfx, int width, int height) {
+  AndroidSurfaceLayer(AndroidGraphics gfx, int width, int height) {
     super(gfx);
     img = (AndroidImage) graphics().createImage(width, height);
     surface = new CanvasSurface(img.canvas());
@@ -69,7 +69,7 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
 
   @Override
   public float scaledWidth() {
-    return transform().scaleX() * width();
+   return transform().scaleX() * width();
   }
 
   @Override

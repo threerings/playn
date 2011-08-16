@@ -65,7 +65,7 @@ public abstract class GameActivity extends Activity {
     }
 
     //Build a View to hold the surface view and report changes to the screen size.
-    viewLayout = new AndroidViewLayout(this);
+    viewLayout = new AndroidLayoutView(this);
     gameView = new GameViewGL(gl20, this, context);
     viewLayout.addView((View)gameView);
 
@@ -156,7 +156,7 @@ public abstract class GameActivity extends Activity {
   protected void onPause() {
     Log.i("playn", "onPause");
     gameView.notifyVisibilityChanged(View.INVISIBLE);
-    platform().audio().pause();
+    if (platform() != null) platform().audio().pause();
     wakeLock.release();
     super.onPause();
 

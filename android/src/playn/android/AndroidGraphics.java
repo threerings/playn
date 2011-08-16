@@ -33,7 +33,7 @@ import playn.core.ImageLayer;
 import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.SurfaceLayer;
-import playn.core.Transform;
+import playn.core.InternalTransform;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.LinearGradient;
@@ -161,11 +161,11 @@ class AndroidGraphics implements Graphics {
       return vertIdx;
     }
 
-    void buildVertex(Transform local, float dx, float dy) {
+    void buildVertex(InternalTransform local, float dx, float dy) {
       buildVertex(local, dx, dy, 0, 0);
     }
 
-    void buildVertex(Transform local, float dx, float dy, float sx, float sy) {
+    void buildVertex(InternalTransform local, float dx, float dy, float sx, float sy) {
       float[] vertexArray = vertexData.array();
       vertexArray[vertexOffset + 0] = local.m00();
       vertexArray[vertexOffset + 1] = local.m01();
@@ -326,7 +326,7 @@ class AndroidGraphics implements Graphics {
   public AndroidGraphics(AndroidGL20 gfx) {
     this.gl20 = gfx;
     gameView = AndroidPlatform.instance.activity.gameView();
-    rootLayer = new AndroidGroupLayer(gfx);
+    rootLayer = new AndroidGroupLayer(this);
     if (startingScreenWidth != 0) screenWidth = startingScreenWidth;
     if (startingScreenHeight != 0) screenHeight = startingScreenHeight;
 //    
@@ -384,31 +384,31 @@ class AndroidGraphics implements Graphics {
 
   @Override
   public CanvasLayer createCanvasLayer(int width, int height) {
-    return new AndroidCanvasLayer(gl20, width, height, true);
+    return new AndroidCanvasLayer(this, width, height, true);
   }
 
   public CanvasLayer createCanvasLayer(int width, int height, boolean alpha) {
-    return new AndroidCanvasLayer(gl20, width, height, alpha);
+    return new AndroidCanvasLayer(this, width, height, alpha);
   }
 
   @Override
   public GroupLayer createGroupLayer() {
-    return new AndroidGroupLayer(gl20);
+    return new AndroidGroupLayer(this);
   }
 
   @Override
   public ImageLayer createImageLayer() {
-    return new AndroidImageLayer(gl20);
+    return new AndroidImageLayer(this);
   }
 
   @Override
   public ImageLayer createImageLayer(Image image) {
-    return new AndroidImageLayer(gl20, (AndroidImage) image);
+    return new AndroidImageLayer(this, (AndroidImage) image);
   }
 
   @Override
   public SurfaceLayer createSurfaceLayer(int width, int height) {
-    return new AndroidSurfaceLayer(gl20, width, height);
+    return new AndroidSurfaceLayer(this, width, height);
   }
 
   @Override
@@ -550,18 +550,18 @@ class AndroidGraphics implements Graphics {
         GL2ES2.GL_RGBA, GL2ES2.GL_BYTE, pixels);
   }
 
-  void drawTexture(int texture, float texWidth, float texHeight, Transform local, float dw,
+  void drawTexture(int texture, float texWidth, float texHeight, InternalTransform local, float dw,
       float dh, boolean repeatX, boolean repeatY, float alpha) {
     drawTexture(texture, texWidth, texHeight, local, 0, 0, dw, dh, repeatX, repeatY, alpha);
   }
 
-  void drawTexture(int texture, float texWidth, float texHeight, Transform local, float dx,
+  void drawTexture(int texture, float texWidth, float texHeight, InternalTransform local, float dx,
       float dy, float dw, float dh, boolean repeatX, boolean repeatY, float alpha) {
     float sw = repeatX ? dw : texWidth, sh = repeatY ? dh : texHeight;
     drawTexture(texture, texWidth, texHeight, local, dx, dy, dw, dh, 0, 0, sw, sh, alpha);
   }
 
-  void drawTexture(int texture, float texWidth, float texHeight, Transform local, float dx,
+  void drawTexture(int texture, float texWidth, float texHeight, InternalTransform local, float dx,
       float dy, float dw, float dh, float sx, float sy, float sw, float sh, float alpha) {
     texShader.prepare(texture, alpha);
     sx /= texWidth;
@@ -585,7 +585,7 @@ class AndroidGraphics implements Graphics {
     texShader.addElement(idx + 2);
   }
 
-  void fillRect(Transform local, float dx, float dy, float dw, float dh, float texWidth,
+  void fillRect(InternalTransform local, float dx, float dy, float dw, float dh, float texWidth,
       float texHeight, int texture, float alpha) {
     texShader.prepare(texture, alpha);
 
@@ -607,7 +607,7 @@ class AndroidGraphics implements Graphics {
     texShader.addElement(idx + 2);
   }
 
-  void fillRect(Transform local, float dx, float dy, float dw, float dh, int color, float alpha) {
+  void fillRect(InternalTransform local, float dx, float dy, float dw, float dh, int color, float alpha) {
     colorShader.prepare(color, alpha);
 
     int idx = colorShader.beginPrimitive(4, 6);
@@ -625,7 +625,7 @@ class AndroidGraphics implements Graphics {
   }
 
   // Verbatim
-  void fillPoly(Transform local, float[] positions, int color, float alpha) {
+  void fillPoly(InternalTransform local, float[] positions, int color, float alpha) {
     colorShader.prepare(color, alpha);
 
     int idx = colorShader.beginPrimitive(4, 6);
