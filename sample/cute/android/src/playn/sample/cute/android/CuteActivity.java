@@ -15,16 +15,14 @@
  */
 package playn.sample.cute.android;
 
-import android.os.Bundle;
-import playn.core.PlayN;
 import playn.android.GameActivity;
+import playn.core.PlayN;
 import playn.sample.cute.core.CuteGame;
 
 public class CuteActivity extends GameActivity {
 
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  public void main(){
     platform().assetManager().setPathPrefix("playn/sample/cute/resources");
     PlayN.run(new CuteGame());
   }
