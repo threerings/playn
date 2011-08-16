@@ -28,25 +28,30 @@ import playn.core.Pointer;
 import playn.showcase.core.Demo;
 
 public class SpritesDemo extends Demo {
-  GroupLayer peaLayer;
+  GroupLayer layer;
   List<Pea> peas = new ArrayList<Pea>(0);
 
   @Override
+  public String name() {
+    return "Sprites";
+  }
+
+  @Override
   public void init() {
+    // create a group layer to hold everything
+    layer = graphics().createGroupLayer();
+    graphics().rootLayer().add(layer);
+
     // create and add background image layer
     Image bgImage = assetManager().getImage("sprites/bg.png");
     ImageLayer bgLayer = graphics().createImageLayer(bgImage);
-    graphics().rootLayer().add(bgLayer);
-
-    // create a group layer to hold the peas
-    peaLayer = graphics().createGroupLayer();
-    graphics().rootLayer().add(peaLayer);
+    layer.add(bgLayer);
 
     // add a listener for pointer (mouse, touch) input
     pointer().setListener(new Pointer.Adapter() {
       @Override
       public void onPointerEnd(Pointer.Event event) {
-        Pea pea = new Pea(peaLayer, event.x(), event.y());
+        Pea pea = new Pea(layer, event.x(), event.y());
         peas.add(pea);
       }
     });
@@ -56,8 +61,8 @@ public class SpritesDemo extends Demo {
   public void shutdown() {
     pointer().setListener(null);
 
-    peaLayer.destroy();
-    peaLayer = null;
+    layer.destroy();
+    layer = null;
   }
 
   @Override

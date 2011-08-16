@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.Game;
+import playn.core.Keyboard;
+import playn.core.PlayN;
 
 import playn.showcase.core.sprites.SpritesDemo;
 
@@ -28,14 +30,44 @@ import playn.showcase.core.sprites.SpritesDemo;
 public class Showcase implements Game
 {
   private Demo activeDemo;
+  private Demo menuDemo = new Menu(this);
 
-  private List<Demo> demos = new ArrayList<Demo>(); {
+  public List<Demo> demos = new ArrayList<Demo>(); {
+    // add your demo here to enable it in the showcase
     demos.add(new SpritesDemo());
+  }
+
+  public void activateDemo(Demo demo) {
+    if (activeDemo != null) {
+      activeDemo.shutdown();
+    }
+    activeDemo = demo;
+    activeDemo.init();
   }
 
   @Override
   public void init() {
-    activateDemo(demos.get(0));
+    PlayN.keyboard().setListener(new Keyboard.Adapter() {
+      public void onKeyDown(Keyboard.Event event) {
+        if (event.keyCode() == Keyboard.KEY_ESC) {
+          activateDemo(menuDemo);
+        } else {
+          Keyboard.Listener delegate = activeDemo.keyboardListener();
+          if (delegate != null) {
+            delegate.onKeyDown(event);
+          }
+        }
+      }
+
+      public void onKeyUp(Keyboard.Event event) {
+        Keyboard.Listener delegate = activeDemo.keyboardListener();
+        if (delegate != null) {
+          delegate.onKeyUp(event);
+        }
+      }
+    });
+
+    activateDemo(menuDemo);
   }
 
   @Override
@@ -51,19 +83,5 @@ public class Showcase implements Game
   @Override
   public int updateRate() {
     return 25;
-  }
-
-  private void activateDemo(Demo demo) {
-    if (activeDemo != null) {
-      activeDemo.shutdown();
-    }
-    activeDemo = demo;
-    activeDemo.init();
-  }
-
-  private void activateNextDemo() {
-    int curIdx = demos.indexOf(activeDemo);
-    int nextIdx = (curIdx + 1) % demos.size();
-    activateDemo(demos.get(nextIdx));
   }
 }

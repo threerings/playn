@@ -16,6 +16,7 @@
 package playn.showcase.core;
 
 import playn.core.Game;
+import playn.core.Keyboard;
 
 /**
  * Demonstrates a particular PlayN feature or set of features. This interface is kind of like
@@ -24,6 +25,11 @@ import playn.core.Game;
  */
 public abstract class Demo
 {
+  /**
+   * Returns the name of this demo.
+   */
+  public abstract String name();
+
   /**
    * Initializes this demo. Here is where listeners should be wired up and resources loaded.
    */
@@ -47,5 +53,14 @@ public abstract class Demo
    * has elapsed since the last call to update.
    */
   public void paint(float alpha) {
+  }
+
+  /**
+   * Because the showcase uses a few keys to move between demos, a demo must not register a
+   * keyboard listener directly, but instead return its listener from this method. This allows the
+   * showcase to intercept the keys it needs and to pass on other key events to the demo.
+   */
+  public Keyboard.Listener keyboardListener() {
+    return null;
   }
 }
