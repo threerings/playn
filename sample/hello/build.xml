@@ -3,5 +3,5 @@
   <property name="java.classname" value="playn.sample.hello.java.HelloGameJava"/>
   <property name="html.classname" value="playn.sample.hello.HelloGame"/>
   <property name="html.index" value="HelloGame.html"/>
-  <import file="../../build-common.xml"/>
+  <import file="../build-common.xml"/>
 </project>

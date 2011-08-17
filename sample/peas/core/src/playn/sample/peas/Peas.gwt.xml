@@ -15,6 +15,7 @@
 -->
 <module rename-to='peas'>
   <inherits name='playn.PlayN' />
+  <inherits name="org.jbox2d.GwtBox2D" />
     
   <!--
     Optionally, enable gwt-log's advanced logging features:
