@@ -14,8 +14,8 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>hello/core</module>
-    <module>cute/core</module>
+    <module>hello</module>
+    <module>cute</module>
     <module>peas/core</module>
 <!-- disabled until we can fix the m2eclipse errors caused by this pom
     <module>peas/flash</module>
