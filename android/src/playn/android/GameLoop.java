@@ -17,8 +17,6 @@ package playn.android;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.media.opengl.GL2ES2;
-
 import android.util.Log;
 
 public class GameLoop implements Runnable {
@@ -32,15 +30,6 @@ public class GameLoop implements Runnable {
   private int updateRate;
   private int accum;
   private int lastTime;  
-  private int lastStats;
-  private int updateCount;
-  private int updateTime;
-  private int paintCount;
-  private int paintQueueStart;
-  private int runQueueStart;
-  private int paintTime, paintLagTime;
-  private int runCount;
-  private int runQueueTime;
 
   private float paintAlpha;
 
@@ -49,13 +38,10 @@ public class GameLoop implements Runnable {
   }
 
   public void start() {
-    lastStats = time();
-
     if (!running.get()) {
       Log.i("playn", "Starting game loop");
       this.updateRate = AndroidPlatform.instance.game.updateRate();
       running.set(true);
-      runQueueStart = lastTime = time();
     }
   }
 
@@ -68,20 +54,12 @@ public class GameLoop implements Runnable {
     // The thread can be stopped between runs.
     if (!running.get())
       return;
-    
-    runCount++;
 
     int now = time();
     float delta = now - lastTime;
     if (delta > MAX_DELTA)
       delta = MAX_DELTA;
-
     lastTime = now;
-    runQueueTime += now - runQueueStart;
-
-    if (now - lastStats > 10000) {
-      updateStats(now);
-    }
 
     if (updateRate == 0) {
       AndroidPlatform.instance.update(delta);
@@ -89,34 +67,13 @@ public class GameLoop implements Runnable {
     } else {
       accum += delta;
       while (accum >= updateRate) {
-        updateCount++;
-        double start = time();
         AndroidPlatform.instance.update(updateRate);
-        updateTime += time() - start;
         accum -= updateRate;
       }
     }
 
     paintAlpha = (updateRate == 0) ? 0 : accum / updateRate;
-    paintQueueStart = time();
     paint();
-  }
-
-  private void updateStats(int now) {
-    if (paintCount > 0)
-      Log.i("playn", "Stats: paints = " + paintCount + " " + ((float) paintTime / paintCount)
-          + "ms (" + ((float) paintCount / (now - lastStats) * 1000) + "/s) lag = "
-          + ((float) paintLagTime / paintCount) + "ms");
-    if (updateCount > 0)
-      Log.i("playn", "Stats: updates = " + updateCount + " "
-          + ((float) updateTime / updateCount) + "ms ("
-          + ((float) updateCount / (now - lastStats) * 1000) + "/s)");
-    Log.i("playn", "Stats: runs = " + runCount + " run lag = "
-        + ((float) runQueueTime / runCount) + "ms (" + runCount / ((float) now - lastStats)
-        * 1000 + "/s)");
-    paintCount = updateCount = runCount = 0;
-    paintTime = paintLagTime = updateTime = 0;
-    lastStats = now;
   }
 
   private int time() {
@@ -131,12 +88,8 @@ public class GameLoop implements Runnable {
   }
 
   protected void paint() {
-    double start = time();
-    paintLagTime += start - paintQueueStart;
     AndroidPlatform.instance.game.paint(paintAlpha);  //Run the game's custom layer-painting code
     gfx.updateLayers();  //Actually draw to the screen
-    paintTime += time() - start;
-    paintCount++;
   }
 
 }
