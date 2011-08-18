@@ -17,7 +17,6 @@ public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder
   private GameLoop loop;
   private final GameActivity activity;
   private boolean gameInitialized = false;
-  private boolean screenSizeEstablished = false;
   public  boolean gameSizeSet = false;  //Set by AndroidGraphics
  
   
@@ -76,7 +75,7 @@ public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder
   private class AndroidRendererGL implements Renderer {    
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-      gl20.glClearColor(0,0,1,1);
+      gl20.glClearColor(1,1,1,1);
     }
 
     @Override
@@ -89,7 +88,6 @@ public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder
     public void onDrawFrame(GL10 gl) {
       //Wait until onDrawFrame to make sure all the metrics
       //are in place at this point.
-      gl20.glClear(GL2ES2.GL_COLOR_BUFFER_BIT | GL2ES2.GL_DEPTH_BUFFER_BIT);
       if (!gameInitialized) {
         AndroidPlatform.register(gl20, activity);
         activity.main();
@@ -97,7 +95,7 @@ public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder
         loop.start();
         gameInitialized = true;
       }
-      if (loop.running() && gameInitialized) loop.run();
+      if (loop.running() && gameInitialized) loop.run();  //Handles updating, clearing the screen, and drawing
     }
   }
 }

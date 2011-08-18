@@ -16,7 +16,7 @@
 package playn.android;
 
 public class Shaders {
-  static final String pathPrefix = "playn/core/gl";
+  static final String pathPrefix = "playn/android";
   static final String vertexShader = "vertex-shader.txt";
   static final String texFragmentShader = "tex-fragment-shader.txt";
   static final String colorFragmentShader = "color-fragment-shader.txt";

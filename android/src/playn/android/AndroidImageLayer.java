@@ -122,6 +122,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
   public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible()) return;
 
+    gfx.checkGlError("androidimage.paint START");
     // TODO(jgw): Assert exclusive source-rect vs. repeat.
 
     int tex = image.ensureTexture(gfx, repeatX, repeatY);
@@ -142,6 +143,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
             childAlpha);
       }
     }
+    gfx.checkGlError("androidimage.paint END");
   }
 
   @Override

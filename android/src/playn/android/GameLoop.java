@@ -17,13 +17,15 @@ package playn.android;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.media.opengl.GL2ES2;
+
 import android.util.Log;
 
 public class GameLoop implements Runnable {
   private static final int MAX_DELTA = 100;
 
   private AtomicBoolean running = new AtomicBoolean();
-  private AndroidGraphics graphics;
+  private AndroidGraphics gfx;
   
   private long timeOffset = System.currentTimeMillis();
 
@@ -43,7 +45,7 @@ public class GameLoop implements Runnable {
   private float paintAlpha;
 
   public GameLoop() {
-    graphics = AndroidPlatform.instance.graphics();
+    gfx = AndroidPlatform.instance.graphics();
   }
 
   public void start() {
@@ -81,12 +83,9 @@ public class GameLoop implements Runnable {
       updateStats(now);
     }
 
-    boolean isPaintDirty = false;
-
     if (updateRate == 0) {
       AndroidPlatform.instance.update(delta);
       accum = 0;
-      isPaintDirty = true;
     } else {
       accum += delta;
       while (accum >= updateRate) {
@@ -95,15 +94,12 @@ public class GameLoop implements Runnable {
         AndroidPlatform.instance.update(updateRate);
         updateTime += time() - start;
         accum -= updateRate;
-        isPaintDirty = true;
       }
     }
 
-    if (isPaintDirty) {
-      paintAlpha = (updateRate == 0) ? 0 : accum / updateRate;
-      paintQueueStart = time();
-      paint();
-    }
+    paintAlpha = (updateRate == 0) ? 0 : accum / updateRate;
+    paintQueueStart = time();
+    paint();
   }
 
   private void updateStats(int now) {
@@ -135,14 +131,12 @@ public class GameLoop implements Runnable {
   }
 
   protected void paint() {
-//    graphics.updateLayers();
+    double start = time();
+    paintLagTime += start - paintQueueStart;
+    AndroidPlatform.instance.game.paint(paintAlpha);  //Run the game's custom layer-painting code
+    gfx.updateLayers();  //Actually draw to the screen
+    paintTime += time() - start;
+    paintCount++;
   }
 
-//  void paint(Canvas c) {
-//    double start = time();
-//    paintLagTime += start - paintQueueStart;
-//    AndroidPlatform.instance.draw(c, paintAlpha);
-//    paintTime += time() - start;
-//    paintCount++;
-//  }
 }
