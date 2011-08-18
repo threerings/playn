@@ -38,6 +38,7 @@ import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.InternalTransform;
+import playn.core.StockInternalTransform;
 import playn.core.SurfaceLayer;
 
 class HtmlGraphicsGL extends HtmlGraphics {
@@ -59,7 +60,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     WebGLUniformLocation uScreenSizeLoc;
     int aMatrix, aTranslation, aPosition, aTexture;
 
-    WebGLBuffer buffer, indexBuffer;
+    WebGLBuffer vertexBuffer, elementBuffer;
 
     Float32Array vertexData = Float32Array.create(VERTEX_SIZE * MAX_VERTS);
     Uint16Array elementData = Uint16Array.create(MAX_ELEMS);
@@ -78,16 +79,16 @@ class HtmlGraphicsGL extends HtmlGraphics {
       aTexture = gl.getAttribLocation(program, "a_Texture");
 
       // Create the vertex and index buffers.
-      buffer = gl.createBuffer();
-      indexBuffer = gl.createBuffer();
+      vertexBuffer = gl.createBuffer();
+      elementBuffer = gl.createBuffer();
     }
 
     boolean prepare() {
       if (useShader(this)) {
         gl.useProgram(program);
         gl.uniform2fv(uScreenSizeLoc, new float[] { screenWidth, screenHeight });
-        gl.bindBuffer(ARRAY_BUFFER, buffer);
-        gl.bindBuffer(ELEMENT_ARRAY_BUFFER, indexBuffer);
+        gl.bindBuffer(ARRAY_BUFFER, vertexBuffer);
+        gl.bindBuffer(ELEMENT_ARRAY_BUFFER, elementBuffer);
 
         gl.enableVertexAttribArray(aMatrix);
         gl.enableVertexAttribArray(aTranslation);

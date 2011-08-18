@@ -132,7 +132,6 @@ class AndroidImage implements CanvasImage {
    * Clears textures associated with this image. This does not destroy the image -- a subsequent
    * call to ensureTexture() will recreate them.
    */
-	//TODO(jonagill): Should 0 be used as a null texture, or would -1 be better?
   void clearTexture(AndroidGraphics gfx) {
     if (pow2tex == tex) {
       pow2tex = 0;
@@ -159,7 +158,6 @@ class AndroidImage implements CanvasImage {
         return tex;
       }
     }
-    
     return 0;
   }
   
@@ -167,42 +165,41 @@ class AndroidImage implements CanvasImage {
     if (tex != 0) {
       return;
     }
-
     tex = gfx.createTexture(false, false);
     gfx.updateTexture(tex, getBitmap());
   }
 
   private void scaleTexture(AndroidGraphics gfx, boolean repeatX, boolean repeatY) {
-//    if (pow2tex != 0) {
-//      return;
-//    }
-//
-//    // Ensure that 'tex' is loaded. We use it below.
-//    loadTexture(gfx);
-//
-//    // GL requires pow2 on axes that repeat.
-//    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
-//
-//    // Don't scale if it's already a power of two.
-//    if ((width == 0) && (height == 0)) {
-//      pow2tex = tex;
-//      return;
-//    }
-//
-//    // width/height == 0 => already a power of two.
-//    if (width == 0) {
-//      width = width();
-//    }
-//    if (height == 0) {
-//      height = height();
-//    }
-//
-//    // Create the pow2 texture.
-//    pow2tex = gfx.createTexture(repeatX, repeatY);
-//    AndroidGL20 gl20 = gfx.gl20;
-//    gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
-//    gl20.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
-//
+    if (pow2tex != 0) {
+      return;
+    }
+
+    // Ensure that 'tex' is loaded. We use it below.
+    loadTexture(gfx);
+
+    // GL requires pow2 on axes that repeat.
+    int width = GLUtil.nextPowerOfTwo(width()), height = GLUtil.nextPowerOfTwo(height());
+
+    // Don't scale if it's already a power of two.
+    if ((width == 0) && (height == 0)) {
+      pow2tex = tex;
+      return;
+    }
+
+    // width/height == 0 => already a power of two.
+    if (width == 0) {
+      width = width();
+    }
+    if (height == 0) {
+      height = height();
+    }
+
+    // Create the pow2 texture.
+    pow2tex = gfx.createTexture(repeatX, repeatY);
+    AndroidGL20 gl20 = gfx.gl20;
+    gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
+    gl20.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
+
 //    // Point a new framebuffer at it.
 //    int[] fbufBuffer = new int[1];
 //    gl20.glGenFramebuffers(1, fbufBuffer, 0);
