@@ -15,7 +15,6 @@
  */
 package playn.sample.sprites.android;
 
-import android.os.Bundle;
 import playn.android.GameActivity;
 import playn.core.PlayN;
 import playn.sample.sprites.core.SpritesGame;
@@ -23,8 +22,7 @@ import playn.sample.sprites.core.SpritesGame;
 public class SpritesGameActivity extends GameActivity {
 
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  public void main(){
     platform().assetManager().setPathPrefix("playn/sample/sprites/resources");
     PlayN.run(new SpritesGame());
   }
