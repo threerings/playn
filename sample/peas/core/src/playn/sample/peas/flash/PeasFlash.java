@@ -27,7 +27,7 @@ public class PeasFlash extends FlashGame {
   @Override
   public void start() {
     FlashAssetManager assets = FlashPlatform.register().assetManager();
-    assets.setPathPrefix("peas/");
+    assets.setPathPrefix("peasflash/");
     PlayN.run(new Peas());
   }
 }
