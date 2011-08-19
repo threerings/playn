@@ -15,6 +15,7 @@
 -->
 <module rename-to='peasflash'>
   <inherits name='playn.PlayNFlash'/>
+  <inherits name="org.jbox2d.GwtBox2D" />
 
   <source path='core'/>
   <source path='flash'/>

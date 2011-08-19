@@ -8,12 +8,9 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>android</artifactId>
-  <packaging>jar</packaging>
-<!-- TODO: when this is all wired up properly, we'll be generating an apklib
-  <packaging>apklib</packaging>
--->
+  <artifactId>playn-android</artifactId>
   <name>PlayN Android</name>
+  <packaging>jar</packaging>
 
   <repositories>
   </repositories>
@@ -21,7 +18,15 @@
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>playn-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- needed because Android uses the same JSON code as playn-java;
+         that should be factored into a library shared by both backends -->
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-java</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -30,13 +35,6 @@
       <artifactId>android</artifactId>
       <version>2.3.3</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>allen_sauer</groupId>
-      <artifactId>gwt-log</artifactId>
-      <version>1.0.r613</version>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -49,13 +47,5 @@
 
   <build>
     <sourceDirectory>src</sourceDirectory>
-    <plugins>
-      <plugin>
-        <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-        <artifactId>maven-android-plugin</artifactId>
-        <version>2.9.0-beta-1</version>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
   </build>
 </project>

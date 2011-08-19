@@ -16,9 +16,12 @@
   </issueManagement>
 
   <modules>
+    <module>core</module>
     <module>gwtbox2d</module>
     <module>webgl</module>
-    <module>core</module>
+    <module>java</module>
+    <module>html</module>
+    <module>flash</module>
     <module>android</module>
     <module>server</module>
     <module>sample</module>
@@ -43,13 +46,10 @@
   </properties>
 
   <repositories>
+    <!-- TEMP: obtain some artifacts from legacy forplay maven repository -->
     <repository>
-      <id>repo1</id>
-      <url>http://repo1.maven.org/maven2/</url>
-    </repository>
-    <repository>
-      <id>playn</id>
-      <url>http://playn.googlecode.com/svn/mavenrepo</url>
+      <id>forplay-legacy</id>
+      <url>http://forplay.googlecode.com/svn/mavenrepo</url>
     </repository>
   </repositories>
 
@@ -63,21 +63,9 @@
   <!-- Common dependencies for all modules -->
   <dependencies>
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>${gwtversion}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-servlet</artifactId>
-      <version>${gwtversion}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -101,6 +89,7 @@
             <soyc>${gwt.soyc}</soyc>
             <localWorkers>${gwt.workers}</localWorkers>
             <extraJvmArgs>-Xmx256m -Dgwt.args="-XdisableRunAsync"</extraJvmArgs>
+	    <draftCompile>true</draftCompile>
             <modules>
               <module>${gwt.module}</module>
             </modules>
@@ -148,14 +137,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>2.1.2</version>
-          <executions>
-            <execution>
-              <phase>package</phase>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-          </executions>
         </plugin>
 
 	<plugin>
