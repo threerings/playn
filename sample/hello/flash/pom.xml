@@ -5,24 +5,24 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.googlecode.playn</groupId>
-    <artifactId>playn-demos</artifactId>
+    <artifactId>playn-hello</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>playn-peaphysics</artifactId>
-  <name>PlayN Peas Sample</name>
+  <artifactId>playn-hello-flash</artifactId>
+  <name>PlayN Hello Flash</name>
+  <packaging>war</packaging>
 
   <properties>
-    <gwt.module>playn.sample.peas.Peas</gwt.module>
-    <gwt.name>peas</gwt.name>
+    <gwt.module>playn.sample.hello.HelloGame</gwt.module>
+    <gwt.name>hello</gwt.name>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-java</artifactId>
-      <version>${coreversion}</version>
+      <artifactId>playn-hello-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -32,34 +32,35 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-jbox2d</artifactId>
-      <version>${coreversion}</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwtversion}</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <outputDirectory>war/WEB-INF/classes</outputDirectory>
 
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <webXml>war/WEB-INF/web.xml</webXml>
+        </configuration>
+      </plugin>
     </plugins>
+
     <resources>
       <resource>
         <directory>${basedir}/src</directory>
-      </resource>
-      <resource>
-        <directory>${basedir}/war/WEB-INF/classes</directory>
       </resource>
     </resources>
   </build>
