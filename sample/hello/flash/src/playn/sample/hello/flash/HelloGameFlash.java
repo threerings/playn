@@ -26,7 +26,7 @@ public class HelloGameFlash extends FlashGame {
   @Override
   public void start() {
     FlashAssetManager assets = FlashPlatform.register().assetManager();
-    assets.setPathPrefix("hellogame/");
+    assets.setPathPrefix("hellogameflash/");
     PlayN.run(new HelloGame());
   }
 }
