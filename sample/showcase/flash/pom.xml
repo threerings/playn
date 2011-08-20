@@ -5,9 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.googlecode.playn</groupId>
-    <artifactId>playn-demos</artifactId>
+    <artifactId>playn-showcase</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <artifactId>playn-showcase-flash</artifactId>
@@ -15,65 +14,78 @@
   <packaging>war</packaging>
 
   <properties>
-    <gwt.module>playn.showcase.flash.ShowcaseFlash</gwt.module>
+    <gwt.module>playn.sample.showcase.ShowcaseFlash</gwt.module>
     <gwt.name>showcaseflash</gwt.name>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-dev</artifactId>
-      <version>${gwtversion}</version>
-      <scope>test</scope>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-showcase-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>playn-flash</artifactId>
       <version>${coreversion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>${gwtversion}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
   <build>
-    <sourceDirectory>../core/src</sourceDirectory>
+    <sourceDirectory>src</sourceDirectory>
+    <outputDirectory>war/WEB-INF/classes</outputDirectory>
 
     <plugins>
-    <plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <version>2.1.1</version>
         <configuration>
-	  <warSourceDirectory>../core/war</warSourceDirectory>
+          <webXml>war/WEB-INF/web.xml</webXml>
         </configuration>
       </plugin>
 
       <!-- download and unpack flex4sdk -->
       <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-dependency-plugin</artifactId>
-         <version>2.2</version>
-         <executions>
-           <execution>
-             <id>unpack</id>
-             <phase>validate</phase>
-             <goals>
-               <goal>unpack</goal>
-             </goals>
-             <configuration>
-               <artifactItems>
-                 <artifactItem>
-                   <groupId>com.adobe.flex</groupId>
-                   <artifactId>flex-sdk</artifactId>
-                   <version>4.1.0.16076_mpl</version>
-                   <type>zip</type>
-                   <overWrite>false</overWrite>
-                   <outputDirectory>${project.build.directory}/flex4sdk</outputDirectory>
-                 </artifactItem>
-               </artifactItems>
-             </configuration>
-           </execution>
-         </executions>
-       </plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.adobe.flex</groupId>
+                  <artifactId>flex-sdk</artifactId>
+                  <version>4.1.0.16076_mpl</version>
+                  <type>zip</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.directory}/flex4sdk</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -85,7 +97,7 @@
             </goals>
             <configuration>
               <tasks>
-                <!-- Dependency plugin discards file permissions so we need to set them back manually -->
+                <!-- Dependency plugin discards file permissions so we need to set them manually -->
                 <chmod file="${project.build.directory}/flex4sdk/bin/mxmlc" perm="ugo+rx"/>
 	     </tasks>
             </configuration>
@@ -100,18 +112,11 @@
 	  <extraJvmArgs>-Dflexsdk.home=${project.build.directory}/flex4sdk</extraJvmArgs>
 	</configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-      </plugin>
     </plugins>
+
     <resources>
       <resource>
-        <directory>../core/src</directory>
-      </resource>
-      <resource>
-        <directory>../core/war/WEB-INF/classes</directory>
+        <directory>${basedir}/src</directory>
       </resource>
     </resources>
   </build>
