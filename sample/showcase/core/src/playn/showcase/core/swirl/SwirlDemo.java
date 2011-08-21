@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.test.core;
+package playn.showcase.core.swirl;
 
 import static playn.core.PlayN.assetManager;
 import static playn.core.PlayN.graphics;
@@ -23,12 +23,18 @@ import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Pointer;
+import playn.showcase.core.Demo;
 
-public class Test implements Game {
+public class SwirlDemo extends Demo {
 
   GroupLayer groupLayer;
   ImageLayer bgLayer;
   ImageLayer layer0, layer1, layer2, layer3;
+
+  @Override
+  public String name() {
+    return "Swirl";
+  }
 
   @Override
   public void init() {
@@ -39,8 +45,8 @@ public class Test implements Game {
       }
     });
 
-    Image background = assetManager().getImage("images/background.png");
-    Image catgirl = assetManager().getImage("images/girlcat.png");
+    Image background = assetManager().getImage("swirl/background.png");
+    Image catgirl = assetManager().getImage("swirl/girlcat.png");
 
     groupLayer = graphics().createGroupLayer();
     groupLayer.setOrigin(128, 128);
@@ -50,7 +56,8 @@ public class Test implements Game {
     bgLayer = graphics().createImageLayer(background);
     bgLayer.setWidth(256);
     bgLayer.setHeight(256);
-    groupLayer.add(bgLayer);
+    bgLayer.setDepth(-1);
+    graphics().rootLayer().add(bgLayer);
 
     layer0 = graphics().createImageLayer(catgirl);
     layer1 = graphics().createImageLayer(catgirl);
@@ -71,6 +78,15 @@ public class Test implements Game {
     layer1.transform().translate(256, 0);
     layer2.transform().translate(256, 256);
     layer3.transform().translate(0, 256);
+  }
+
+  @Override
+  public void shutdown() {
+    groupLayer.destroy();
+    groupLayer = null;
+    bgLayer.destroy();
+    bgLayer = null;
+    layer0 = layer1 = layer2 = layer3 = null;
   }
 
   private void doStuff() {
@@ -100,10 +116,5 @@ public class Test implements Game {
 
   @Override
   public void paint(float alpha) {
-  }
-
-  @Override
-  public int updateRate() {
-    return 33;
   }
 }
