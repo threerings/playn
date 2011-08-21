@@ -27,38 +27,79 @@ class AndroidTouchEventHandler {
   boolean inTouchSequence = false;
 
   /**
+   * Special implementation of Touch.Event.Impl that has a shared static preventDefault state.
+   * <p>
+   * Note: Call AndroidTouchEventImpl.init() before using to initialize the shared state.
+   */
+  static class AndroidTouchEventImpl extends Touch.Event.Impl {
+    public static boolean preventDefault;
+
+    public AndroidTouchEventImpl(double time, float x, float y, int id) {
+      super(time, x, y, id);
+    }
+
+    public AndroidTouchEventImpl(double time, float x, float y, int id, float pressure, float size) {
+      super(time, x, y, id, pressure, size);
+    }
+
+    @Override
+    public void setPreventDefault(boolean preventDefault) {
+      AndroidTouchEventImpl.preventDefault = preventDefault;
+    }
+
+    @Override
+    public boolean getPreventDefault() {
+      return AndroidTouchEventImpl.preventDefault;
+    }
+
+    /**
+     * Initialize the shared state
+     */
+    public static void init() {
+      preventDefault = false;
+    }
+  }
+
+  /**
    * Default Android touch behavior. Parses the immediate MotionEvent and passes
    * it to listener and the appropriate method in
    * AndroidPlatform.instance().pointer(). Ignores historical values.
    */
-  public boolean onMotionEvent(MotionEvent event) {
+  public boolean onMotionEvent(MotionEvent nativeEvent) {
     AndroidPointer pointer = AndroidPlatform.instance.pointer();
     AndroidTouch touch = (AndroidTouch) AndroidPlatform.instance.touch();
-    double time = event.getEventTime();
-    int action = event.getAction();
-    Touch.Event[] touches = parseMotionEvent(event);
+    double time = nativeEvent.getEventTime();
+    int action = nativeEvent.getAction();
+    Touch.Event[] touches = parseMotionEvent(nativeEvent);
     Touch.Event pointerEvent = touches[0];
+    
+    AndroidTouchEventImpl.init();
+    Pointer.Event.Impl event;
+
     switch (action) {
       case (MotionEvent.ACTION_DOWN):
         inTouchSequence = true;
         touch.onTouchStart(touches);
-        pointer.onPointerStart(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
-        break;
+        event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
+        pointer.onPointerStart(event);
+        return (AndroidTouchEventImpl.preventDefault || event.getPreventDefault());
       case (MotionEvent.ACTION_UP):
         inTouchSequence = false;
         touch.onTouchEnd(touches);
-        pointer.onPointerEnd(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
-        break;
+        event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
+        pointer.onPointerEnd(event);
+        return (AndroidTouchEventImpl.preventDefault || event.getPreventDefault());
       case (MotionEvent.ACTION_MOVE):
         touch.onTouchMove(touches);
-        pointer.onPointerMove(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
-        break;
+        event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
+        pointer.onPointerMove(event);
+        return (AndroidTouchEventImpl.preventDefault || event.getPreventDefault());
       case (MotionEvent.ACTION_CANCEL):
         break;
       case (MotionEvent.ACTION_OUTSIDE):
         break;
     }
-    return true;
+    return false;
   }
 
   /**
@@ -83,7 +124,7 @@ class AndroidTouchEventHandler {
       pressure = event.getPressure(pointerIndex);
       size = event.getSize(pointerIndex);
       id = event.getPointerId(pointerIndex);
-      touches[t] = new Touch.Event.Impl(time, x, y, id, pressure, size);
+      touches[t] = new AndroidTouchEventImpl(time, x, y, id, pressure, size);
     }
     return touches;
   }

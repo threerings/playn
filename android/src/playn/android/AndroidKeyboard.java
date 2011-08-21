@@ -26,15 +26,21 @@ public class AndroidKeyboard implements Keyboard {
     this.listener = listener;
   }
 
-  void onKeyDown(double time, int keyCode) {
+  boolean onKeyDown(double time, int keyCode) {
     if (listener != null) {
-      listener.onKeyDown(new Event.Impl(time, keyCode));
+      Event.Impl event = new Event.Impl(time, keyCode);
+      listener.onKeyDown(event);
+      return event.getPreventDefault();
     }
+    return false;
   }
 
-  void onKeyUp(double time, int keyCode) {
+  boolean onKeyUp(double time, int keyCode) {
     if (listener != null) {
-      listener.onKeyUp(new Event.Impl(time, keyCode));
+      Event.Impl event = new Event.Impl(time, keyCode);
+      listener.onKeyUp(event);
+      return event.getPreventDefault();
     }
+    return false;
   }
 }
