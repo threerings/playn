@@ -15,6 +15,10 @@
  */
 package playn.core;
 
+import pythagoras.f.IPoint;
+import pythagoras.f.Point;
+import pythagoras.f.Transform;
+
 /**
  * Layer is the base element for all rendering in PlayN
  * <p>
@@ -51,7 +55,7 @@ public interface Layer {
   /**
    * Returns the layer's transformation matrix.
    */
-  InternalTransform transform();
+  Transform transform();
 
   /**
    * Returns true if this layer is visible (i.e. it is being rendered).
@@ -171,7 +175,7 @@ public interface Layer {
   /**
    * Interface for {@link Layer}s containing explicit sizes.
    */
-  public interface HasSize {
+  public interface HasSize extends Layer {
     /**
      * Return the width of the layer.
      */
@@ -191,5 +195,106 @@ public interface Layer {
      * Return the height of the layer after applying scale.
      */
     public float scaledHeight();
+  }
+
+  /**
+   * Utility class for transforming coordinates between {@link Layer}s.
+   */
+  public static class Util {
+    /**
+     * Converts the supplied point from coordinates relative to the specified
+     * layer to screen coordinates. The results are stored into {@code into},
+     * which is returned for convenience.
+     */
+    public static Point layerToScreen(Layer layer, IPoint point, Point into) {
+      return layerToParent(layer, null, point, into);
+    }
+
+    /**
+     * Converts the supplied point from coordinates relative to the specified
+     * layer to screen coordinates.
+     */
+    public static Point layerToScreen(Layer layer, float x, float y) {
+      Point into = new Point(x, y);
+      return layerToScreen(layer, into, into);
+    }
+
+    /**
+     * Converts the supplied point from coordinates relative to the specified
+     * child layer to coordinates relative to the specified parent layer. The
+     * results are stored into {@code into}, which is returned for convenience.
+     */
+    public static Point layerToParent(Layer layer, Layer parent, IPoint point, Point into) {
+      into.set(point);
+      while (layer != parent) {
+        if (layer == null) {
+          throw new IllegalArgumentException(
+              "Failed to find parent, perhaps you passed parent, layer instead of "
+                  + "layer, parent?");
+        }
+        into.x -= layer.originX();
+        into.y -= layer.originY();
+        layer.transform().transform(into, into);
+        layer = layer.parent();
+      }
+      return into;
+    }
+
+    /**
+     * Converts the supplied point from coordinates relative to the specified
+     * child layer to coordinates relative to the specified parent layer.
+     */
+    public static Point layerToParent(Layer layer, Layer parent, float x, float y) {
+      Point into = new Point(x, y);
+      return layerToParent(layer, parent, into.set(x, y), into);
+    }
+
+    /**
+     * Converts the supplied point from screen coordinates to coordinates
+     * relative to the specified layer. The results are stored into {@code into}
+     * , which is returned for convenience.
+     */
+    public static Point screenToLayer(Layer layer, IPoint point, Point into) {
+      Layer parent = layer.parent();
+      IPoint cur = (parent == null) ? point : screenToLayer(parent, point, into);
+      into = layer.transform().inverseTransform(cur, into);
+      into.x += layer.originX();
+      into.y += layer.originY();
+      return into;
+    }
+
+    /**
+     * Converts the supplied point from screen coordinates to coordinates
+     * relative to the specified layer.
+     */
+    public static Point screenToLayer(Layer layer, float x, float y) {
+      Point into = new Point(x, y);
+      return screenToLayer(layer, into.set(x, y), into);
+    }
+
+    /**
+     * Returns true if a {@link IPoint} on the screen touches a {@link Layer.HasSize}.
+     */
+    public static boolean hitTest(Layer.HasSize layer, IPoint point) {
+      return hitTest(layer, point.x(), point.y());
+    }
+
+    /**
+     * Returns true if a {@link Events.Position} touches a {@link Layer.HasSize}.
+     */
+    public static boolean hitTest(Layer.HasSize layer, Events.Position position) {
+      return hitTest(layer, position.x(), position.y());
+    }
+
+    /**
+     * Returns true if a coordinate on the screen touches a {@link Layer.HasSize}.
+     */
+    public static boolean hitTest(Layer.HasSize layer, float x, float y) {
+      Point point = new Point(x, y);
+      screenToLayer(layer, point, point);
+      return (
+          point.x() >= 0 &&  point.y() >= 0 && 
+          point.x() <= layer.width() && point.y() <= layer.height());
+    }
   }
 }

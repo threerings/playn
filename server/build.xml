@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<project name="server" default="compile">
-  <import file="../build-common.xml"/>
+<project name="playn-server" default="compile">
+  <import file="../etc/build-common.xml"/>
 </project>
