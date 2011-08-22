@@ -7,6 +7,8 @@ import android.view.MotionEvent;
 import android.widget.LinearLayout;
 
 public class AndroidLayoutView extends LinearLayout {
+  private GameViewGL gameView;
+  
   public AndroidLayoutView(Activity activity) {
     super(activity);
     setBackgroundColor(0xFF000000);
@@ -19,7 +21,7 @@ public class AndroidLayoutView extends LinearLayout {
     Log.i("playn", "Screen sized changed to ( " + w + " , " + h + ")");
     AndroidPlatform platform = AndroidPlatform.instance;
     if (platform != null) {
-      platform.graphics().refreshScreenSize();
+      if (platform.graphics() != null) platform.graphics().refreshScreenSize();
     }else {
       AndroidGraphics.setStartingScreenSize(w,h);
     }
@@ -30,15 +32,8 @@ public class AndroidLayoutView extends LinearLayout {
     super.onLayout(changed, l, t, r, b);
   }
   
-  
-  /**
-   *  Called automatically to handle touch events.
-   *  Automatically passes through the parsed MotionEvent
-   *  to AndroidTouch.Listener and AndroidPointer.Listener 
-   *  instances.
-   */
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    return AndroidPlatform.instance.touchEventHandler().onMotionEvent(event);
+  public void setGameView(GameViewGL gameView) {
+    this.gameView = gameView;
   }
+  
 }

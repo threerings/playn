@@ -39,7 +39,6 @@ import playn.core.Pattern;
 import playn.core.StockInternalTransform;
 import playn.core.SurfaceLayer;
 import android.graphics.Bitmap;
-import android.graphics.BitmapShader;
 import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
@@ -50,7 +49,7 @@ class AndroidGraphics implements Graphics {
   private static final int VERTEX_SIZE = 10; // 10 floats per vertex
 
   private static final int MAX_VERTS = 4;
-  private static final int MAX_ELEMS = 4;
+  private static final int MAX_ELEMS = 6;
   private static final int FLOAT_SIZE_BYTES = 4;
   private static final int SHORT_SIZE_BYTES = 2;
   private static final int VERTEX_STRIDE = VERTEX_SIZE * FLOAT_SIZE_BYTES;
@@ -93,9 +92,9 @@ class AndroidGraphics implements Graphics {
         gl20.glUseProgram(program);
         checkGlError("program used");
         // Couldn't get glUniform2fv to work for whatever reason.
-        gl20.glUniform2f(uScreenSizeLoc, width, height);
+        gl20.glUniform2f(uScreenSizeLoc, fbufWidth, fbufHeight);
         
-        checkGlError("screensizeloc vector set to " + width + " " + height);
+        checkGlError("screensizeloc vector set to " + viewWidth + " " + viewHeight);
 
         gl20.glBindBuffer(GL2ES2.GL_ARRAY_BUFFER, vertexBuffer);
         gl20.glBindBuffer(GL2ES2.GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
@@ -130,6 +129,7 @@ class AndroidGraphics implements Graphics {
           GL2ES2.GL_STREAM_DRAW);
       gl20.glBufferData(GL2ES2.GL_ELEMENT_ARRAY_BUFFER, elementOffset * SHORT_SIZE_BYTES,
           elementData, GL2ES2.GL_STREAM_DRAW);
+      //FIXME: Crashed here messing with frameBuffer
       checkGlError("shader.flush postBuffer");
       gl20.glDrawElements(GL2ES2.GL_TRIANGLE_STRIP, elementOffset, GL2ES2.GL_UNSIGNED_SHORT, 0);
       vertexOffset = elementOffset = 0;
@@ -322,7 +322,7 @@ class AndroidGraphics implements Graphics {
   protected final AndroidGL20 gl20;
   final AndroidGroupLayer rootLayer;
   private final GameViewGL gameView;
-  private int width, height, lastFrameBuffer, screenWidth, screenHeight;
+  private int viewWidth, viewHeight, lastFrameBuffer, screenWidth, screenHeight, fbufWidth, fbufHeight;
   private boolean sizeSetManually = false;
 
   // Debug
@@ -339,10 +339,10 @@ class AndroidGraphics implements Graphics {
     rootLayer = new AndroidGroupLayer(this);
     if (startingScreenWidth != 0)
       screenWidth = startingScreenWidth;
-      width = screenWidth;
+      viewWidth = screenWidth;
     if (startingScreenHeight != 0)
       screenHeight = startingScreenHeight;
-      height = screenHeight;
+      viewHeight = screenHeight;
     initGL();
 
     shaderAssetManager.setPathPrefix(Shaders.pathPrefix);
@@ -374,9 +374,7 @@ class AndroidGraphics implements Graphics {
   @Override
   public Pattern createPattern(Image img) {
     Asserts.checkArgument(img instanceof AndroidImage);
-    Bitmap bitmap = ((AndroidImage) img).getBitmap();
-    BitmapShader shader = new BitmapShader(bitmap, TileMode.REPEAT, TileMode.REPEAT);
-    return new AndroidPattern(shader);
+    return new AndroidPattern(img);
   }
 
   @Override
@@ -385,11 +383,19 @@ class AndroidGraphics implements Graphics {
     return new AndroidGradient(gradient);
   }
 
+  /**
+   * @return The height of the Android View containing the game 
+   * (generally the entire display height) in pixels.
+   */
   @Override
   public int screenHeight() {
     return screenHeight;
   }
 
+  /**
+   * @return The width of the Android View containing the game 
+   * (generally the entire display width) in pixels.
+   */
   @Override
   public int screenWidth() {
     return screenWidth;
@@ -424,14 +430,22 @@ class AndroidGraphics implements Graphics {
     return new AndroidSurfaceLayer(this, width, height);
   }
 
+  /**
+   * @return The height of the game itself in pixels. Defaults to the value of 
+   * screenHeight(), but can be set using setSize()
+   */
   @Override
   public int height() {
-    return height;
+    return viewHeight;
   }
 
+  /**
+   * @return The width of the game itself in pixels. Defaults to the value of 
+   * screenWidth(), but can be set using setSize()
+   */
   @Override
   public int width() {
-    return width;
+    return viewWidth;
   }
 
   @Override
@@ -455,7 +469,7 @@ class AndroidGraphics implements Graphics {
     refreshScreenSize(true);
   }
 
-  /**
+  /*
    * Public manual setSize function. Once this is called, automatic calls to
    * refreshScreenSize() when something changes the size of the gameView will
    * not force a call to setSize.
@@ -468,10 +482,9 @@ class AndroidGraphics implements Graphics {
   private void setSize(int width, int height, boolean manual) {
     if (manual)
       sizeSetManually = true;
-    if (!gameView.gameSizeSet)
-      gameView.gameSizeSet = true;
-    this.width = width;
-    this.height = height;
+    gameView.gameSizeSet();
+    this.viewWidth = width;
+    this.viewHeight = height;
     AndroidPlatform.instance.touchEventHandler().calculateOffsets();
     // Layout the views again to change the surface size
     AndroidPlatform.instance.activity.runOnUiThread(new Runnable() {
@@ -513,8 +526,8 @@ class AndroidGraphics implements Graphics {
       lastFrameBuffer = frameBuffer;
       gl20.glBindFramebuffer(GL2ES2.GL_FRAMEBUFFER, frameBuffer);
       gl20.glViewport(0, 0, width, height);
-      screenWidth = width;
-      screenHeight = height;
+      fbufWidth = width;
+      fbufHeight = height;
     }
   }
 
@@ -546,7 +559,6 @@ class AndroidGraphics implements Graphics {
 
     // Clear to transparent
     gl20.glClear(GL2ES2.GL_COLOR_BUFFER_BIT | GL2ES2.GL_DEPTH_BUFFER_BIT);
-
     // Paint all the layers
     rootLayer.paint(StockInternalTransform.IDENTITY, 1);
     checkGlError("updateLayers");
@@ -555,15 +567,7 @@ class AndroidGraphics implements Graphics {
   }
 
   void updateTexture(int texture, Bitmap image) {
-//    int width = image.getWidth();
-//    int height = image.getHeight();
-//    ByteBuffer pixels = ByteBuffer.allocateDirect(width * height * INT_SIZE_BYTES).order(
-//      ByteOrder.nativeOrder());
-//    pixels.position(0);
-//    image.copyPixelsToBuffer(pixels);
-//    gl20.glBindTexture(GL2ES2.GL_TEXTURE_2D, texture);
-//    gl20.glTexImage2D(GL2ES2.GL_TEXTURE_2D, 0, GL2ES2.GL_RGBA, width, height,
-//      0, GL2ES2.GL_RGBA, GL2ES2.GL_UNSIGNED_BYTE, pixels);
+    gl20.glBindTexture(GL2ES2.GL_TEXTURE_2D, texture);
     texImage2D(GL2ES2.GL_TEXTURE_2D, 0, image, 0);
     checkGlError("updateTexture end");
   }
@@ -637,7 +641,8 @@ class AndroidGraphics implements Graphics {
     colorShader.addElement(idx + 3);
     checkGlError("fillRect done");
   }
-
+  
+  //FIXME(jonagill) Does this still work with TRIANGLE_STRIP?
   void fillPoly(InternalTransform local, float[] positions, int color, float alpha) {
     colorShader.prepare(color, alpha);
 
@@ -673,6 +678,7 @@ class AndroidGraphics implements Graphics {
     gl20.glDisable(GL2ES2.GL_CULL_FACE);  //Could speed up by not disabling this.
     gl20.glEnable(GL2ES2.GL_BLEND);
     gl20.glBlendFunc(GL2ES2.GL_SRC_ALPHA, GL2ES2.GL_ONE_MINUS_SRC_ALPHA);
+    gl20.glClearColor(0, 0, 0, 1);
   }
 
   private boolean useShader(Shader shader) {

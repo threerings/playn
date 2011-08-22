@@ -16,7 +16,6 @@
 package playn.android;
 
 import playn.core.Canvas;
-import playn.core.InternalTransform;
 import playn.core.gl.LayerGL;
 
 public abstract class AndroidLayer extends LayerGL {
@@ -34,7 +33,4 @@ public abstract class AndroidLayer extends LayerGL {
         transform.m11(), transform.tx() - originX, transform.ty() - originY);
     canvas.translate(-originX, -originY);
   }
-  
-  @Override
-  public void paint(InternalTransform parentTransform, float parentAlpha) { }
 }

@@ -88,6 +88,7 @@ public class GameLoop implements Runnable {
   }
 
   protected void paint() {
+    gfx.bindFramebuffer();
     AndroidPlatform.instance.game.paint(paintAlpha);  //Run the game's custom layer-painting code
     gfx.updateLayers();  //Actually draw to the screen
   }

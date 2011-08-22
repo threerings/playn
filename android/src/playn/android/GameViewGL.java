@@ -1,6 +1,5 @@
 package playn.android;
 
-import javax.media.opengl.GL2ES2;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -17,7 +16,7 @@ public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder
   private GameLoop loop;
   private final GameActivity activity;
   private boolean gameInitialized = false;
-  public  boolean gameSizeSet = false;  //Set by AndroidGraphics
+  private boolean gameSizeSet = false;  //Set by AndroidGraphics
  
   
   public GameViewGL(AndroidGL20 _gl20, GameActivity activity, Context context) {
@@ -68,15 +67,13 @@ public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder
     }
   }
   
-  public void gameInitialized() {
-    gameInitialized = true;
+  void gameSizeSet() {
+    gameSizeSet = true;
   }
   
   private class AndroidRendererGL implements Renderer {    
     @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-      gl20.glClearColor(1,1,1,1);
-    }
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) { }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {

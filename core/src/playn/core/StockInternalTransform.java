@@ -45,7 +45,7 @@ public class StockInternalTransform extends AffineTransform implements InternalT
   }
 
   @Override
-  public InternalTransform set(Transform other) {
+  public Transform set(Transform other) {
     StockInternalTransform ot = (StockInternalTransform) other;
     setTransform(ot.m00, ot.m01, ot.m10, ot.m11, ot.tx, ot.ty);
     return this;
