@@ -19,6 +19,7 @@ import static android.opengl.GLUtils.texImage2D;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.CharBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
@@ -49,7 +50,7 @@ class AndroidGraphics implements Graphics {
   private static final int VERTEX_SIZE = 10; // 10 floats per vertex
 
   private static final int MAX_VERTS = 4;
-  private static final int MAX_ELEMS = 6;
+  private static final int MAX_ELEMS = 4;
   private static final int FLOAT_SIZE_BYTES = 4;
   private static final int SHORT_SIZE_BYTES = 2;
   private static final int VERTEX_STRIDE = VERTEX_SIZE * FLOAT_SIZE_BYTES;
@@ -88,11 +89,21 @@ class AndroidGraphics implements Graphics {
 
     boolean prepare() {
       checkGlError("prepare start");
-      if (useShader(this)) {
+      if (useShader(this) && gl20.glIsProgram(program)) {
+        checkGlError("prepare entered");
+
+//        gl20.glValidateProgram(program);
+//        int status[] = new int[1];
+//        gl20.glGetProgramiv(program, GL2ES2.GL_VALIDATE_STATUS, status, 0);
+//        ByteBuffer logBuffer = ByteBuffer.allocate(1024 * SHORT_SIZE_BYTES).order(ByteOrder.nativeOrder());
+//        IntBuffer lengthBuffer = IntBuffer.allocate(1);//ByteBuffer.allocateDirect(FLOAT_SIZE_BYTES).order(ByteOrder.nativeOrder()).asIntBuffer();
+//        gl20.glGetProgramInfoLog(program, 1024, lengthBuffer, logBuffer);
+//        Log.w("playn", status[0] + " : " + logBuffer.asCharBuffer().toString());
         gl20.glUseProgram(program);
         checkGlError("program used");
         // Couldn't get glUniform2fv to work for whatever reason.
         gl20.glUniform2f(uScreenSizeLoc, fbufWidth, fbufHeight);
+        Log.w("playn", fbufWidth + " " + fbufHeight);
         
         checkGlError("screensizeloc vector set to " + viewWidth + " " + viewHeight);
 
@@ -133,6 +144,7 @@ class AndroidGraphics implements Graphics {
       checkGlError("shader.flush postBuffer");
       gl20.glDrawElements(GL2ES2.GL_TRIANGLE_STRIP, elementOffset, GL2ES2.GL_UNSIGNED_SHORT, 0);
       vertexOffset = elementOffset = 0;
+      checkGlError("shader.flush post-draw");
     }
 
     // Verbatim
@@ -324,6 +336,8 @@ class AndroidGraphics implements Graphics {
   private final GameViewGL gameView;
   private int viewWidth, viewHeight, lastFrameBuffer, screenWidth, screenHeight, fbufWidth, fbufHeight;
   private boolean sizeSetManually = false;
+  
+  private boolean wasPaused = false;  //If the Activity was paused, we need to re-initialize
 
   // Debug
   private int texCount;
@@ -338,14 +352,16 @@ class AndroidGraphics implements Graphics {
     gameView = AndroidPlatform.instance.activity.gameView();
     rootLayer = new AndroidGroupLayer(this);
     if (startingScreenWidth != 0)
-      screenWidth = startingScreenWidth;
-      viewWidth = screenWidth;
+     fbufWidth = viewWidth = screenWidth = startingScreenWidth;
     if (startingScreenHeight != 0)
-      screenHeight = startingScreenHeight;
-      viewHeight = screenHeight;
+      fbufHeight = viewHeight = screenHeight = startingScreenHeight;
     initGL();
 
     shaderAssetManager.setPathPrefix(Shaders.pathPrefix);
+    generateShaders();
+  }
+
+  private void generateShaders() {
     texShader = new TextureShader();
     colorShader = new ColorShader();
   }
@@ -460,7 +476,7 @@ class AndroidGraphics implements Graphics {
     screenWidth = viewLayout.getWidth();
     screenHeight = viewLayout.getHeight();
     AndroidPlatform.instance.touchEventHandler().calculateOffsets();
-    // Change game size to fill the screen if it's never been set manually.
+    // Change game size to fill the screen if it has never been set manually.
     if (resize && !sizeSetManually && (screenWidth != oldWidth || screenHeight != oldHeight))
       setSize(screenWidth, screenHeight, false);
   }
@@ -511,7 +527,7 @@ class AndroidGraphics implements Graphics {
   }
 
   void bindFramebuffer() {
-    bindFramebuffer(0, width(), height());
+    bindFramebuffer(0, viewWidth, viewHeight);
   }
 
   void bindFramebuffer(int frameBuffer, int width, int height) {
@@ -555,6 +571,12 @@ class AndroidGraphics implements Graphics {
   void updateLayers() {
     // Bind the default frameBuffer (the SurfaceView's Surface)
     checkGlError("updateLayers Start");
+    if (wasPaused) {
+      generateShaders();
+      initGL();
+      wasPaused = false;
+    }
+    
     bindFramebuffer();
 
     // Clear to transparent
@@ -687,8 +709,13 @@ class AndroidGraphics implements Graphics {
       flush();
       curShader = shader;
       return true;
+      
     }
     return false;
+  }
+  
+  void pauseNotify() {
+    wasPaused = true;
   }
 
   void checkGlError(String op) {

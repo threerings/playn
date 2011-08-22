@@ -118,7 +118,7 @@ class AndroidImage implements CanvasImage {
     if (bitmapRef != null) {
       Bitmap bm = bitmapRef.get();
       if (bm == null && path != null) {
-        // Log.i("playn", "Bitmap " + path + " fell out of memory");
+//        Log.i("playn", "Bitmap " + path + " fell out of memory");
         bitmapRef = new SoftReference<Bitmap>(
             bm = AndroidPlatform.instance.assetManager().doGetBitmap(path));
       }
@@ -172,7 +172,7 @@ class AndroidImage implements CanvasImage {
   }
 
   private void loadTexture(AndroidGraphics gfx) {
-    if (tex != 0) {
+    if (tex != 0 && gfx.gl20.glIsTexture(tex)) {
       return;
     }
     tex = gfx.createTexture(false, false);

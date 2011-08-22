@@ -59,11 +59,11 @@ public class GameViewGL extends GLSurfaceView implements GameView, SurfaceHolder
   public void notifyVisibilityChanged(int visibility) {
     Log.i("playn", "notifyVisibilityChanged: " + visibility);
     if (visibility == INVISIBLE) {
-      onPause();
       if (loop != null) loop.pause();
+      onPause();
     }else {
-      onResume();
       if (loop != null) loop.start();
+      onResume();
     }
   }
   

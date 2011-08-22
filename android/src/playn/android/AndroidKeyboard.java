@@ -18,8 +18,11 @@ package playn.android;
 import playn.core.Keyboard;
 
 public class AndroidKeyboard implements Keyboard {
-	
   private Listener listener;
+  private static final int MAX_STORED_EVENTS_PER_TYPE = 3;
+  private Event.Impl[] storedDownEvents = new Event.Impl[MAX_STORED_EVENTS_PER_TYPE];
+  private Event.Impl[] storedUpEvents = new Event.Impl[MAX_STORED_EVENTS_PER_TYPE];
+  private int storedDownIndex, storedUpIndex;
 
   @Override
   public void setListener(Listener listener) {
@@ -27,15 +30,28 @@ public class AndroidKeyboard implements Keyboard {
   }
 
   void onKeyDown(double time, int keyCode) {
-    if (listener != null) {
-      listener.onKeyDown(new Event.Impl(time, keyCode));
-    }
+    if (listener != null && storedDownIndex < MAX_STORED_EVENTS_PER_TYPE)
+      storedDownEvents[storedDownIndex++] = new Event.Impl(time, keyCode);
   }
 
   void onKeyUp(double time, int keyCode) {
-    if (listener != null) {
-      listener.onKeyUp(new Event.Impl(time, keyCode));
-    }
+    if (listener != null && storedUpIndex < MAX_STORED_EVENTS_PER_TYPE)
+      storedUpEvents[storedUpIndex++] = new Event.Impl(time, keyCode);
   }
   
+  void processQueuedEvents() {
+    if (listener != null) {
+      for (int i = 0; i < MAX_STORED_EVENTS_PER_TYPE; i++) {
+        if (storedDownEvents[i] != null) {
+          listener.onKeyDown(storedDownEvents[i]);
+          storedDownEvents[i] = null;
+        }
+        if (storedUpEvents[i] != null) {
+          listener.onKeyUp(storedUpEvents[i]);
+          storedUpEvents[i] = null;
+        }
+        storedDownIndex = storedUpIndex = 0;
+      }
+    }
+  }
 }

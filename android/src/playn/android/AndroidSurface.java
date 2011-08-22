@@ -61,7 +61,7 @@ class AndroidSurface implements Surface {
    * The screen's framebuffer is automatically restored in AndroidGraphics.updateLayers()
    * before any drawing to the screen occurs.
    */
-  
+
   @Override
   public void drawImage(Image image, float x, float y) {
     drawImage(image, x, y, image.width(), image.height());

@@ -191,9 +191,8 @@ public abstract class GameActivity extends Activity {
   @Override
   public boolean onKeyUp(int keyCode, KeyEvent event) {
     if (platform() != null && platform().keyboard() != null) {
-      platform().keyboard().onKeyDown(event.getEventTime(), keyCode);
+      platform().keyboard().onKeyUp(event.getEventTime(), keyCode);
     }
-    platform().keyboard().onKeyUp(event.getEventTime(), keyCode);
     if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
       return false;
     }

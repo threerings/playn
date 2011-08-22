@@ -15,17 +15,13 @@
  */
 package playn.android;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import javax.media.opengl.GL2ES2;
-
-import android.util.Log;
 
 import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
+import android.util.Log;
 
 class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
 
@@ -39,25 +35,24 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
     this.width = width;
     this.height = height;
     gfx.flush();
-
+    
     AndroidGL20 gl20 = gfx.gl20;
     tex = gfx.createTexture(false, false);
     gl20.glTexImage2D(GL2ES2.GL_TEXTURE_2D, 0, GL2ES2.GL_RGBA, width, height, 0, GL2ES2.GL_RGBA,
         GL2ES2.GL_UNSIGNED_BYTE, null);
-    
+
     int[] fbufBuffer = new int[1];
     gl20.glGenFramebuffers(1, fbufBuffer, 0);
     fbuf = fbufBuffer[0];
     Log.w("playn", "Fbuf " + fbuf);
-    //gfx.bindFramebuffer(fbuf, width, height, false);
     gfx.gl20.glBindFramebuffer(GL2ES2.GL_FRAMEBUFFER, fbuf);
     gl20.glFramebufferTexture2D(GL2ES2.GL_FRAMEBUFFER, GL2ES2.GL_COLOR_ATTACHMENT0, GL2ES2.GL_TEXTURE_2D, tex, 0);
 //    gl20.glBindTexture(GL2ES2.GL_TEXTURE_2D, 0);
     gfx.bindFramebuffer();
-    
+
     surface = new AndroidSurface(gfx, fbuf, width, height);
     surface.clear();
-    
+
   }
 
   @Override
@@ -65,7 +60,7 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
     super.destroy();
     gfx.destroyTexture(tex);
     gfx.gl20.glDeleteBuffers(1, new int[] { fbuf }, 0);
-    
+
     tex = fbuf = 0;
     surface = null;
   }
