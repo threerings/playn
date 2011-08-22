@@ -44,7 +44,7 @@ public class AndroidTouch implements Touch {
   public void setListener(Listener listener) {
     this.listener = listener;
   }
-  
+
   void processQueuedEvents() {
     if (listener != null) {
       for (int i = 0; i < MAX_STORED_EVENTS_PER_TYPE; i++) {

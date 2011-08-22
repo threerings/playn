@@ -190,20 +190,9 @@ public class AndroidPlatform implements Platform {
     return Type.ANDROID;
   }
 
-//  void draw(Canvas c, float delta) {
-//    //Run the game's custom painting code.
-//    //Separate from layers painting themselves.
-//    if (game != null) {
-//      game.paint(delta);
-//
-//      AndroidCanvas surf = new AndroidCanvas(c);
-//      surf.clear();
-//      graphics.rootLayer.paint(surf);
-//    }
-//  }
-
   void update(float delta) {
     if (game != null) {
+      keyboard.processQueuedEvents();
       pointer.processQueuedEvents();
       touch.processQueuedEvents();
       game.update(delta);

@@ -47,6 +47,7 @@ public class GameLoop implements Runnable {
 
   public void pause() {
     Log.i("playn", "Pausing game loop");
+    gfx.pauseNotify();
     running.set(false);
   }
 
