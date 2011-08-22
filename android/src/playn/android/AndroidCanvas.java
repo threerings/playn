@@ -22,6 +22,7 @@ import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
@@ -34,16 +35,27 @@ class AndroidCanvas implements playn.core.Canvas {
   private static RectF rectf = new RectF();
 
   private final Canvas canvas;
+  private final Bitmap bitmap;
+  private boolean dirty = true;
+  
   private LinkedList<AndroidCanvasState> paintStack = new LinkedList<AndroidCanvasState>();
 
-  AndroidCanvas(Canvas canvas) {
-    this.canvas = canvas;
+  AndroidCanvas(int width, int height) {
+    bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+    canvas = new Canvas(bitmap);
+    paintStack.addFirst(new AndroidCanvasState());
+  }
+  
+  AndroidCanvas(Bitmap bitmap) {
+    this.bitmap = bitmap;
+    canvas = new Canvas(bitmap);
     paintStack.addFirst(new AndroidCanvasState());
   }
 
   @Override
   public void clear() {
     canvas.drawColor(0, PorterDuff.Mode.SRC);
+    dirty = true;
   }
 
   @Override
@@ -59,6 +71,7 @@ class AndroidCanvas implements playn.core.Canvas {
     if (aimg.getBitmap() != null) {
       canvas.drawBitmap(aimg.getBitmap(), x, y, currentState().prepareImage());
     }
+    dirty = true;
   }
 
   @Override
@@ -69,6 +82,7 @@ class AndroidCanvas implements playn.core.Canvas {
       rectf.set(x, y, x + w, y + h);
       canvas.drawBitmap(aimg.getBitmap(), null, rectf, currentState().prepareImage());
     }
+    dirty = true;
   }
 
   @Override
@@ -81,37 +95,44 @@ class AndroidCanvas implements playn.core.Canvas {
       rectf.set(dx, dy, dx + dw, dy + dh);
       canvas.drawBitmap(aimg.getBitmap(), rect, rectf, currentState().prepareImage());
     }
+    dirty = true;
   }
 
   @Override
   public void drawImageCentered(Image image, float dx, float dy) {
     drawImage(image, dx - image.width() / 2, dy - image.height() / 2);
+    dirty = true;
   }
 
   @Override
   public void drawLine(float x0, float y0, float x1, float y1) {
     canvas.drawLine(x0, y0, x1, y1, currentState().prepareStroke());
+    dirty = true;
   }
 
   @Override
   public void drawPoint(float x, float y) {
     canvas.drawPoint(x, y, currentState().prepareStroke());
+    dirty = true;
   }
 
   @Override
   public void drawText(String text, float x, float y) {
     canvas.drawText(text, x, y, currentState().prepareFill());
+    dirty = true;
   }
 
   @Override
   public void fillCircle(float x, float y, float radius) {
     canvas.drawCircle(x, y, radius, currentState().prepareFill());
+    dirty = true;
   }
 
   @Override
   public void fillPath(Path path) {
     Asserts.checkArgument(path instanceof AndroidPath);
     canvas.drawPath(((AndroidPath) path).path, currentState().prepareFill());
+    dirty = true;
   }
 
   @Override
@@ -121,6 +142,7 @@ class AndroidCanvas implements playn.core.Canvas {
     float right = left + width;
     float bottom = top + height;
     canvas.drawRect(left, top, right, bottom, currentState().prepareFill());
+    dirty = true;
   }
 
   @Override
@@ -218,12 +240,14 @@ class AndroidCanvas implements playn.core.Canvas {
   @Override
   public void strokeCircle(float x, float y, float radius) {
     canvas.drawCircle(x, y, radius, currentState().prepareStroke());
+    dirty = true;
   }
 
   @Override
   public void strokePath(Path path) {
     Asserts.checkArgument(path instanceof AndroidPath);
     canvas.drawPath(((AndroidPath) path).path, currentState().prepareStroke());
+    dirty = true;
   }
 
   @Override
@@ -233,6 +257,7 @@ class AndroidCanvas implements playn.core.Canvas {
     float right = left + width;
     float bottom = top + height;
     canvas.drawRect(left, top, right, bottom, currentState().prepareStroke());
+    dirty = true;
   }
 
   @Override
@@ -249,6 +274,14 @@ class AndroidCanvas implements playn.core.Canvas {
   @Override
   public int width() {
     return canvas.getWidth();
+  }
+  
+  void clearDirty() {
+    dirty = false;
+  }
+  
+  boolean dirty() {
+    return dirty;
   }
 
   private AndroidCanvasState currentState() {

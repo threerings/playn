@@ -204,6 +204,8 @@ public class AndroidPlatform implements Platform {
 
   void update(float delta) {
     if (game != null) {
+      pointer.processQueuedEvents();
+      touch.processQueuedEvents();
       game.update(delta);
     }
   }

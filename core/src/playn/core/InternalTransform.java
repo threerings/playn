@@ -51,18 +51,20 @@ public interface InternalTransform extends Transform {
   /**
    * Configures this transform to be equal to the supplied other.
    */
-  InternalTransform set(Transform other);
+  Transform set(Transform other);
+  
+  Transform setTransform (float m00, float m01, float m10, float m11, float tx, float ty);
 
   /**
    * Concatenates the supplied layer transform onto this transform, accounting for the specified
    * origin offset.
    */
-  InternalTransform concatenate(Transform other, float originX, float originY);
+  Transform concatenate(Transform other, float originX, float originY);
 
   /**
    * Concatenates the supplied transform onto this transform, accounting for the specified origin
    * offset.
    */
-  InternalTransform concatenate(float m00, float m01, float m10, float m11, float tx, float ty,
+  Transform concatenate(float m00, float m01, float m10, float m11, float tx, float ty,
       float originX, float originY);
 }

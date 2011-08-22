@@ -25,6 +25,8 @@ import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.media.opengl.GL2ES2;
+
 import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.CanvasImage;
@@ -41,96 +43,104 @@ import android.graphics.Bitmap;
  */
 class AndroidImage implements CanvasImage {
 
-	private SoftReference<Bitmap> bitmapRef;
-	private AndroidCanvas canvas;
-	private Bitmap canvasBitmap;
-	private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
-	private int width, height, tex, pow2tex;
-	private String path;
+  private SoftReference<Bitmap> bitmapRef;
+  private AndroidCanvas canvas;
+  private Bitmap canvasBitmap;
+  private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
+  private int width, height, tex, pow2tex;
+  private String path;
 
-	public AndroidImage(String path, Bitmap bitmap) {
-		this.path = path;
-		bitmapRef = new SoftReference<Bitmap>(bitmap);
-		width = bitmap.getWidth();
-		height = bitmap.getHeight();
-	}
+  public AndroidImage(String path, Bitmap bitmap) {
+    this.path = path;
+    bitmapRef = new SoftReference<Bitmap>(bitmap);
+    width = bitmap.getWidth();
+    height = bitmap.getHeight();
+  }
 
-	public AndroidImage(int w, int h, boolean alpha) {
-		Bitmap newBitmap = Bitmap.createBitmap(w, h,
-				alpha ? AndroidPlatform.instance.preferredBitmapConfig
-						: Bitmap.Config.RGB_565);
-		bitmapRef = new SoftReference<Bitmap>(newBitmap);
-		width = w;
-		height = h;
-	}
+  public AndroidImage(int w, int h, boolean alpha) {
+    Bitmap newBitmap = Bitmap.createBitmap(w, h, alpha
+        ? AndroidPlatform.instance.preferredBitmapConfig : Bitmap.Config.ARGB_8888);
+    bitmapRef = new SoftReference<Bitmap>(newBitmap);
+    width = w;
+    height = h;
+  }
 
-	public void addCallback(ResourceCallback<Image> callback) {
-		callbacks.add(callback);
-		if (isReady()) {
-			runCallbacks(true);
-		}
-	}
+  public void addCallback(ResourceCallback<Image> callback) {
+    callbacks.add(callback);
+    if (isReady()) {
+      runCallbacks(true);
+    }
+  }
 
-	public Canvas canvas() {
-		if (canvas == null) {
-			canvasBitmap = getBitmap();
-			canvas = new AndroidCanvas(
-					new android.graphics.Canvas(canvasBitmap));
-		}
-		bitmapRef = null;
-		return canvas;
-	}
+  public Canvas canvas() {
+    if (canvas == null) {
+      canvasBitmap = getBitmap();
+      if (canvasBitmap != null) {
+        canvas = new AndroidCanvas(canvasBitmap);
+      }else {
+        canvas = new AndroidCanvas(width, height);
+      }
+    }
+    bitmapRef = null;
+    return canvas;
+  }
+  
+  public boolean canvasDirty() {
+    return (canvas != null && canvas.dirty());
+  }
+  
+  public void clearDirty() { 
+    canvas.clearDirty();
+  }
 
-	public int height() {
-		return height;
-	}
+  public int height() {
+    return height;
+  }
 
-	public boolean isReady() {
-		return bitmapRef != null || canvas != null;
-	}
+  public boolean isReady() {
+    return bitmapRef != null || canvas != null;
+  }
 
-	public void replaceWith(Image image) {
-		Asserts.checkArgument(image instanceof AndroidImage);
-		bitmapRef = new SoftReference<Bitmap>(
-				((AndroidImage) image).getBitmap());
-		canvas = null;
-	}
+  public void replaceWith(Image image) {
+    Asserts.checkArgument(image instanceof AndroidImage);
+    bitmapRef = new SoftReference<Bitmap>(((AndroidImage) image).getBitmap());
+    canvas = null;
+  }
 
-	public int width() {
-		return width;
-	}
+  public int width() {
+    return width;
+  }
 
-	public Bitmap getBitmap() {
-		if (canvasBitmap != null) {
-			return canvasBitmap;
-		}
-		if (bitmapRef != null) {
-			Bitmap bm = bitmapRef.get();
-			if (bm == null && path != null) {
-				// Log.i("playn", "Bitmap " + path + " fell out of memory");
-				bitmapRef = new SoftReference<Bitmap>(
-						bm = AndroidPlatform.instance.assetManager()
-								.doGetBitmap(path));
-			}
-			return bm;
-		}
-		return null;
-	}
+  public Bitmap getBitmap() {
+    if (canvasBitmap != null) {
+      return canvasBitmap;
+    }
+    if (bitmapRef != null) {
+      Bitmap bm = bitmapRef.get();
+      if (bm == null && path != null) {
+        // Log.i("playn", "Bitmap " + path + " fell out of memory");
+        bitmapRef = new SoftReference<Bitmap>(
+            bm = AndroidPlatform.instance.assetManager().doGetBitmap(path));
+      }
+      return bm;
+    }
+    return null;
+  }
 
-	private void runCallbacks(boolean success) {
-		for (ResourceCallback<Image> cb : callbacks) {
-			if (success) {
-				cb.done(this);
-			} else {
-				cb.error(new Exception("Error loading image"));
-			}
-		}
-		callbacks.clear();
-	}
-	
+  private void runCallbacks(boolean success) {
+    for (ResourceCallback<Image> cb : callbacks) {
+      if (success) {
+        cb.done(this);
+      } else {
+        cb.error(new Exception("Error loading image"));
+      }
+    }
+    callbacks.clear();
+  }
+
   /*
-   * Clears textures associated with this image. This does not destroy the image -- a subsequent
-   * call to ensureTexture() will recreate them.
+   * Clears textures associated with this image. This does not destroy the image
+   * -- a subsequent call to ensureTexture() will recreate them.
    */
   void clearTexture(AndroidGraphics gfx) {
     if (pow2tex == tex) {
@@ -146,7 +156,7 @@ class AndroidImage implements CanvasImage {
       pow2tex = 0;
     }
   }
-  
+
   int ensureTexture(AndroidGraphics gfx, boolean repeatX, boolean repeatY) {
     // Create requested textures if loaded.
     if (isReady()) {
@@ -160,7 +170,7 @@ class AndroidImage implements CanvasImage {
     }
     return 0;
   }
-  
+
   private void loadTexture(AndroidGraphics gfx) {
     if (tex != 0) {
       return;
@@ -194,30 +204,35 @@ class AndroidImage implements CanvasImage {
       height = height();
     }
 
+    // TODO: Throw error if the size is bigger than GL_MAX_RENDERBUFFER_SIZE?
+
     // Create the pow2 texture.
     pow2tex = gfx.createTexture(repeatX, repeatY);
     AndroidGL20 gl20 = gfx.gl20;
     gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
     gl20.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
 
-//    // Point a new framebuffer at it.
-//    int[] fbufBuffer = new int[1];
-//    gl20.glGenFramebuffers(1, fbufBuffer, 0);
-//    int fbuf = fbufBuffer[0];
-//    gfx.bindFramebuffer(fbuf, width, height);
-//    gl20.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pow2tex, 0);
-//    //TODO(jonagill): No mip-mapping?
-//
-//    // Render the scaled texture into the framebuffer.
-//    // (rebind the texture because gfx.bindFramebuffer() may have bound it when flushing)
-//    gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
-//    gfx.drawTexture(tex, width(), height(), StockInternalTransform.IDENTITY, 0, height, width, -height, false,
-//        false, 1);
-//    gfx.flush();
-//    gfx.bindFramebuffer();
-//
-//    gl20.glDeleteFramebuffers(1, new int[] {fbuf}, 0);
+    // Point a new framebuffer at it.
+    int[] fbufBuffer = new int[1];
+    gl20.glGenFramebuffers(1, fbufBuffer, 0);
+    int fbuf = fbufBuffer[0];
+    gfx.bindFramebuffer(fbuf, width, height);
+    gl20.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pow2tex, 0);
+    // Render the scaled texture into the framebuffer.
+    // (rebind the texture because gfx.bindFramebuffer() may have bound it when
+    // flushing)
+    gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
+    gl20.glClearColor(0, 0, 0, 0);
+    gl20.glClear(GL2ES2.GL_COLOR_BUFFER_BIT);
+    //TODO(jonagill): Is this necessary or is the clear color bound to that fbuf?
+    gl20.glClearColor(0, 0, 0, 1);
+    
+    gfx.drawTexture(tex, width(), height(), StockInternalTransform.IDENTITY, 0, height,
+        width, -height, false, false, 1);
+    gfx.flush();
+    gfx.bindFramebuffer();
+
+    gl20.glDeleteFramebuffers(1, new int[] {fbuf}, 0);
   }
-  
-  
+
 }

@@ -18,6 +18,11 @@ package playn.android;
 import playn.core.Pointer;
 
 class AndroidPointer implements Pointer {
+  private static final int MAX_STORED_EVENTS_PER_TYPE = 1;
+  private Event[] storedStartEvents = new Event[MAX_STORED_EVENTS_PER_TYPE];
+  private Event[] storedMoveEvents = new Event[MAX_STORED_EVENTS_PER_TYPE];
+  private Event[] storedEndEvents = new Event[MAX_STORED_EVENTS_PER_TYPE];
+  private int storedStartIndex, storedMoveIndex, storedEndIndex;
 
   // true when we are in a drag sequence (after pointer start but before pointer end)
   private boolean inDragSequence = false;
@@ -27,26 +32,47 @@ class AndroidPointer implements Pointer {
   public void setListener(Listener listener) {
     this.listener = listener;
   }
-
-  void onPointerEnd(Event event) {
-    if (listener != null) {
-      inDragSequence = false;
-      listener.onPointerEnd(event);
+  
+  void onPointerStart(Event event) {
+    if (listener != null && storedStartIndex < MAX_STORED_EVENTS_PER_TYPE) {
+      inDragSequence = true;
+      storedStartEvents[storedStartIndex++] = event;
     }
   }
 
   void onPointerMove(Event event) {
-    if (listener != null) {
+    if (listener != null && storedMoveIndex < MAX_STORED_EVENTS_PER_TYPE) {
       if (inDragSequence) {
         listener.onPointerDrag(event);
+        storedMoveEvents[storedMoveIndex++] = event;
       }
     }
   }
-
-  void onPointerStart(Event event) {
+  
+  void onPointerEnd(Event event) {
+    if (listener != null && storedEndIndex < MAX_STORED_EVENTS_PER_TYPE) {
+      inDragSequence = false;
+      storedEndEvents[storedEndIndex++] = event;
+    }
+  }
+  
+  void processQueuedEvents() {
     if (listener != null) {
-      inDragSequence = true;
-      listener.onPointerStart(event);
+      for (int i = 0; i < MAX_STORED_EVENTS_PER_TYPE; i++) {
+        if (storedStartEvents[i] != null) {
+          listener.onPointerStart(storedStartEvents[i]);
+          storedStartEvents[i] = null;
+        }
+        if (storedMoveEvents[i] != null) {
+          listener.onPointerDrag(storedMoveEvents[i]);
+          storedMoveEvents[i] = null;
+        }
+        if (storedEndEvents[i] != null) {
+          listener.onPointerEnd(storedEndEvents[i]);
+          storedEndEvents[i] = null;
+        }
+        storedStartIndex = storedMoveIndex = storedEndIndex = 0;
+      }
     }
   }
 }

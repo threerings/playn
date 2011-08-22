@@ -26,6 +26,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
@@ -38,7 +39,7 @@ public abstract class GameActivity extends Activity {
   private final int REQUIRED_CONFIG_CHANGES = ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_KEYBOARD_HIDDEN;
   
   private GameViewGL gameView;
-  private LinearLayout viewLayout;
+  private AndroidLayoutView viewLayout;
   private WakeLock wakeLock;
   private Context context;
   
@@ -68,6 +69,7 @@ public abstract class GameActivity extends Activity {
     viewLayout = new AndroidLayoutView(this);
     gameView = new GameViewGL(gl20, this, context);
     viewLayout.addView((View)gameView);
+    viewLayout.setGameView(gameView);
 
     //Build the Window and View
     if (isHoneycombOrLater()) {
@@ -176,7 +178,9 @@ public abstract class GameActivity extends Activity {
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    platform().keyboard().onKeyDown(event.getEventTime(), keyCode);
+    if (platform() != null && platform().keyboard() != null) {
+      platform().keyboard().onKeyDown(event.getEventTime(), keyCode);
+    }
     //Don't prevent volume controls from propagating to the system.
     if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
       return false;
@@ -186,6 +190,9 @@ public abstract class GameActivity extends Activity {
 
   @Override
   public boolean onKeyUp(int keyCode, KeyEvent event) {
+    if (platform() != null && platform().keyboard() != null) {
+      platform().keyboard().onKeyDown(event.getEventTime(), keyCode);
+    }
     platform().keyboard().onKeyUp(event.getEventTime(), keyCode);
     if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
       return false;
@@ -193,16 +200,15 @@ public abstract class GameActivity extends Activity {
     return true;
   }
   
-
-//  public void onLayout(boolean changed, int left, int top, int right, int bottom) {
-//    int displayWidth = right - left;
-//    int displayHeight = bottom - top;
-//    
-//    /*
-//     * TODO: Pass the width and height here into AndroidGraphics as the display
-//     * width/height (this is the only way to take into account the size of the
-//     * Honeycomb bezel). This requires the game activity lifecycle to be
-//     * reworked, so it is currently not implemented.
-//     */
-//  }
+  
+  /**
+   *  Called automatically to handle touch events.
+   *  Automatically passes through the parsed MotionEvent
+   *  to AndroidTouch.Listener and AndroidPointer.Listener 
+   *  instances.
+   */
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    return AndroidPlatform.instance.touchEventHandler().onMotionEvent(event);
+  }
 }

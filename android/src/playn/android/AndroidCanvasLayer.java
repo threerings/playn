@@ -15,58 +15,64 @@
  */
 package playn.android;
 
-import static playn.core.PlayN.graphics;
 import playn.core.Asserts;
 import playn.core.Canvas;
-import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
 import playn.core.InternalTransform;
+import android.graphics.Bitmap;
+import android.util.Log;
 
 class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
 
-  private CanvasImage canvas;
+  private AndroidImage image;
 
   AndroidCanvasLayer(AndroidGraphics gfx, int width, int height, boolean alpha) {
     super(gfx);
-    canvas = ((AndroidGraphics)graphics()).createImage(width, height, alpha);
+    image = (AndroidImage) (AndroidPlatform.instance.graphics().createImage(width, height, alpha));
   }
 
   @Override
   public Canvas canvas() {
-    return canvas.canvas();
+    return image.canvas();
   }
 
   @Override
   public void destroy() {
     super.destroy();
-    canvas = null;
+    image = null;
   }
 
   @Override
-  //TODO (jonagill): Actually be able to paint CanvasLayers
-  public void paint(InternalTransform parentTransform, float parentAlpha) { }
-  
-//  @Override
-//  void paint(AndroidCanvas surf) {
-//    if (!visible()) return;
-//
-//    surf.save();
-//    transform(surf);
-//    surf.setAlpha(surf.alpha() * alpha);
-//    surf.drawImage(canvas, 0, 0);
-//    surf.restore();
-//  }
+  public void paint(InternalTransform parentTransform, float parentAlpha) { 
+    if (!visible()) return;
+    
+    int tex = image.ensureTexture(gfx, false, false);
+    if (tex != 0) {
+      Bitmap bitmap = image.getBitmap();
+      
+      if (image.canvasDirty()) {
+        image.clearDirty();
+        gfx.updateTexture(tex, bitmap);
+      }
+
+      InternalTransform xform = localTransform(parentTransform);
+      float childAlpha = parentAlpha * alpha;
+      Log.w("playn", "CANVASPAINT " + bitmap.getWidth() + " " + width() + " " + childAlpha);
+      gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, width(), height(), false, false,
+          childAlpha);
+    } 
+  }
 
   @Override
   public float width() {
-    Asserts.checkNotNull(canvas, "Canvas must not be null");
-    return canvas.width();
+    Asserts.checkNotNull(image, "Canvas must not be null");
+    return image.width();
   }
 
   @Override
   public float height() {
-    Asserts.checkNotNull(canvas, "Canvas must not be null");
-    return canvas.height();
+    Asserts.checkNotNull(image, "Canvas must not be null");
+    return image.height();
   }
 
   @Override
