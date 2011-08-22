@@ -24,12 +24,12 @@ public class GameLoop implements Runnable {
 
   private AtomicBoolean running = new AtomicBoolean();
   private AndroidGraphics gfx;
-  
+
   private long timeOffset = System.currentTimeMillis();
 
   private int updateRate;
   private int accum;
-  private int lastTime;  
+  private int lastTime;
 
   private float paintAlpha;
 
@@ -83,15 +83,16 @@ public class GameLoop implements Runnable {
     // int range.
     return (int) (System.currentTimeMillis() - timeOffset);
   }
-  
+
   public boolean running() {
     return running.get();
   }
 
   protected void paint() {
     gfx.bindFramebuffer();
-    AndroidPlatform.instance.game.paint(paintAlpha);  //Run the game's custom layer-painting code
-    gfx.updateLayers();  //Actually draw to the screen
+    AndroidPlatform.instance.game.paint(paintAlpha); // Run the game's custom
+                                                     // layer-painting code
+    gfx.updateLayers(); // Actually draw to the screen
   }
 
 }

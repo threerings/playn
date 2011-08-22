@@ -15,12 +15,11 @@
  */
 package playn.android;
 
-import javax.media.opengl.GL2ES2;
-
 import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
+import playn.core.gl.GL20;
 import android.util.Log;
 
 class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
@@ -35,19 +34,20 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
     this.width = width;
     this.height = height;
     gfx.flush();
-    
+
     AndroidGL20 gl20 = gfx.gl20;
     tex = gfx.createTexture(false, false);
-    gl20.glTexImage2D(GL2ES2.GL_TEXTURE_2D, 0, GL2ES2.GL_RGBA, width, height, 0, GL2ES2.GL_RGBA,
-        GL2ES2.GL_UNSIGNED_BYTE, null);
+    gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
+        GL20.GL_UNSIGNED_BYTE, null);
 
     int[] fbufBuffer = new int[1];
     gl20.glGenFramebuffers(1, fbufBuffer, 0);
     fbuf = fbufBuffer[0];
     Log.w("playn", "Fbuf " + fbuf);
-    gfx.gl20.glBindFramebuffer(GL2ES2.GL_FRAMEBUFFER, fbuf);
-    gl20.glFramebufferTexture2D(GL2ES2.GL_FRAMEBUFFER, GL2ES2.GL_COLOR_ATTACHMENT0, GL2ES2.GL_TEXTURE_2D, tex, 0);
-//    gl20.glBindTexture(GL2ES2.GL_TEXTURE_2D, 0);
+    gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
+    gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, GL20.GL_TEXTURE_2D,
+        tex, 0);
+    // gl20.glBindTexture(GL20.GL_TEXTURE_2D, 0);
     gfx.bindFramebuffer();
 
     surface = new AndroidSurface(gfx, fbuf, width, height);
@@ -59,7 +59,7 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
   public void destroy() {
     super.destroy();
     gfx.destroyTexture(tex);
-    gfx.gl20.glDeleteBuffers(1, new int[] { fbuf }, 0);
+    gfx.gl20.glDeleteBuffers(1, new int[] {fbuf}, 0);
 
     tex = fbuf = 0;
     surface = null;
@@ -72,14 +72,17 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
 
   @Override
   public void paint(InternalTransform parentTransform, float parentAlpha) {
-    if (!visible()) return;
+    if (!visible())
+      return;
 
-    // Draw this layer to the screen upside-down, because its contents are flipped
+    // Draw this layer to the screen upside-down, because its contents are
+    // flipped
     // (This happens because it uses the same vertex program as everything else,
-    //  which flips vertically to put the origin at the top-left).
-    gfx.drawTexture(tex, width, height, localTransform(parentTransform),
-                    0, height, width, -height, false, false, parentAlpha * alpha);
+    // which flips vertically to put the origin at the top-left).
+    gfx.drawTexture(tex, width, height, localTransform(parentTransform), 0, height, width, -height,
+        false, false, parentAlpha * alpha);
   }
+
   @Override
   public float width() {
     Asserts.checkNotNull(surface, "Surface must not be null");

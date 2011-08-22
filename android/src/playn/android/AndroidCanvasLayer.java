@@ -43,13 +43,14 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
   }
 
   @Override
-  public void paint(InternalTransform parentTransform, float parentAlpha) { 
-    if (!visible()) return;
-    
+  public void paint(InternalTransform parentTransform, float parentAlpha) {
+    if (!visible())
+      return;
+
     int tex = image.ensureTexture(gfx, false, false);
     if (tex != 0) {
       Bitmap bitmap = image.getBitmap();
-      
+
       if (image.canvasDirty()) {
         image.clearDirty();
         gfx.updateTexture(tex, bitmap);
@@ -58,9 +59,9 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
       InternalTransform xform = localTransform(parentTransform);
       float childAlpha = parentAlpha * alpha;
       Log.w("playn", "CANVASPAINT " + bitmap.getWidth() + " " + width() + " " + childAlpha);
-      gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, width(), height(), false, false,
-          childAlpha);
-    } 
+      gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, width(), height(), false,
+          false, childAlpha);
+    }
   }
 
   @Override

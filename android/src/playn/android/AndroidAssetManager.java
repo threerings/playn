@@ -82,7 +82,7 @@ public class AndroidAssetManager extends AbstractAssetManager {
 
   private Bitmap decodeBitmap(InputStream is) {
     BitmapFactory.Options options = new BitmapFactory.Options();
-    // 
+    //
     options.inDither = true;
     // Prefer the bitmap config we computed from the window parameter
     options.inPreferredConfig = AndroidPlatform.instance.preferredBitmapConfig;

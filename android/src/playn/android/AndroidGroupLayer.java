@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -29,7 +29,7 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer 
   public AndroidGroupLayer(AndroidGraphics gfx) {
     super(gfx);
   }
-  
+
   @Override
   public Layer get(int index) {
     return impl.children.get(index);
@@ -91,11 +91,12 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer 
     impl.depthChanged(this, layer, oldDepth);
   }
 
-  //TODO(jonagill) Test this -- copied verbatim from HTMLGroupLayerGL
+  // TODO(jonagill) Test this -- copied verbatim from HTMLGroupLayerGL
   @Override
   public void paint(InternalTransform parentTransform, float parentAlpha) {
     gfx.checkGlError("grouplayer.paint");
-    if (!visible()) return;
+    if (!visible())
+      return;
 
     for (AndroidLayer child : impl.children) {
       child.paint(localTransform(parentTransform), parentAlpha * alpha);

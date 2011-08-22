@@ -24,7 +24,8 @@ class AndroidPointer implements Pointer {
   private Event[] storedEndEvents = new Event[MAX_STORED_EVENTS_PER_TYPE];
   private int storedStartIndex, storedMoveIndex, storedEndIndex;
 
-  // true when we are in a drag sequence (after pointer start but before pointer end)
+  // true when we are in a drag sequence (after pointer start but before pointer
+  // end)
   private boolean inDragSequence = false;
   private Listener listener;
 
@@ -32,7 +33,7 @@ class AndroidPointer implements Pointer {
   public void setListener(Listener listener) {
     this.listener = listener;
   }
-  
+
   void onPointerStart(Event event) {
     if (listener != null && storedStartIndex < MAX_STORED_EVENTS_PER_TYPE) {
       inDragSequence = true;
@@ -48,14 +49,14 @@ class AndroidPointer implements Pointer {
       }
     }
   }
-  
+
   void onPointerEnd(Event event) {
     if (listener != null && storedEndIndex < MAX_STORED_EVENTS_PER_TYPE) {
       inDragSequence = false;
       storedEndEvents[storedEndIndex++] = event;
     }
   }
-  
+
   void processQueuedEvents() {
     if (listener != null) {
       for (int i = 0; i < MAX_STORED_EVENTS_PER_TYPE; i++) {

@@ -91,11 +91,11 @@ class AndroidTouchEventHandler {
     }
     return touches;
   }
-  
+
   public void calculateOffsets() {
     Graphics graphics = AndroidPlatform.instance.graphics();
-    xScreenOffset = -(graphics.screenWidth() - graphics.width())/2;
-    yScreenOffset = -(graphics.screenHeight() - graphics.height())/2;
+    xScreenOffset = -(graphics.screenWidth() - graphics.width()) / 2;
+    yScreenOffset = -(graphics.screenHeight() - graphics.height()) / 2;
   }
 
 }

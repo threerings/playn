@@ -16,6 +16,10 @@
 package playn.android;
 
 public class Shaders {
+  // FIXME: When we get Android projects correctly including resources when
+  // built
+  // from Eclipse, we should change the pathPrefix to playn/core/gl and delete
+  // the duplicate .txt files in the Android project.
   static final String pathPrefix = "playn/android";
   static final String vertexShader = "vertex-shader.txt";
   static final String texFragmentShader = "tex-fragment-shader.txt";

@@ -19,12 +19,9 @@ import static android.opengl.GLUtils.texImage2D;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.CharBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-
-import javax.media.opengl.GL2ES2;
 
 import playn.core.Asserts;
 import playn.core.CanvasImage;
@@ -39,6 +36,7 @@ import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.StockInternalTransform;
 import playn.core.SurfaceLayer;
+import playn.core.gl.GL20;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
@@ -91,24 +89,16 @@ class AndroidGraphics implements Graphics {
       checkGlError("prepare start");
       if (useShader(this) && gl20.glIsProgram(program)) {
         checkGlError("prepare entered");
-
-//        gl20.glValidateProgram(program);
-//        int status[] = new int[1];
-//        gl20.glGetProgramiv(program, GL2ES2.GL_VALIDATE_STATUS, status, 0);
-//        ByteBuffer logBuffer = ByteBuffer.allocate(1024 * SHORT_SIZE_BYTES).order(ByteOrder.nativeOrder());
-//        IntBuffer lengthBuffer = IntBuffer.allocate(1);//ByteBuffer.allocateDirect(FLOAT_SIZE_BYTES).order(ByteOrder.nativeOrder()).asIntBuffer();
-//        gl20.glGetProgramInfoLog(program, 1024, lengthBuffer, logBuffer);
-//        Log.w("playn", status[0] + " : " + logBuffer.asCharBuffer().toString());
         gl20.glUseProgram(program);
         checkGlError("program used");
         // Couldn't get glUniform2fv to work for whatever reason.
         gl20.glUniform2f(uScreenSizeLoc, fbufWidth, fbufHeight);
         Log.w("playn", fbufWidth + " " + fbufHeight);
-        
+
         checkGlError("screensizeloc vector set to " + viewWidth + " " + viewHeight);
 
-        gl20.glBindBuffer(GL2ES2.GL_ARRAY_BUFFER, vertexBuffer);
-        gl20.glBindBuffer(GL2ES2.GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+        gl20.glBindBuffer(GL20.GL_ARRAY_BUFFER, vertexBuffer);
+        gl20.glBindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
 
         checkGlError("buffers bound");
 
@@ -120,11 +110,11 @@ class AndroidGraphics implements Graphics {
 
         checkGlError("attrib arrays enabled");
 
-        gl20.glVertexAttribPointer(aMatrix, 4, GL2ES2.GL_FLOAT, false, VERTEX_STRIDE, 0);
-        gl20.glVertexAttribPointer(aTranslation, 2, GL2ES2.GL_FLOAT, false, VERTEX_STRIDE, 16);
-        gl20.glVertexAttribPointer(aPosition, 2, GL2ES2.GL_FLOAT, false, VERTEX_STRIDE, 24);
+        gl20.glVertexAttribPointer(aMatrix, 4, GL20.GL_FLOAT, false, VERTEX_STRIDE, 0);
+        gl20.glVertexAttribPointer(aTranslation, 2, GL20.GL_FLOAT, false, VERTEX_STRIDE, 16);
+        gl20.glVertexAttribPointer(aPosition, 2, GL20.GL_FLOAT, false, VERTEX_STRIDE, 24);
         if (aTexture != -1)
-          gl20.glVertexAttribPointer(aTexture, 2, GL2ES2.GL_FLOAT, false, VERTEX_STRIDE, 32);
+          gl20.glVertexAttribPointer(aTexture, 2, GL20.GL_FLOAT, false, VERTEX_STRIDE, 32);
         checkGlError("prepare end");
         return true;
       }
@@ -136,13 +126,12 @@ class AndroidGraphics implements Graphics {
         return;
       }
       checkGlError("shader.flush preBuffer");
-      gl20.glBufferData(GL2ES2.GL_ARRAY_BUFFER,  vertexOffset * FLOAT_SIZE_BYTES, vertexData,
-          GL2ES2.GL_STREAM_DRAW);
-      gl20.glBufferData(GL2ES2.GL_ELEMENT_ARRAY_BUFFER, elementOffset * SHORT_SIZE_BYTES,
-          elementData, GL2ES2.GL_STREAM_DRAW);
-      //FIXME: Crashed here messing with frameBuffer
+      gl20.glBufferData(GL20.GL_ARRAY_BUFFER, vertexOffset * FLOAT_SIZE_BYTES, vertexData,
+          GL20.GL_STREAM_DRAW);
+      gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, elementOffset * SHORT_SIZE_BYTES,
+          elementData, GL20.GL_STREAM_DRAW);
       checkGlError("shader.flush postBuffer");
-      gl20.glDrawElements(GL2ES2.GL_TRIANGLE_STRIP, elementOffset, GL2ES2.GL_UNSIGNED_SHORT, 0);
+      gl20.glDrawElements(GL20.GL_TRIANGLE_STRIP, elementOffset, GL20.GL_UNSIGNED_SHORT, 0);
       vertexOffset = elementOffset = 0;
       checkGlError("shader.flush post-draw");
     }
@@ -181,7 +170,7 @@ class AndroidGraphics implements Graphics {
 
     void addElement(int index) {
       elementData.position(elementOffset);
-      elementData.put((short)index);
+      elementData.put((short) index);
       elementOffset++;
       elementData.position(0);
     }
@@ -205,7 +194,7 @@ class AndroidGraphics implements Graphics {
       gl20.glCompileShader(shader);
 
       IntBuffer compiled = IntBuffer.allocate(1);
-      gl20.glGetShaderiv(shader, GL2ES2.GL_COMPILE_STATUS, compiled);
+      gl20.glGetShaderiv(shader, GL20.GL_COMPILE_STATUS, compiled);
 
       if (compiled.array()[0] == 0) { // Same as gfx.GL_FALSE
         Log.e(this.getClass().getName(), "Could not compile shader " + type + ":");
@@ -220,8 +209,8 @@ class AndroidGraphics implements Graphics {
     // Creates program object, attaches shaders, and links into pipeline
     protected int createProgram(String vertexSource, String fragmentSource) {
       // Load the vertex and fragment shaders
-      int vertexShader = loadShader(GL2ES2.GL_VERTEX_SHADER, vertexSource);
-      int fragmentShader = loadShader(GL2ES2.GL_FRAGMENT_SHADER, fragmentSource);
+      int vertexShader = loadShader(GL20.GL_VERTEX_SHADER, vertexSource);
+      int fragmentShader = loadShader(GL20.GL_FRAGMENT_SHADER, fragmentSource);
       // Create the program object
       int program = gl20.glCreateProgram();
       if (vertexShader == 0 || fragmentShader == 0 || program == 0)
@@ -234,8 +223,8 @@ class AndroidGraphics implements Graphics {
         checkGlError("glAttachShader");
         gl20.glLinkProgram(program);
         IntBuffer linkStatus = IntBuffer.allocate(1);
-        gl20.glGetProgramiv(program, GL2ES2.GL_LINK_STATUS, linkStatus);
-        if (linkStatus.array()[0] != GL2ES2.GL_TRUE) {
+        gl20.glGetProgramiv(program, GL20.GL_LINK_STATUS, linkStatus);
+        if (linkStatus.array()[0] != GL20.GL_TRUE) {
           Log.e(this.getClass().getName(), "Could not link program: ");
           Log.e(this.getClass().getName(), gl20.glGetProgramInfoLog(program));
           gl20.glDeleteProgram(program);
@@ -258,14 +247,14 @@ class AndroidGraphics implements Graphics {
 
     @Override
     void flush() {
-      gl20.glBindTexture(GL2ES2.GL_TEXTURE_2D, lastTex);
+      gl20.glBindTexture(GL20.GL_TEXTURE_2D, lastTex);
       super.flush();
     }
 
     void prepare(int tex, float alpha) {
       checkGlError("textureShader.prepare start");
       if (super.prepare()) {
-        gl20.glActiveTexture(GL2ES2.GL_TEXTURE0);
+        gl20.glActiveTexture(GL20.GL_TEXTURE0);
         gl20.glUniform1i(uTexture, 0);
       }
 
@@ -291,8 +280,8 @@ class AndroidGraphics implements Graphics {
       uColor = gl20.glGetUniformLocation(program, "u_Color");
       uAlpha = gl20.glGetUniformLocation(program, "u_Alpha");
     }
-    
-    //Here for debugging
+
+    // Here for debugging
     void flush() {
       super.flush();
     }
@@ -302,11 +291,11 @@ class AndroidGraphics implements Graphics {
       super.prepare();
 
       checkGlError("colorShader.prepare super called");
-      
+
       if (color == lastColor && alpha == lastAlpha)
         return;
       flush();
-      
+
       checkGlError("colorShader.prepare flushed");
 
       gl20.glUniform1f(uAlpha, alpha);
@@ -321,7 +310,8 @@ class AndroidGraphics implements Graphics {
       colorsArray[0] = (float) ((color >> 16) & 0xff) / 255;
       colorsArray[1] = (float) ((color >> 8) & 0xff) / 255;
       colorsArray[2] = (float) ((color >> 0) & 0xff) / 255;
-      //Still can't work out how to use glUniform4fv without generating a glError
+      // Still can't work out how to use glUniform4fv without generating a
+      // glError
       gl20.glUniform4f(uColor, colorsArray[0], colorsArray[1], colorsArray[2], colorsArray[3]);
 
       lastColor = color;
@@ -334,10 +324,12 @@ class AndroidGraphics implements Graphics {
   protected final AndroidGL20 gl20;
   final AndroidGroupLayer rootLayer;
   private final GameViewGL gameView;
-  private int viewWidth, viewHeight, lastFrameBuffer, screenWidth, screenHeight, fbufWidth, fbufHeight;
+  private int viewWidth, viewHeight, lastFrameBuffer, screenWidth, screenHeight, fbufWidth,
+      fbufHeight;
   private boolean sizeSetManually = false;
-  
-  private boolean wasPaused = false;  //If the Activity was paused, we need to re-initialize
+
+  private boolean wasPaused = false; // If the Activity was paused, we need to
+                                     // re-initialize
 
   // Debug
   private int texCount;
@@ -352,7 +344,7 @@ class AndroidGraphics implements Graphics {
     gameView = AndroidPlatform.instance.activity.gameView();
     rootLayer = new AndroidGroupLayer(this);
     if (startingScreenWidth != 0)
-     fbufWidth = viewWidth = screenWidth = startingScreenWidth;
+      fbufWidth = viewWidth = screenWidth = startingScreenWidth;
     if (startingScreenHeight != 0)
       fbufHeight = viewHeight = screenHeight = startingScreenHeight;
     initGL();
@@ -400,8 +392,8 @@ class AndroidGraphics implements Graphics {
   }
 
   /**
-   * @return The height of the Android View containing the game 
-   * (generally the entire display height) in pixels.
+   * @return The height of the Android View containing the game (generally the
+   *         entire display height) in pixels.
    */
   @Override
   public int screenHeight() {
@@ -409,8 +401,8 @@ class AndroidGraphics implements Graphics {
   }
 
   /**
-   * @return The width of the Android View containing the game 
-   * (generally the entire display width) in pixels.
+   * @return The width of the Android View containing the game (generally the
+   *         entire display width) in pixels.
    */
   @Override
   public int screenWidth() {
@@ -447,8 +439,8 @@ class AndroidGraphics implements Graphics {
   }
 
   /**
-   * @return The height of the game itself in pixels. Defaults to the value of 
-   * screenHeight(), but can be set using setSize()
+   * @return The height of the game itself in pixels. Defaults to the value of
+   *         screenHeight(), but can be set using setSize()
    */
   @Override
   public int height() {
@@ -456,8 +448,8 @@ class AndroidGraphics implements Graphics {
   }
 
   /**
-   * @return The width of the game itself in pixels. Defaults to the value of 
-   * screenWidth(), but can be set using setSize()
+   * @return The width of the game itself in pixels. Defaults to the value of
+   *         screenWidth(), but can be set using setSize()
    */
   @Override
   public int width() {
@@ -510,7 +502,6 @@ class AndroidGraphics implements Graphics {
         viewLayout.requestLayout();
       }
     });
-    // TODO(jonagill) Is this necessary?
     bindFramebuffer(0, width, height, true);
   }
 
@@ -540,7 +531,7 @@ class AndroidGraphics implements Graphics {
       flush();
 
       lastFrameBuffer = frameBuffer;
-      gl20.glBindFramebuffer(GL2ES2.GL_FRAMEBUFFER, frameBuffer);
+      gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, frameBuffer);
       gl20.glViewport(0, 0, width, height);
       fbufWidth = width;
       fbufHeight = height;
@@ -551,13 +542,13 @@ class AndroidGraphics implements Graphics {
     int[] texId = new int[1];
     gl20.glGenTextures(1, texId, 0);
     int texture = texId[0];
-    gl20.glBindTexture(GL2ES2.GL_TEXTURE_2D, texture);
-    gl20.glTexParameterf(GL2ES2.GL_TEXTURE_2D, GL2ES2.GL_TEXTURE_MAG_FILTER, GL2ES2.GL_LINEAR);
-    gl20.glTexParameterf(GL2ES2.GL_TEXTURE_2D, GL2ES2.GL_TEXTURE_MIN_FILTER, GL2ES2.GL_LINEAR);
-    gl20.glTexParameterf(GL2ES2.GL_TEXTURE_2D, GL2ES2.GL_TEXTURE_WRAP_S, repeatX ? GL2ES2.GL_REPEAT
-        : GL2ES2.GL_CLAMP_TO_EDGE);
-    gl20.glTexParameterf(GL2ES2.GL_TEXTURE_2D, GL2ES2.GL_TEXTURE_WRAP_T, repeatY ? GL2ES2.GL_REPEAT
-        : GL2ES2.GL_CLAMP_TO_EDGE);
+    gl20.glBindTexture(GL20.GL_TEXTURE_2D, texture);
+    gl20.glTexParameterf(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MAG_FILTER, GL20.GL_LINEAR);
+    gl20.glTexParameterf(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_MIN_FILTER, GL20.GL_LINEAR);
+    gl20.glTexParameterf(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_WRAP_S, repeatX ? GL20.GL_REPEAT
+        : GL20.GL_CLAMP_TO_EDGE);
+    gl20.glTexParameterf(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_WRAP_T, repeatY ? GL20.GL_REPEAT
+        : GL20.GL_CLAMP_TO_EDGE);
     ++texCount;
     Log.d("playn", texCount + " textures created.");
     return texture;
@@ -576,11 +567,11 @@ class AndroidGraphics implements Graphics {
       initGL();
       wasPaused = false;
     }
-    
+
     bindFramebuffer();
 
     // Clear to transparent
-    gl20.glClear(GL2ES2.GL_COLOR_BUFFER_BIT | GL2ES2.GL_DEPTH_BUFFER_BIT);
+    gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     // Paint all the layers
     rootLayer.paint(StockInternalTransform.IDENTITY, 1);
     checkGlError("updateLayers");
@@ -589,8 +580,8 @@ class AndroidGraphics implements Graphics {
   }
 
   void updateTexture(int texture, Bitmap image) {
-    gl20.glBindTexture(GL2ES2.GL_TEXTURE_2D, texture);
-    texImage2D(GL2ES2.GL_TEXTURE_2D, 0, image, 0);
+    gl20.glBindTexture(GL20.GL_TEXTURE_2D, texture);
+    texImage2D(GL20.GL_TEXTURE_2D, 0, image, 0);
     checkGlError("updateTexture end");
   }
 
@@ -663,12 +654,12 @@ class AndroidGraphics implements Graphics {
     colorShader.addElement(idx + 3);
     checkGlError("fillRect done");
   }
-  
-  //FIXME(jonagill) Does this still work with TRIANGLE_STRIP?
+
   void fillPoly(InternalTransform local, float[] positions, int color, float alpha) {
     colorShader.prepare(color, alpha);
 
-    int idx = colorShader.beginPrimitive(4, 6);  //FIXME:  This won't scale for non-line polys, will it?
+    int idx = colorShader.beginPrimitive(4, 6); // FIXME: This won't scale for
+                                                // non-line polys, will it?
     int points = positions.length / 2;
     for (int i = 0; i < points; ++i) {
       float dx = positions[i * 2];
@@ -697,9 +688,9 @@ class AndroidGraphics implements Graphics {
   }
 
   private void initGL() {
-    gl20.glDisable(GL2ES2.GL_CULL_FACE);  //Could speed up by not disabling this.
-    gl20.glEnable(GL2ES2.GL_BLEND);
-    gl20.glBlendFunc(GL2ES2.GL_SRC_ALPHA, GL2ES2.GL_ONE_MINUS_SRC_ALPHA);
+    gl20.glDisable(GL20.GL_CULL_FACE); // Could speed up by not disabling this.
+    gl20.glEnable(GL20.GL_BLEND);
+    gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     gl20.glClearColor(0, 0, 0, 1);
   }
 
@@ -709,18 +700,18 @@ class AndroidGraphics implements Graphics {
       flush();
       curShader = shader;
       return true;
-      
+
     }
     return false;
   }
-  
+
   void pauseNotify() {
     wasPaused = true;
   }
 
   void checkGlError(String op) {
     int error;
-    while ((error = gl20.glGetError()) != GL2ES2.GL_NO_ERROR) {
+    while ((error = gl20.glGetError()) != GL20.GL_NO_ERROR) {
       Log.e(this.getClass().getName(), op + ": glError " + error);
       throw new RuntimeException(op + ": glError " + error);
     }

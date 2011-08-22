@@ -78,7 +78,7 @@ public class AndroidPlatform implements Platform {
     ActivityManager activityManager = (ActivityManager) activity.getApplication().getSystemService(
         Activity.ACTIVITY_SERVICE);
     int memoryClass = activityManager.getMemoryClass();
-    
+
     // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
     preferredBitmapConfig = memoryClass <= 16 ? Bitmap.Config.ARGB_4444 : mapDisplayPixelFormat();
   }
@@ -149,7 +149,7 @@ public class AndroidPlatform implements Platform {
   public Touch touch() {
     return touch;
   }
-  
+
   public AndroidTouchEventHandler touchEventHandler() {
     return touchHandler;
   }
@@ -184,7 +184,7 @@ public class AndroidPlatform implements Platform {
   public double time() {
     return System.currentTimeMillis();
   }
-  
+
   @Override
   public Type type() {
     return Type.ANDROID;
