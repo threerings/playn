@@ -37,7 +37,7 @@ class AndroidCanvas implements playn.core.Canvas {
   private final Canvas canvas;
   private final Bitmap bitmap;
   private boolean dirty = true;
-  
+
   private LinkedList<AndroidCanvasState> paintStack = new LinkedList<AndroidCanvasState>();
 
   AndroidCanvas(int width, int height) {
@@ -45,7 +45,7 @@ class AndroidCanvas implements playn.core.Canvas {
     canvas = new Canvas(bitmap);
     paintStack.addFirst(new AndroidCanvasState());
   }
-  
+
   AndroidCanvas(Bitmap bitmap) {
     this.bitmap = bitmap;
     canvas = new Canvas(bitmap);
@@ -275,11 +275,11 @@ class AndroidCanvas implements playn.core.Canvas {
   public int width() {
     return canvas.getWidth();
   }
-  
+
   void clearDirty() {
     dirty = false;
   }
-  
+
   boolean dirty() {
     return dirty;
   }

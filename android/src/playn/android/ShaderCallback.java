@@ -19,7 +19,7 @@ import playn.core.ResourceCallback;
 
 class ShaderCallback implements ResourceCallback<String> {
   private String shader;
-  
+
   @Override
   public void done(String shader) {
     this.shader = shader;
@@ -29,7 +29,7 @@ class ShaderCallback implements ResourceCallback<String> {
   public void error(Throwable err) {
     throw new RuntimeException("Exception loading shader strings.", err);
   }
-  
+
   public String shader() {
     return shader;
   }

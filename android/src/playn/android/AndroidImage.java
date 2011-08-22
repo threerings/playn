@@ -15,17 +15,9 @@
  */
 package playn.android;
 
-import static javax.media.opengl.GL.GL_COLOR_ATTACHMENT0;
-import static javax.media.opengl.GL.GL_FRAMEBUFFER;
-import static javax.media.opengl.GL.GL_RGBA;
-import static javax.media.opengl.GL.GL_TEXTURE_2D;
-import static javax.media.opengl.GL.GL_UNSIGNED_BYTE;
-
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.media.opengl.GL2ES2;
 
 import playn.core.Asserts;
 import playn.core.Canvas;
@@ -33,6 +25,7 @@ import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ResourceCallback;
 import playn.core.StockInternalTransform;
+import playn.core.gl.GL20;
 import playn.core.gl.GLUtil;
 import android.graphics.Bitmap;
 
@@ -77,19 +70,19 @@ class AndroidImage implements CanvasImage {
       canvasBitmap = getBitmap();
       if (canvasBitmap != null) {
         canvas = new AndroidCanvas(canvasBitmap);
-      }else {
+      } else {
         canvas = new AndroidCanvas(width, height);
       }
     }
     bitmapRef = null;
     return canvas;
   }
-  
+
   public boolean canvasDirty() {
     return (canvas != null && canvas.dirty());
   }
-  
-  public void clearDirty() { 
+
+  public void clearDirty() {
     canvas.clearDirty();
   }
 
@@ -118,7 +111,7 @@ class AndroidImage implements CanvasImage {
     if (bitmapRef != null) {
       Bitmap bm = bitmapRef.get();
       if (bm == null && path != null) {
-//        Log.i("playn", "Bitmap " + path + " fell out of memory");
+        // Log.i("playn", "Bitmap " + path + " fell out of memory");
         bitmapRef = new SoftReference<Bitmap>(
             bm = AndroidPlatform.instance.assetManager().doGetBitmap(path));
       }
@@ -209,26 +202,26 @@ class AndroidImage implements CanvasImage {
     // Create the pow2 texture.
     pow2tex = gfx.createTexture(repeatX, repeatY);
     AndroidGL20 gl20 = gfx.gl20;
-    gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
-    gl20.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
+    gl20.glBindTexture(GL20.GL_TEXTURE_2D, pow2tex);
+    gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
+        GL20.GL_UNSIGNED_BYTE, null);
 
     // Point a new framebuffer at it.
     int[] fbufBuffer = new int[1];
     gl20.glGenFramebuffers(1, fbufBuffer, 0);
     int fbuf = fbufBuffer[0];
     gfx.bindFramebuffer(fbuf, width, height);
-    gl20.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pow2tex, 0);
+    gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, GL20.GL_TEXTURE_2D,
+        pow2tex, 0);
     // Render the scaled texture into the framebuffer.
     // (rebind the texture because gfx.bindFramebuffer() may have bound it when
     // flushing)
-    gl20.glBindTexture(GL_TEXTURE_2D, pow2tex);
+    gl20.glBindTexture(GL20.GL_TEXTURE_2D, pow2tex);
     gl20.glClearColor(0, 0, 0, 0);
-    gl20.glClear(GL2ES2.GL_COLOR_BUFFER_BIT);
-    //TODO(jonagill): Is this necessary or is the clear color bound to that fbuf?
-    gl20.glClearColor(0, 0, 0, 1);
-    
-    gfx.drawTexture(tex, width(), height(), StockInternalTransform.IDENTITY, 0, height,
-        width, -height, false, false, 1);
+    gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+    gfx.drawTexture(tex, width(), height(), StockInternalTransform.IDENTITY, 0, height, width,
+        -height, false, false, 1);
     gfx.flush();
     gfx.bindFramebuffer();
 

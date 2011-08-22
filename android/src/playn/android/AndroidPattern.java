@@ -27,6 +27,7 @@ class AndroidPattern implements Pattern {
 
   AndroidPattern(Image image) {
     this.image = (AndroidImage) image;
-    shader = new BitmapShader(this.image.getBitmap(), Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+    shader = new BitmapShader(this.image.getBitmap(), Shader.TileMode.REPEAT,
+        Shader.TileMode.REPEAT);
   }
 }

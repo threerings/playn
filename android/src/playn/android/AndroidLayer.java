@@ -21,7 +21,7 @@ import playn.core.gl.LayerGL;
 public abstract class AndroidLayer extends LayerGL {
 
   protected final AndroidGraphics gfx;
-  
+
   protected AndroidLayer(AndroidGraphics gfx) {
     super();
     this.gfx = gfx;
@@ -29,8 +29,8 @@ public abstract class AndroidLayer extends LayerGL {
 
   void transform(Canvas canvas) {
     canvas.translate(originX, originY);
-    canvas.transform(transform.m00(), transform.m01(), transform.m10(),
-        transform.m11(), transform.tx() - originX, transform.ty() - originY);
+    canvas.transform(transform.m00(), transform.m01(), transform.m10(), transform.m11(),
+        transform.tx() - originX, transform.ty() - originY);
     canvas.translate(-originX, -originY);
   }
 }

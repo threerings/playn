@@ -36,42 +36,43 @@ import android.widget.LinearLayout;
  * TODO: save/restore state
  */
 public abstract class GameActivity extends Activity {
-  private final int REQUIRED_CONFIG_CHANGES = ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_KEYBOARD_HIDDEN;
-  
+  private final int REQUIRED_CONFIG_CHANGES = ActivityInfo.CONFIG_ORIENTATION
+      | ActivityInfo.CONFIG_KEYBOARD_HIDDEN;
+
   private GameViewGL gameView;
   private AndroidLayoutView viewLayout;
   private WakeLock wakeLock;
   private Context context;
-  
+
   /**
-   * The entry-point into a PlayN game.  Developers should
-   * implement main() to call platform().assetManager().setPathPrefix()
-   * and PlayN.run().
+   * The entry-point into a PlayN game. Developers should implement main() to
+   * call platform().assetManager().setPathPrefix() and PlayN.run().
    */
   public abstract void main();
-  
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    
+
     context = getApplicationContext();
-    
-    //Build the AndroidPlatform and register this activity.
+
+    // Build the AndroidPlatform and register this activity.
     AndroidGL20 gl20;
     if (isHoneycombOrLater()) {
       gl20 = new AndroidGL20();
-    }else {
-      //Provide our own native bindings for some missing methods.
+    } else {
+      // Provide our own native bindings for some missing methods.
       gl20 = new AndroidGL20Native();
     }
 
-    //Build a View to hold the surface view and report changes to the screen size.
+    // Build a View to hold the surface view and report changes to the screen
+    // size.
     viewLayout = new AndroidLayoutView(this);
     gameView = new GameViewGL(gl20, this, context);
-    viewLayout.addView((View)gameView);
+    viewLayout.addView((View) gameView);
     viewLayout.setGameView(gameView);
 
-    //Build the Window and View
+    // Build the Window and View
     if (isHoneycombOrLater()) {
       // Use the raw constant rather than the flag to avoid blowing up on
       // earlier Android
@@ -79,20 +80,19 @@ public abstract class GameActivity extends Activity {
       getWindow().setFlags(flagHardwareAccelerated, flagHardwareAccelerated);
     }
 
-
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
     LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
     getWindow().setContentView(viewLayout, params);
-    
-    //Default to landscape orientation.
+
+    // Default to landscape orientation.
     if (usePortraitOrientation()) {
       setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    }else {
+    } else {
       setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
-    //Check that the Wake Lock permissions are set correctly.
+    // Check that the Wake Lock permissions are set correctly.
     try {
       PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
       wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK
@@ -104,33 +104,36 @@ public abstract class GameActivity extends Activity {
       new AlertDialog.Builder(this).setMessage(
           "Unable to acquire wake lock. Please add <uses-permission android:name=\"android.permission.WAKE_LOCK\" /> to the manifest.").show();
     }
-    
-    //Make sure the AndroidManifest.xml is set up correctly.
+
+    // Make sure the AndroidManifest.xml is set up correctly.
     try {
-      ActivityInfo info = this.getPackageManager().getActivityInfo(new ComponentName(context, this.getPackageName() + "." + this.getLocalClassName()), 0);
-        if ((info.configChanges & REQUIRED_CONFIG_CHANGES) != REQUIRED_CONFIG_CHANGES) {
-          new AlertDialog.Builder(this).setMessage(
-            "Unable to guarantee application will handle configuration changes. " +
-            "Please add the following line to the Activity manifest: " +
-            "      android:configChanges=\"keyboardHidden|orientation\"").show();
-        }
-    }catch (NameNotFoundException e) {
-        Log.w("GameActivity", "Cannot access game AndroidManifest.xml file.");
+      ActivityInfo info = this.getPackageManager().getActivityInfo(
+          new ComponentName(context, this.getPackageName() + "." + this.getLocalClassName()), 0);
+      if ((info.configChanges & REQUIRED_CONFIG_CHANGES) != REQUIRED_CONFIG_CHANGES) {
+        new AlertDialog.Builder(this).setMessage(
+            "Unable to guarantee application will handle configuration changes. "
+                + "Please add the following line to the Activity manifest: "
+                + "      android:configChanges=\"keyboardHidden|orientation\"").show();
+      }
+    } catch (NameNotFoundException e) {
+      Log.w("GameActivity", "Cannot access game AndroidManifest.xml file.");
     }
   }
-  
+
   /**
    * Determines whether or not a game should run in portrait orientation or not.
-   * Defaults to false.  Override this method to return true to use portrait.
+   * Defaults to false. Override this method to return true to use portrait.
+   * 
    * @return Whether or not the game will run in portrait orientation
    */
   public boolean usePortraitOrientation() {
     return false;
   }
-  
+
   public LinearLayout viewLayout() {
     return viewLayout;
   }
+
   public GameViewGL gameView() {
     return gameView;
   }
@@ -138,7 +141,7 @@ public abstract class GameActivity extends Activity {
   protected AndroidPlatform platform() {
     return AndroidPlatform.instance;
   }
-  
+
   protected Context context() {
     return context;
   }
@@ -158,7 +161,8 @@ public abstract class GameActivity extends Activity {
   protected void onPause() {
     Log.i("playn", "onPause");
     gameView.notifyVisibilityChanged(View.INVISIBLE);
-    if (platform() != null) platform().audio().pause();
+    if (platform() != null)
+      platform().audio().pause();
     wakeLock.release();
     super.onPause();
 
@@ -169,7 +173,8 @@ public abstract class GameActivity extends Activity {
   protected void onResume() {
     Log.i("playn", "onResume");
     gameView.notifyVisibilityChanged(View.VISIBLE);
-    if (platform() != null) platform().audio().resume();
+    if (platform() != null)
+      platform().audio().resume();
     wakeLock.acquire();
     super.onResume();
 
@@ -181,7 +186,7 @@ public abstract class GameActivity extends Activity {
     if (platform() != null && platform().keyboard() != null) {
       platform().keyboard().onKeyDown(event.getEventTime(), keyCode);
     }
-    //Don't prevent volume controls from propagating to the system.
+    // Don't prevent volume controls from propagating to the system.
     if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
       return false;
     }
@@ -198,13 +203,11 @@ public abstract class GameActivity extends Activity {
     }
     return true;
   }
-  
-  
+
   /**
-   *  Called automatically to handle touch events.
-   *  Automatically passes through the parsed MotionEvent
-   *  to AndroidTouch.Listener and AndroidPointer.Listener 
-   *  instances.
+   * Called automatically to handle touch events. Automatically passes through
+   * the parsed MotionEvent to AndroidTouch.Listener and AndroidPointer.Listener
+   * instances.
    */
   @Override
   public boolean onTouchEvent(MotionEvent event) {

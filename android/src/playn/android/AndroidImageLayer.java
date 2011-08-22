@@ -34,7 +34,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
   AndroidImageLayer(AndroidGraphics gfx) {
     super(gfx);
   }
-  
+
   AndroidImageLayer(AndroidGraphics gfx, AndroidImage image) {
     this(gfx);
     this.image = image;
@@ -117,10 +117,10 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
     this.width = width;
   }
 
-  //TODO (jonagill): Actually be able to paint ImageLayers
   @Override
   public void paint(InternalTransform parentTransform, float parentAlpha) {
-    if (!visible()) return;
+    if (!visible())
+      return;
 
     gfx.checkGlError("androidimagelayer.paint START");
     // TODO(jgw): Assert exclusive source-rect vs. repeat.
@@ -136,11 +136,11 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
       float height = heightSet ? this.height : bitmap.getHeight();
 
       if (sourceRectSet) {
-        gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, 0, 0, width, height, sx, sy, sw, sh,
-            childAlpha);
+        gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, 0, 0, width, height, sx,
+            sy, sw, sh, childAlpha);
       } else {
-        gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, width, height, repeatX, repeatY,
-            childAlpha);
+        gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, width, height, repeatX,
+            repeatY, childAlpha);
       }
     }
     gfx.checkGlError("androidimagelayer.paint END");

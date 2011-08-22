@@ -18,15 +18,13 @@ package playn.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.opengl.GL2ES2;
-
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Pattern;
 import playn.core.StockInternalTransform;
 import playn.core.Surface;
-
+import playn.core.gl.GL20;
 
 class AndroidSurface implements Surface {
 
@@ -52,14 +50,14 @@ class AndroidSurface implements Surface {
     gfx.bindFramebuffer(fbuf, width, height);
 
     gfx.gl20.glClearColor(0, 0, 0, 0);
-    gfx.gl20.glClear(GL2ES2.GL_COLOR_BUFFER_BIT);
-    //TODO(jonagill) Do we need another clear color call?
+    gfx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    // TODO(jonagill) Do we need another clear color call?
   }
 
   /*
    * None of these draw* calls rebind the screen's framebuffer for efficiency.
-   * The screen's framebuffer is automatically restored in AndroidGraphics.updateLayers()
-   * before any drawing to the screen occurs.
+   * The screen's framebuffer is automatically restored in
+   * AndroidGraphics.updateLayers() before any drawing to the screen occurs.
    */
 
   @Override
@@ -81,7 +79,7 @@ class AndroidSurface implements Surface {
             false, 1);
       }
     }
-//    gfx.bindFramebuffer();
+    // gfx.bindFramebuffer();
   }
 
   @Override
@@ -99,11 +97,11 @@ class AndroidSurface implements Surface {
             sw, sh, 1);
       }
     }
-//    gfx.bindFramebuffer();
+    // gfx.bindFramebuffer();
   }
 
   public void drawImageCentered(Image img, float x, float y) {
-    drawImage(img, x - img.width()/2, y - img.height()/2);
+    drawImage(img, x - img.width() / 2, y - img.height() / 2);
   }
 
   @Override
@@ -116,12 +114,16 @@ class AndroidSurface implements Surface {
     dy = dy * (width / 2) / len;
 
     float[] pos = new float[8];
-    pos[0] = x0 - dy; pos[1] = y0 + dx;
-    pos[2] = x1 - dy; pos[3] = y1 + dx;
-    pos[4] = x1 + dy; pos[5] = y1 - dx;
-    pos[6] = x0 + dy; pos[7] = y0 - dx;
+    pos[0] = x0 - dy;
+    pos[1] = y0 + dx;
+    pos[2] = x1 - dy;
+    pos[3] = y1 + dx;
+    pos[4] = x1 + dy;
+    pos[5] = y1 - dx;
+    pos[6] = x0 + dy;
+    pos[7] = y0 - dx;
     gfx.fillPoly(topTransform(), pos, fillColor, 1);
-//    gfx.bindFramebuffer();
+    // gfx.bindFramebuffer();
   }
 
   @Override
@@ -135,7 +137,7 @@ class AndroidSurface implements Surface {
     } else {
       gfx.fillRect(topTransform(), x, y, width, height, fillColor, 1);
     }
-//    gfx.bindFramebuffer();
+    // gfx.bindFramebuffer();
   }
 
   @Override
