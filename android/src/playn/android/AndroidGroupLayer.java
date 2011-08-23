@@ -94,7 +94,7 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer 
   // TODO(jonagill) Test this -- copied verbatim from HTMLGroupLayerGL
   @Override
   public void paint(InternalTransform parentTransform, float parentAlpha) {
-    gfx.checkGlError("grouplayer.paint");
+    gfx.checkGlError("GroupLayer.paint");
     if (!visible())
       return;
 

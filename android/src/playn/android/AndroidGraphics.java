@@ -86,21 +86,19 @@ class AndroidGraphics implements Graphics {
     }
 
     boolean prepare() {
-      checkGlError("prepare start");
       if (useShader(this) && gl20.glIsProgram(program)) {
-        checkGlError("prepare entered");
         gl20.glUseProgram(program);
-        checkGlError("program used");
+        checkGlError("Shader.prepare useProgram");
         // Couldn't get glUniform2fv to work for whatever reason.
         gl20.glUniform2f(uScreenSizeLoc, fbufWidth, fbufHeight);
-        Log.w("playn", fbufWidth + " " + fbufHeight);
 
-        checkGlError("screensizeloc vector set to " + viewWidth + " " + viewHeight);
+        checkGlError("Shader.prepare uScreenSizeLoc vector set to "
+          + viewWidth + " " + viewHeight);
 
         gl20.glBindBuffer(GL20.GL_ARRAY_BUFFER, vertexBuffer);
         gl20.glBindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
 
-        checkGlError("buffers bound");
+        checkGlError("Shader.prepare BindBuffer");
 
         gl20.glEnableVertexAttribArray(aMatrix);
         gl20.glEnableVertexAttribArray(aTranslation);
@@ -108,14 +106,14 @@ class AndroidGraphics implements Graphics {
         if (aTexture != -1)
           gl20.glEnableVertexAttribArray(aTexture);
 
-        checkGlError("attrib arrays enabled");
+        checkGlError("Shader.prepare AttribArrays enabled");
 
         gl20.glVertexAttribPointer(aMatrix, 4, GL20.GL_FLOAT, false, VERTEX_STRIDE, 0);
         gl20.glVertexAttribPointer(aTranslation, 2, GL20.GL_FLOAT, false, VERTEX_STRIDE, 16);
         gl20.glVertexAttribPointer(aPosition, 2, GL20.GL_FLOAT, false, VERTEX_STRIDE, 24);
         if (aTexture != -1)
           gl20.glVertexAttribPointer(aTexture, 2, GL20.GL_FLOAT, false, VERTEX_STRIDE, 32);
-        checkGlError("prepare end");
+        checkGlError("Shader.prepare AttribPointer");
         return true;
       }
       return false;
@@ -125,18 +123,17 @@ class AndroidGraphics implements Graphics {
       if (vertexOffset == 0) {
         return;
       }
-      checkGlError("shader.flush preBuffer");
+      checkGlError("Shader.flush");
       gl20.glBufferData(GL20.GL_ARRAY_BUFFER, vertexOffset * FLOAT_SIZE_BYTES, vertexData,
           GL20.GL_STREAM_DRAW);
       gl20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, elementOffset * SHORT_SIZE_BYTES,
           elementData, GL20.GL_STREAM_DRAW);
-      checkGlError("shader.flush postBuffer");
+      checkGlError("Shader.flush BufferData");
       gl20.glDrawElements(GL20.GL_TRIANGLE_STRIP, elementOffset, GL20.GL_UNSIGNED_SHORT, 0);
       vertexOffset = elementOffset = 0;
-      checkGlError("shader.flush post-draw");
+      checkGlError("Shader.flush DrawElements");
     }
 
-    // Verbatim
     int beginPrimitive(int vertexCount, int elemCount) {
       int vertIdx = vertexOffset / VERTEX_SIZE;
       if ((vertIdx + vertexCount > MAX_VERTS) || (elementOffset + elemCount > MAX_ELEMS)) {
@@ -218,9 +215,9 @@ class AndroidGraphics implements Graphics {
 
       if (program != 0) {
         gl20.glAttachShader(program, vertexShader);
-        checkGlError("glAttachShader");
+        checkGlError("createProgram Attaching vertex shader");
         gl20.glAttachShader(program, fragmentShader);
-        checkGlError("glAttachShader");
+        checkGlError("createProgram Attaching fragment shader");
         gl20.glLinkProgram(program);
         IntBuffer linkStatus = IntBuffer.allocate(1);
         gl20.glGetProgramiv(program, GL20.GL_LINK_STATUS, linkStatus);
@@ -279,11 +276,6 @@ class AndroidGraphics implements Graphics {
       super(Shaders.colorFragmentShader);
       uColor = gl20.glGetUniformLocation(program, "u_Color");
       uAlpha = gl20.glGetUniformLocation(program, "u_Alpha");
-    }
-
-    // Here for debugging
-    void flush() {
-      super.flush();
     }
 
     void prepare(int color, float alpha) {
@@ -710,10 +702,10 @@ class AndroidGraphics implements Graphics {
   }
 
   void checkGlError(String op) {
-    int error;
-    while ((error = gl20.glGetError()) != GL20.GL_NO_ERROR) {
-      Log.e(this.getClass().getName(), op + ": glError " + error);
-      throw new RuntimeException(op + ": glError " + error);
-    }
+    // int error;
+    // while ((error = gl20.glGetError()) != GL20.GL_NO_ERROR) {
+    // Log.e(this.getClass().getName(), op + ": glError " + error);
+    // throw new RuntimeException(op + ": glError " + error);
+    // }
   }
 }

@@ -44,7 +44,6 @@ class AndroidPointer implements Pointer {
   synchronized void onPointerMove(Event event) {
     if (listener != null && storedMoveIndex < MAX_STORED_EVENTS_PER_TYPE) {
       if (inDragSequence) {
-        listener.onPointerDrag(event);
         storedMoveEvents[storedMoveIndex++] = event;
       }
     }

@@ -71,7 +71,8 @@ public class AndroidAssetManager extends AbstractAssetManager {
     try {
       InputStream is = openAsset(path);
       try {
-        return decodeBitmap(is);
+        Bitmap bitmap = decodeBitmap(is);
+        return bitmap;
       } finally {
         is.close();
       }

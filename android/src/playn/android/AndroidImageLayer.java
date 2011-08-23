@@ -19,7 +19,6 @@ import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.InternalTransform;
-import android.graphics.Bitmap;
 
 class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
@@ -122,7 +121,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
     if (!visible())
       return;
 
-    gfx.checkGlError("androidimagelayer.paint START");
+    gfx.checkGlError("AndroidImageLayer.paint start");
     // TODO(jgw): Assert exclusive source-rect vs. repeat.
 
     int tex = image.ensureTexture(gfx, repeatX, repeatY);
@@ -141,7 +140,7 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
             repeatY, childAlpha);
       }
     }
-    gfx.checkGlError("androidimagelayer.paint END");
+    gfx.checkGlError("AndroidImageLayer.paint end");
   }
 
   @Override

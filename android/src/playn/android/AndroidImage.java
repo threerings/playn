@@ -52,6 +52,7 @@ class AndroidImage implements CanvasImage {
   }
 
   public AndroidImage(int w, int h, boolean alpha) {
+    //TODO(jonagill): What's the deal with the configs here?
     Bitmap newBitmap = Bitmap.createBitmap(w, h, alpha
         ? AndroidPlatform.instance.preferredBitmapConfig : Bitmap.Config.ARGB_8888);
     bitmapRef = new SoftReference<Bitmap>(newBitmap);

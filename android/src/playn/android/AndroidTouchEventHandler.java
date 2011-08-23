@@ -25,7 +25,6 @@ import android.view.MotionEvent;
  * them into an array of Touch.Events for the Listener.
  */
 class AndroidTouchEventHandler {
-  boolean inTouchSequence = false;
   private float xScreenOffset = 0;
   private float yScreenOffset = 0;
 
@@ -36,19 +35,17 @@ class AndroidTouchEventHandler {
    */
   public boolean onMotionEvent(MotionEvent event) {
     AndroidPointer pointer = AndroidPlatform.instance.pointer();
-    AndroidTouch touch = (AndroidTouch) AndroidPlatform.instance.touch();
+    AndroidTouch touch = AndroidPlatform.instance.touch();
     double time = event.getEventTime();
     int action = event.getAction();
     Touch.Event[] touches = parseMotionEvent(event);
     Touch.Event pointerEvent = touches[0];
     switch (action) {
       case (MotionEvent.ACTION_DOWN):
-        inTouchSequence = true;
         touch.onTouchStart(touches);
         pointer.onPointerStart(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;
       case (MotionEvent.ACTION_UP):
-        inTouchSequence = false;
         touch.onTouchEnd(touches);
         pointer.onPointerEnd(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;

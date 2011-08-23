@@ -20,7 +20,6 @@ import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.Platform;
 import playn.core.PlayN;
-import playn.core.Touch;
 import playn.java.JavaJson;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -75,23 +74,25 @@ public class AndroidPlatform implements Platform {
     storage = new AndroidStorage(activity);
 
     assetManager.assets = activity.getAssets();
-    ActivityManager activityManager = (ActivityManager) activity.getApplication().getSystemService(
-        Activity.ACTIVITY_SERVICE);
-    int memoryClass = activityManager.getMemoryClass();
 
-    // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
-    preferredBitmapConfig = memoryClass <= 16 ? Bitmap.Config.ARGB_4444 : mapDisplayPixelFormat();
+    preferredBitmapConfig = mapDisplayPixelFormat();
   }
 
   /**
    * Determines the most performant pixel format for the active display.
    */
+  //FIXME:  This method will require testing over a variety of devices.
   private Config mapDisplayPixelFormat() {
     int format = activity.getWindowManager().getDefaultDisplay().getPixelFormat();
+    ActivityManager activityManager = (ActivityManager) activity.getApplication().getSystemService(
+        Activity.ACTIVITY_SERVICE);
+    int memoryClass = activityManager.getMemoryClass();
 
-    if (format == PixelFormat.RGBA_8888 || format == PixelFormat.RGBX_8888)
-      return Bitmap.Config.ARGB_8888;
-    return Bitmap.Config.ARGB_4444;
+    // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
+    //FIXME: The memoryClass check is from the Canvas-only implementation and may function incorrectly with OpenGL
+    if (format == PixelFormat.RGBA_4444 ||  memoryClass <= 16)
+      return Bitmap.Config.ARGB_4444;
+    else return Bitmap.Config.ARGB_8888;
   }
 
   @Override
@@ -146,7 +147,7 @@ public class AndroidPlatform implements Platform {
   }
 
   @Override
-  public Touch touch() {
+  public AndroidTouch touch() {
     return touch;
   }
 
