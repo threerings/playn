@@ -16,6 +16,9 @@
 
 package playn.flash;
 
+import flash.display.BitmapData;
+import flash.geom.Point;
+import flash.geom.Rectangle;
 import playn.core.Asserts;
 
 import flash.display.Bitmap;
@@ -32,24 +35,45 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   
   private final Image image;
 
+  private BitmapData bitmapData;
+
+  private Rectangle sourceRect;
+
   /**
    * @param image
    */
   public FlashImageLayer(Image image) {
-    super((Sprite) (Bitmap.create(((FlashImage) image).bitmapData()).cast()));
+    super((Sprite) (Bitmap.create()));
     this.image = image;
+    setBitmapData(((FlashImage) image));
+    
     image.addCallback(new ResourceCallback<Image>() {
-      
+
       @Override
       public void error(Throwable err) {
-       PlayN.log().error(err.toString());
+        PlayN.log().error(err.toString());
       }
-    
+
       @Override
       public void done(Image resource) {
-        ((Bitmap) display().cast()).setBitmapData(((FlashImage) resource).bitmapData());
+        setBitmapData((FlashImage) resource);
       }
     });
+  }
+
+  private void setBitmapData(FlashImage resource) {
+    bitmapData = resource.bitmapData();
+    applySourceRect();
+  }
+
+  private void applySourceRect() {
+    BitmapData clippedSource;
+    if (sourceRect == null) {
+      clippedSource = bitmapData;
+    } else {
+      clippedSource = bitmapData.applyFilter(bitmapData, sourceRect, Point.create(0,0), null);
+    }
+    ((Bitmap) display()).setBitmapData(clippedSource);
   }
 
   /**
@@ -74,8 +98,8 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void clearSourceRect() {
-    // TODO Auto-generated method stub
-
+    sourceRect = null;
+    applySourceRect();
   }
 
   /* (non-Javadoc)
@@ -110,9 +134,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void setImage(Image image) {
-    ((Bitmap) display().cast()).setBitmapData(((FlashImage) image).bitmapData());
-
-
+    setBitmapData((FlashImage) image);
   }
 
   /* (non-Javadoc)
@@ -138,8 +160,8 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void setSourceRect(float sx, float sy, float sw, float sh) {
-    // TODO Auto-generated method stub
-
+    sourceRect = Rectangle.create(sx, sy, sw, sh);
+    applySourceRect();
   }
 
   /* (non-Javadoc)

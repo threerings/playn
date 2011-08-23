@@ -21,17 +21,42 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-peaphysics</artifactId>
+      <version>${coreversion}</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <version>${gwtversion}</version>
-      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${gwtversion}</version>
     </dependency>
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>playn-core</artifactId>
       <version>${coreversion}</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-jbox2d</artifactId>
+      <version>${coreversion}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.googlecode.playn</groupId>
+      <artifactId>playn-flash</artifactId>
+      <version>${coreversion}</version>
+    </dependency>
+
   </dependencies>
 
   <build>

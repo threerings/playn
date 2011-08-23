@@ -21,6 +21,8 @@ package flash.display;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
+import flash.geom.Point;
+import flash.geom.Rectangle;
 import flash.gwt.FlashImport;
 
 
@@ -95,5 +97,8 @@ final public class BitmapData extends JavaScriptObject {
           transparent, fillColor);
     }-*/;
 
+  public static native BitmapData applyFilter(BitmapData bitmapData, Rectangle sourceRect, Point dest, Object filter) /*-{
+    return this.applyFilter(bitmapData, sourceRect, dest, filter);
+  }-*/;
 }
 

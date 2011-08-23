@@ -222,7 +222,7 @@ public class FlashPlatform implements Platform {
         if (frameCounter == FPS_COUNTER_MAX) {
           double frameRate = frameCounter / 
             ((time() - frameCounterStart) / 1000.0);
-          PlayN.log().info("FPS: " + frameRate);
+          PlayN.log().info("XFPS: " + frameRate);
           frameCounter = 0;
         }
       }
@@ -261,7 +261,7 @@ public class FlashPlatform implements Platform {
   }-*/;
 
   public static native void captureEvent(EventType eventType, EventHandler<?> eventHandler) /*-{
-    $root.addEventListener(eventType, function(arg) {
+    $root.stage.addEventListener(eventType, function(arg) {
       eventHandler.@playn.flash.EventHandler::handleEvent(Lflash/events/Event;)(arg);
     });
   }-*/;
