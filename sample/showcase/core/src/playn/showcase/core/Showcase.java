@@ -26,6 +26,7 @@ import playn.showcase.core.peas.PeasDemo;
 import playn.showcase.core.snake.SnakeDemo;
 import playn.showcase.core.sprites.SpritesDemo;
 import playn.showcase.core.swirl.SwirlDemo;
+import playn.showcase.core.text.TextDemo;
 
 /**
  * The main entry point for the showcase "game".
@@ -41,6 +42,7 @@ public class Showcase implements Game
     demos.add(new PeasDemo());
     demos.add(new SwirlDemo());
     demos.add(new SnakeDemo());
+    demos.add(new TextDemo());
   }
 
   public void activateDemo(Demo demo) {

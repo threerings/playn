@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package playn.sample.text.core;
+package playn.showcase.core.text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,16 +23,27 @@ import playn.core.CanvasLayer;
 import playn.core.Game;
 import playn.core.Layer;
 import playn.core.SurfaceLayer;
+import playn.core.GroupLayer;
 import playn.core.Font;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import static playn.core.PlayN.*;
 
-public class TextGame implements Game {
-  // List<Pea> peas = new ArrayList<Pea>(0);
+import playn.showcase.core.Demo;
+
+public class TextDemo extends Demo {
+  private GroupLayer base;
+
+  @Override
+  public String name() {
+    return "Text";
+  }
 
   @Override
   public void init() {
+    base = graphics().createGroupLayer();
+    graphics().rootLayer().add(base);
+
     // draw a soothing flat background
     CanvasImage bgtile = graphics().createImage(64, 64);
     bgtile.canvas().setFillColor(0xFFCCCCCC);
@@ -44,7 +55,7 @@ public class TextGame implements Game {
     bgsurf.surface().setFillPattern(graphics().createPattern(bgtile));
     bgsurf.surface().fillRect(0, 0, graphics().width(), graphics().height());
     // TODO: I think bgsurf.surface().clear() should also work, but doesn't
-    graphics().rootLayer().add(bgsurf);
+    base.add(bgsurf);
 
     // add some text to said soothing background
     final float MARGIN = 10;
@@ -58,7 +69,7 @@ public class TextGame implements Game {
           TextLayout layout = graphics().layoutText("Hello PlayN World", format);
           Layer layer = createTextLayer(layout);
           layer.setTranslation(xpos, ypos);
-          graphics().rootLayer().add(layer);
+          base.add(layer);
           ypos += layout.height();
           maxWidth = Math.max(maxWidth, layout.width());
           maxYPos = Math.max(ypos, maxYPos);
@@ -78,7 +89,7 @@ public class TextGame implements Game {
                              withEffect(TextFormat.Effect.shadow(0x33000000, -2, -2)));
     Layer layer = createTextLayer(layout);
     layer.setTranslation(xpos, ypos);
-    graphics().rootLayer().add(layer);
+    base.add(layer);
     xpos += layout.width() + MARGIN;
     ypos += MARGIN;
 
@@ -88,7 +99,7 @@ public class TextGame implements Game {
                              withEffect(TextFormat.Effect.shadow(0x33000000, 2, 2)));
     layer = createTextLayer(layout);
     layer.setTranslation(xpos, ypos);
-    graphics().rootLayer().add(layer);
+    base.add(layer);
     xpos += layout.width() + MARGIN;
     ypos += MARGIN;
 
@@ -98,26 +109,15 @@ public class TextGame implements Game {
                              withEffect(TextFormat.Effect.outline(0xFFFFFFFF)));
     layer = createTextLayer(layout);
     layer.setTranslation(xpos, ypos);
-    graphics().rootLayer().add(layer);
+    base.add(layer);
     xpos += layout.width() + MARGIN;
     ypos += MARGIN;
   }
 
   @Override
-  public void paint(float alpha) {
-    // nothing needed here
-  }
-
-  @Override
-  public void update(float delta) {
-    // for (Pea pea : peas) {
-    //   pea.update(delta);
-    // }
-  }
-
-  @Override
-  public int updateRate() {
-    return 25;
+  public void shutdown() {
+    base.destroy();
+    base = null;
   }
 
   protected Layer createTextLayer(TextLayout layout) {
