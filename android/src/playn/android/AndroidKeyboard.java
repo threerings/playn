@@ -29,17 +29,17 @@ public class AndroidKeyboard implements Keyboard {
     this.listener = listener;
   }
 
-  void onKeyDown(double time, int keyCode) {
+  synchronized void onKeyDown(double time, int keyCode) {
     if (listener != null && storedDownIndex < MAX_STORED_EVENTS_PER_TYPE)
       storedDownEvents[storedDownIndex++] = new Event.Impl(time, keyCode);
   }
 
-  void onKeyUp(double time, int keyCode) {
+  synchronized void onKeyUp(double time, int keyCode) {
     if (listener != null && storedUpIndex < MAX_STORED_EVENTS_PER_TYPE)
       storedUpEvents[storedUpIndex++] = new Event.Impl(time, keyCode);
   }
 
-  void processQueuedEvents() {
+  synchronized void processQueuedEvents() {
     if (listener != null) {
       for (int i = 0; i < MAX_STORED_EVENTS_PER_TYPE; i++) {
         if (storedDownEvents[i] != null) {

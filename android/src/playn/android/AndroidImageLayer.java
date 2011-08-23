@@ -127,19 +127,17 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
 
     int tex = image.ensureTexture(gfx, repeatX, repeatY);
     if (tex != 0) {
-      Bitmap bitmap = image.getBitmap();
-
       InternalTransform xform = localTransform(parentTransform);
       float childAlpha = parentAlpha * alpha;
 
-      float width = widthSet ? this.width : bitmap.getWidth();
-      float height = heightSet ? this.height : bitmap.getHeight();
+      float width = widthSet ? this.width : image.width();
+      float height = heightSet ? this.height : image.height();
 
       if (sourceRectSet) {
-        gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, 0, 0, width, height, sx,
+        gfx.drawTexture(tex, image.width(), image.height(), xform, 0, 0, width, height, sx,
             sy, sw, sh, childAlpha);
       } else {
-        gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, width, height, repeatX,
+        gfx.drawTexture(tex, image.width(), image.height(), xform, width, height, repeatX,
             repeatY, childAlpha);
       }
     }

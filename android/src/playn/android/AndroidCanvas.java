@@ -66,34 +66,23 @@ class AndroidCanvas implements playn.core.Canvas {
 
   @Override
   public void drawImage(Image img, float x, float y) {
-    Asserts.checkArgument(img instanceof AndroidImage);
-    AndroidImage aimg = (AndroidImage) img;
-    if (aimg.getBitmap() != null) {
-      canvas.drawBitmap(aimg.getBitmap(), x, y, currentState().prepareImage());
-    }
-    dirty = true;
+    drawImage(img, x, y, img.width(), img.height());
   }
 
   @Override
   public void drawImage(Image img, float x, float y, float w, float h) {
-    Asserts.checkArgument(img instanceof AndroidImage);
-    AndroidImage aimg = (AndroidImage) img;
-    if (aimg.getBitmap() != null) {
-      rectf.set(x, y, x + w, y + h);
-      canvas.drawBitmap(aimg.getBitmap(), null, rectf, currentState().prepareImage());
-    }
-    dirty = true;
+    drawImage(img, x, y, w, h, 0, 0, img.width(), img.height());
   }
 
   @Override
   public void drawImage(Image img, float dx, float dy, float dw, float dh, float sx, float sy,
       float sw, float sh) {
     Asserts.checkArgument(img instanceof AndroidImage);
-    AndroidImage aimg = (AndroidImage) img;
-    if (aimg.getBitmap() != null) {
+    Bitmap bitmap = ((AndroidImage) img).getBitmap();
+    if (bitmap != null) {
       rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
       rectf.set(dx, dy, dx + dw, dy + dh);
-      canvas.drawBitmap(aimg.getBitmap(), rect, rectf, currentState().prepareImage());
+      canvas.drawBitmap(bitmap, rect, rectf, currentState().prepareImage());
     }
     dirty = true;
   }

@@ -25,27 +25,27 @@ public class AndroidTouch implements Touch {
   private Event[][] storedEndEvents = new Event[MAX_STORED_EVENTS_PER_TYPE][];
   private int storedStartIndex, storedMoveIndex, storedEndIndex;
 
-  public void onTouchStart(Event[] touches) {
+  synchronized void onTouchStart(Event[] touches) {
     if (listener != null && storedStartIndex < MAX_STORED_EVENTS_PER_TYPE)
       storedStartEvents[storedStartIndex++] = touches;
   }
 
-  public void onTouchMove(Event[] touches) {
+  synchronized void onTouchMove(Event[] touches) {
     if (listener != null && storedMoveIndex < MAX_STORED_EVENTS_PER_TYPE)
       storedMoveEvents[storedMoveIndex++] = touches;
   }
 
-  public void onTouchEnd(Event[] touches) {
+  synchronized void onTouchEnd(Event[] touches) {
     if (listener != null && storedEndIndex < MAX_STORED_EVENTS_PER_TYPE)
       storedMoveEvents[storedEndIndex++] = touches;
   }
 
   @Override
-  public void setListener(Listener listener) {
+  public synchronized void setListener(Listener listener) {
     this.listener = listener;
   }
 
-  void processQueuedEvents() {
+  synchronized void processQueuedEvents() {
     if (listener != null) {
       for (int i = 0; i < MAX_STORED_EVENTS_PER_TYPE; i++) {
         if (storedStartEvents[i] != null) {

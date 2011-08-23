@@ -23,6 +23,7 @@ import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
+import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.StockInternalTransform;
 import playn.core.gl.GL20;
@@ -78,11 +79,11 @@ class AndroidImage implements CanvasImage {
     return canvas;
   }
 
-  public boolean canvasDirty() {
+  boolean canvasDirty() {
     return (canvas != null && canvas.dirty());
   }
 
-  public void clearDirty() {
+  void clearDirty() {
     canvas.clearDirty();
   }
 
@@ -90,34 +91,50 @@ class AndroidImage implements CanvasImage {
     return height;
   }
 
+  public int width() {
+    return width;
+  }
+  
   public boolean isReady() {
     return bitmapRef != null || canvas != null;
   }
 
   public void replaceWith(Image image) {
     Asserts.checkArgument(image instanceof AndroidImage);
-    bitmapRef = new SoftReference<Bitmap>(((AndroidImage) image).getBitmap());
+    AndroidImage aimg = (AndroidImage) image;
+    bitmapRef = new SoftReference<Bitmap>(aimg.getBitmap());
+    width = image.width();
+    height = image.height();
+    path = aimg.getPath();
     canvas = null;
   }
 
-  public int width() {
-    return width;
-  }
-
-  public Bitmap getBitmap() {
+  /*
+   * getBitmap() can be exceptionally slow, as it will likely
+   * need to retrieve the bitmap from the file path.  As such
+   * it should only be called when a direct reference to the
+   * Bitmap is necessary.  (Note that this is less of an
+   * issue for an AndroidImage that has had a canvas built,
+   * as a hard reference to the bitmap is held in memory then).
+   */
+  Bitmap getBitmap() {
     if (canvasBitmap != null) {
       return canvasBitmap;
     }
     if (bitmapRef != null) {
       Bitmap bm = bitmapRef.get();
       if (bm == null && path != null) {
-        // Log.i("playn", "Bitmap " + path + " fell out of memory");
+        PlayN.log().info("Bitmap " + path + " fell out of memory");
         bitmapRef = new SoftReference<Bitmap>(
             bm = AndroidPlatform.instance.assetManager().doGetBitmap(path));
       }
       return bm;
     }
     return null;
+  }
+  
+  String getPath() {
+    return path;
   }
 
   private void runCallbacks(boolean success) {

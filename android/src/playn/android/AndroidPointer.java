@@ -30,18 +30,18 @@ class AndroidPointer implements Pointer {
   private Listener listener;
 
   @Override
-  public void setListener(Listener listener) {
+  public synchronized void setListener(Listener listener) {
     this.listener = listener;
   }
 
-  void onPointerStart(Event event) {
+  synchronized void onPointerStart(Event event) {
     if (listener != null && storedStartIndex < MAX_STORED_EVENTS_PER_TYPE) {
       inDragSequence = true;
       storedStartEvents[storedStartIndex++] = event;
     }
   }
 
-  void onPointerMove(Event event) {
+  synchronized void onPointerMove(Event event) {
     if (listener != null && storedMoveIndex < MAX_STORED_EVENTS_PER_TYPE) {
       if (inDragSequence) {
         listener.onPointerDrag(event);
@@ -50,14 +50,14 @@ class AndroidPointer implements Pointer {
     }
   }
 
-  void onPointerEnd(Event event) {
+  synchronized void onPointerEnd(Event event) {
     if (listener != null && storedEndIndex < MAX_STORED_EVENTS_PER_TYPE) {
       inDragSequence = false;
       storedEndEvents[storedEndIndex++] = event;
     }
   }
 
-  void processQueuedEvents() {
+  synchronized void processQueuedEvents() {
     if (listener != null) {
       for (int i = 0; i < MAX_STORED_EVENTS_PER_TYPE; i++) {
         if (storedStartEvents[i] != null) {

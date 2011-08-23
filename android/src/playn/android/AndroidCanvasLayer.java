@@ -19,8 +19,6 @@ import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.CanvasLayer;
 import playn.core.InternalTransform;
-import android.graphics.Bitmap;
-import android.util.Log;
 
 class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
 
@@ -49,17 +47,15 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
 
     int tex = image.ensureTexture(gfx, false, false);
     if (tex != 0) {
-      Bitmap bitmap = image.getBitmap();
 
       if (image.canvasDirty()) {
         image.clearDirty();
-        gfx.updateTexture(tex, bitmap);
+        gfx.updateTexture(tex, image.getBitmap());
       }
 
       InternalTransform xform = localTransform(parentTransform);
       float childAlpha = parentAlpha * alpha;
-      Log.w("playn", "CANVASPAINT " + bitmap.getWidth() + " " + width() + " " + childAlpha);
-      gfx.drawTexture(tex, bitmap.getWidth(), bitmap.getHeight(), xform, width(), height(), false,
+      gfx.drawTexture(tex, image.width(), image.height(), xform, width(), height(), false,
           false, childAlpha);
     }
   }
