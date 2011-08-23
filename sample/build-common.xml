@@ -30,12 +30,16 @@
   </target>
 
   <target name="-prepare-html" depends="-prepare">
-    <artifact:dependencies pathId="html.classpath">
+    <artifact:dependencies pathId="html-extras.classpath">
       <dependency groupId="com.googlecode.playn" artifactId="playn-html"
                   version="${pom.properties.coreversion}"/>
       <dependency groupId="com.google.gwt" artifactId="gwt-dev"
                   version="${pom.properties.gwtversion}"/>
     </artifact:dependencies>
+    <path id="html.classpath">
+      <path refid="classpath"/>
+      <path refid="html-extras.classpath"/>
+    </path>
   </target>
 
   <target name="-prepare-android" depends="-prepare">
@@ -79,13 +83,6 @@
   </target>
 
   <target name="compile-html" depends="-prep-webapp,-compile-html" description="Compiles HTML game.">
-    <javac srcdir="html/${src.dir}" destdir="${classes.dir}" includeAntRuntime="false"
-           debug="on" deprecation="on" source="1.6" target="1.6">
-      <classpath refid="html.classpath"/>
-      <compilerarg value="-Xlint"/>
-      <compilerarg value="-Xlint:-serial"/>
-    </javac>
-
     <java fork="true" maxmemory="1024M" failonerror="true" classname="com.google.gwt.dev.Compiler">
       <classpath>
         <pathelement location="${javax.validation:validation-api:jar}"/>
@@ -106,7 +103,7 @@
 
   <target name="run-html" depends="compile-html" description="Serves HTML game on localhost.">
     <artifact:dependencies pathId="jetty-ant.classpath">
-      <remoteRepository url="http://oss.sonatype.org/content/groups/jetty/"/>
+      <remoteRepository id="jetty-repo" url="http://oss.sonatype.org/content/groups/jetty/"/>
       <Dependency groupId="org.mortbay.jetty" artifactId="jetty-ant"
                   version="7.4.2.v20110526" scope="runtime" />
     </artifact:dependencies>
