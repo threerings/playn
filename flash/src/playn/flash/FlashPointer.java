@@ -30,7 +30,6 @@ class FlashPointer implements Pointer {
     // Mouse handlers.
     FlashPlatform.captureEvent(Sprite.MOUSEDOWN, new EventHandler<MouseEvent>() {
       public void handleEvent(MouseEvent evt) {
-        PlayN.log().info("MouseDown");
         evt.preventDefault();  
         mouseDown = true;
         if (listener != null) {
@@ -41,8 +40,6 @@ class FlashPointer implements Pointer {
     });
     FlashPlatform.captureEvent(Sprite.MOUSEUP, new EventHandler<MouseEvent>() {
       public void handleEvent(MouseEvent evt) {
-        PlayN.log().info("MouseUp");
-        
         mouseDown = false;
         if (listener != null) {
           listener.onPointerEnd(

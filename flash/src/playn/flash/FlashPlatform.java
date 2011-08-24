@@ -222,7 +222,7 @@ public class FlashPlatform implements Platform {
         if (frameCounter == FPS_COUNTER_MAX) {
           double frameRate = frameCounter / 
             ((time() - frameCounterStart) / 1000.0);
-          PlayN.log().info("XFPS: " + frameRate);
+          PlayN.log().info("FPS: " + frameRate);
           frameCounter = 0;
         }
       }
