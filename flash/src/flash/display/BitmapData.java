@@ -97,8 +97,12 @@ final public class BitmapData extends JavaScriptObject {
           transparent, fillColor);
     }-*/;
 
-  public static native BitmapData applyFilter(BitmapData bitmapData, Rectangle sourceRect, Point dest, Object filter) /*-{
+  public native BitmapData applyFilter(BitmapData bitmapData, Rectangle sourceRect, Point dest, Object filter) /*-{
     return this.applyFilter(bitmapData, sourceRect, dest, filter);
+  }-*/;
+
+  public native void copyPixels(BitmapData bitmapData, Rectangle sourceRect, Point dest, BitmapData alphaBitmap, Point alphaPoint, boolean mergeAlpha) /*-{
+    this.copyPixels(bitmapData, sourceRect, dest, alphaBitmap, alphaPoint, mergeAlpha);
   }-*/;
 }
 

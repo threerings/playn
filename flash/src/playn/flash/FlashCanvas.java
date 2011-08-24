@@ -86,6 +86,8 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void drawText(String text, float x, float y) {
+    context2d.strokeText(text, x, y);
+    context2d.fillText(text, x, y);
     dirty = true;
   }
 
@@ -101,6 +103,7 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void fillRect(float x, float y, float w, float h) {
+    context2d.fillRect(x, y, w, h);
     dirty = true;
   }
 
@@ -111,18 +114,22 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void restore() {
+    context2d.restore();
   }
 
   @Override
   public void rotate(float radians) {
+    context2d.rotate(radians);
   }
 
   @Override
   public void save() {
+    context2d.save();
   }
 
   @Override
   public void scale(float x, float y) {
+    context2d.scale(x, y);
   }
 
   @Override
@@ -131,6 +138,12 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void setFillColor(int color) {
+    context2d.setFillStyle("rgba(" 
+        + ((color >> 16) & 0xff) + "," 
+        + ((color >> 8) & 0xff) + ","
+        + (color & 0xff) + ","
+        + ((color >> 24) & 0xff) + ")");
+    
   }
 
   @Override
@@ -155,6 +168,11 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void setStrokeColor(int color) { 
+    context2d.setStrokeStyle("rgba(" 
+        + ((color >> 16) & 0xff) + "," 
+        + ((color >> 8) & 0xff) + ","
+        + (color & 0xff) + ","
+        + ((color >> 24) & 0xff) + ")");
   }
 
   @Override
@@ -163,6 +181,7 @@ class FlashCanvas implements Canvas {
 
   @Override
   public void setTransform(float m11, float m12, float m21, float m22, float dx, float dy) {
+    context2d.setTransform(m11, m12, m21, m22, dx, dy);
   }
 
   @Override
@@ -183,10 +202,12 @@ class FlashCanvas implements Canvas {
   @Override
   public void transform(float m11, float m12, float m21, float m22, float dx,
       float dy) {
+    context2d.transform(m11, m12, m21, m22, dx, dy);
   }
 
   @Override
   public void translate(float x, float y) {
+    context2d.translate(x, y);
   }
 
   @Override

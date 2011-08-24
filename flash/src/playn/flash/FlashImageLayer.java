@@ -43,7 +43,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    * @param image
    */
   public FlashImageLayer(Image image) {
-    super((Sprite) (Bitmap.create()));
+    super((Sprite) (Bitmap.create(null).cast()));
     this.image = image;
     setBitmapData(((FlashImage) image));
     
@@ -68,10 +68,11 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
 
   private void applySourceRect() {
     BitmapData clippedSource;
-    if (sourceRect == null) {
+    if (sourceRect == null || bitmapData == null) {
       clippedSource = bitmapData;
     } else {
-      clippedSource = bitmapData.applyFilter(bitmapData, sourceRect, Point.create(0,0), null);
+      clippedSource = BitmapData.create(sourceRect.getWidth(), sourceRect.getHeight(), true, 0x000000FF);
+      clippedSource.copyPixels(bitmapData, sourceRect, Point.create(0,0), null, null, false);
     }
     ((Bitmap) display()).setBitmapData(clippedSource);
   }

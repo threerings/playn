@@ -27,4 +27,12 @@ final public class Rectangle extends JavaScriptObject {
   public static native Rectangle create(float sx, float sy, float sw, float sh) /*-{
     return new flash.geom.Rectangle(sx, sy, sw, sh);
   }-*/;
+
+  public native int getWidth() /*-{
+    return this.width;
+  }-*/;
+  
+  public native int getHeight() /*-{
+    return this.height;
+  }-*/;
 }

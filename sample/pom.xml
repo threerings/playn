@@ -17,8 +17,8 @@
     <module>hello</module>
     <module>showcase</module>
     <module>cute</module>
-    <module>peas/core</module>
-    <module>peas/flash</module>
+<!--    <module>peas/core</module> -->
+<!--    <module>peas/flash</module> -->
 <!-- disabled until we can fix the m2eclipse errors caused by this pom
 
 -->
