@@ -16,7 +16,6 @@
 package playn.sample.cute.html;
 
 import playn.core.PlayN;
-import playn.html.HtmlAssetManager;
 import playn.html.HtmlGame;
 import playn.html.HtmlPlatform;
 import playn.sample.cute.core.CuteGame;
@@ -25,8 +24,8 @@ public class CuteGameHtml extends HtmlGame {
 
   @Override
   public void start() {
-    HtmlAssetManager assets = HtmlPlatform.register().assetManager();
-    assets.setPathPrefix("cutegame/");
+    HtmlPlatform platform = HtmlPlatform.register();
+    platform.assetManager().setPathPrefix("cutegame/");
     PlayN.run(new CuteGame());
   }
 }

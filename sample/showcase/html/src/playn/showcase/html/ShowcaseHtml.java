@@ -15,8 +15,6 @@
  */
 package playn.showcase.html;
 
-import playn.html.HtmlAssetManager;
-
 import playn.core.PlayN;
 import playn.html.HtmlGame;
 import playn.html.HtmlPlatform;
@@ -26,8 +24,8 @@ public class ShowcaseHtml extends HtmlGame {
 
   @Override
   public void start() {
-    HtmlAssetManager assets = HtmlPlatform.register().assetManager();
-    assets.setPathPrefix("showcase/");
+    HtmlPlatform platform = HtmlPlatform.register();
+    platform.assetManager().setPathPrefix("showcase/");
     PlayN.run(new Showcase());
   }
 }

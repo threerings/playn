@@ -16,7 +16,6 @@
 package playn.showcase.flash;
 
 import playn.core.PlayN;
-import playn.flash.FlashAssetManager;
 import playn.flash.FlashGame;
 import playn.flash.FlashPlatform;
 import playn.showcase.core.Showcase;
@@ -25,8 +24,8 @@ public class ShowcaseFlash extends FlashGame {
 
   @Override
   public void start() {
-    FlashAssetManager assets = FlashPlatform.register().assetManager();
-    assets.setPathPrefix("showcaseflash/");
+    FlashPlatform platform = FlashPlatform.register();
+    platform.assetManager().setPathPrefix("showcaseflash/");
     PlayN.run(new Showcase());
   }
 }

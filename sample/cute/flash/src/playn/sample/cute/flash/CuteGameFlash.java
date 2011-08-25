@@ -16,7 +16,6 @@
 package playn.sample.cute.flash;
 
 import playn.core.PlayN;
-import playn.flash.FlashAssetManager;
 import playn.flash.FlashGame;
 import playn.flash.FlashPlatform;
 import playn.sample.cute.core.CuteGame;
@@ -25,8 +24,8 @@ public class CuteGameFlash extends FlashGame {
 
   @Override
   public void start() {
-    FlashAssetManager assets = FlashPlatform.register().assetManager();
-    assets.setPathPrefix("cute/");
+    FlashPlatform platform = FlashPlatform.register();
+    platform.assetManager().setPathPrefix("cuteflash/");
     PlayN.run(new CuteGame());
   }
 }
