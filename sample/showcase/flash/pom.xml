@@ -22,40 +22,8 @@
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-showcase-core</artifactId>
-      <version>${coreversion}</version>
+      <version>${project.version}</version>
     </dependency>
-
-
-    <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-peaphysics</artifactId>
-      <version>${coreversion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-dev</artifactId>
-      <version>${gwtversion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-user</artifactId>
-      <version>${gwtversion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-core</artifactId>
-      <version>${coreversion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-jbox2d</artifactId>
-      <version>${coreversion}</version>
-    </dependency>
-
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>

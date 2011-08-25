@@ -30,13 +30,6 @@
       <artifactId>playn-flash</artifactId>
       <version>${coreversion}</version>
     </dependency>
-
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-dev</artifactId>
-      <version>${gwtversion}</version>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 
   <build>

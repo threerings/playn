@@ -21,7 +21,6 @@
   </repositories>
 
   <dependencies>
-
     <dependency>
       <groupId>com.samskivert</groupId>
       <artifactId>pythagoras</artifactId>
