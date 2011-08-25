@@ -16,15 +16,14 @@
 package playn.sample.cute.java;
 
 import playn.core.PlayN;
-import playn.java.JavaAssetManager;
 import playn.java.JavaPlatform;
 import playn.sample.cute.core.CuteGame;
 
 public class CuteGameJava {
 
   public static void main(String[] args) {
-    JavaAssetManager assets = JavaPlatform.register().assetManager();
-    assets.setPathPrefix("src/playn/sample/cute/resources");
+    JavaPlatform platform = JavaPlatform.register();
+    platform.assetManager().setPathPrefix("src/playn/sample/cute/resources");
     PlayN.run(new CuteGame());
   }
 }

@@ -16,7 +16,6 @@
 package playn.sample.hello.flash;
 
 import playn.core.PlayN;
-import playn.flash.FlashAssetManager;
 import playn.flash.FlashGame;
 import playn.flash.FlashPlatform;
 import playn.sample.hello.core.HelloGame;
@@ -25,8 +24,8 @@ public class HelloGameFlash extends FlashGame {
 
   @Override
   public void start() {
-    FlashAssetManager assets = FlashPlatform.register().assetManager();
-    assets.setPathPrefix("hellogameflash/");
+    FlashPlatform platform = FlashPlatform.register();
+    platform.assetManager().setPathPrefix("hellogameflash/");
     PlayN.run(new HelloGame());
   }
 }
