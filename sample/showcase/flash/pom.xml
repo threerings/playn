@@ -29,7 +29,7 @@
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-flash</artifactId>
-      <version>${coreversion}</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

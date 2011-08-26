@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project name="build-common" default="compile" xmlns:artifact="urn:maven-artifact-ant">
   <property name="src.dir"     value="src"/>
+  <property name="war.dir"     value="war"/>
   <property name="target.dir"  value="target"/>
   <property name="classes.dir" value="${target.dir}/classes"/>
   <property name="webapp.dir"  value="${target.dir}/webapp"/>
@@ -32,9 +33,9 @@
   <target name="-prepare-html" depends="-prepare">
     <artifact:dependencies pathId="html-extras.classpath">
       <dependency groupId="com.googlecode.playn" artifactId="playn-html"
-                  version="${pom.properties.coreversion}"/>
+                  version="${pom.version}"/>
       <dependency groupId="com.google.gwt" artifactId="gwt-dev"
-                  version="${pom.properties.gwtversion}"/>
+                  version="${pom.properties.gwt.version}"/>
     </artifact:dependencies>
     <path id="html.classpath">
       <path refid="classpath"/>
@@ -50,7 +51,7 @@
   <target name="-prep-webapp" depends="-prepare-html">
     <mkdir dir="${webapp.dir}"/>
     <copy todir="${webapp.dir}">
-      <fileset dir="html/war" includes="**"/>
+      <fileset dir="html/${war.dir}" includes="**"/>
     </copy>
     <!-- we need to resolve this for the GWT classpath to avoid a bunch of warnings -->
     <artifact:dependencies sourcesFileSetId="validation.sources.fileset">
