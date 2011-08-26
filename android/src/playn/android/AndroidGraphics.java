@@ -22,6 +22,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.util.HashSet;
+import java.util.Set;
 
 import playn.core.Asserts;
 import playn.core.CanvasImage;
@@ -34,7 +36,9 @@ import playn.core.ImageLayer;
 import playn.core.InternalTransform;
 import playn.core.Path;
 import playn.core.Pattern;
+import playn.core.PlayN;
 import playn.core.StockInternalTransform;
+import playn.core.Surface;
 import playn.core.SurfaceLayer;
 import playn.core.gl.GL20;
 import android.graphics.Bitmap;
@@ -45,10 +49,11 @@ import android.util.Log;
 import android.view.View;
 
 class AndroidGraphics implements Graphics {
-  private static final int VERTEX_SIZE = 10; // 10 floats per vertex
+  public static final boolean CHECK_ERRORS = true;
 
+  private static final int VERTEX_SIZE = 10; // 10 floats per vertex
   private static final int MAX_VERTS = 4;
-  private static final int MAX_ELEMS = 4;
+  private static final int MAX_ELEMS = 6;
   private static final int FLOAT_SIZE_BYTES = 4;
   private static final int SHORT_SIZE_BYTES = 2;
   private static final int VERTEX_STRIDE = VERTEX_SIZE * FLOAT_SIZE_BYTES;
@@ -319,9 +324,7 @@ class AndroidGraphics implements Graphics {
   private int viewWidth, viewHeight, lastFrameBuffer, screenWidth, screenHeight, fbufWidth,
       fbufHeight;
   private boolean sizeSetManually = false;
-
-  private boolean wasPaused = false; // If the Activity was paused, we need to
-                                     // re-initialize
+  private Set<Surface> surfaces = new HashSet<Surface>();
 
   // Debug
   private int texCount;
@@ -488,6 +491,7 @@ class AndroidGraphics implements Graphics {
     AndroidPlatform.instance.touchEventHandler().calculateOffsets();
     // Layout the views again to change the surface size
     AndroidPlatform.instance.activity.runOnUiThread(new Runnable() {
+      @Override
       public void run() {
         View viewLayout = AndroidPlatform.instance.activity.viewLayout();
         viewLayout.measure(viewLayout.getMeasuredWidth(), viewLayout.getMeasuredHeight());
@@ -549,16 +553,12 @@ class AndroidGraphics implements Graphics {
   void destroyTexture(int texture) {
     gl20.glDeleteTextures(1, IntBuffer.wrap(new int[] {texture}));
     --texCount;
+    Log.d("playn", texCount + " textures remain.");
   }
 
-  void updateLayers() {
+  void paintLayers() {
     // Bind the default frameBuffer (the SurfaceView's Surface)
     checkGlError("updateLayers Start");
-    if (wasPaused) {
-      generateShaders();
-      initGL();
-      wasPaused = false;
-    }
 
     bindFramebuffer();
 
@@ -567,8 +567,15 @@ class AndroidGraphics implements Graphics {
     // Paint all the layers
     rootLayer.paint(StockInternalTransform.IDENTITY, 1);
     checkGlError("updateLayers");
+
     // Guarantee a flush
     useShader(null);
+  }
+
+  void refreshGL() {
+    generateShaders();
+    initGL();
+    refreshSurfaces();
   }
 
   void updateTexture(int texture, Bitmap image) {
@@ -650,6 +657,7 @@ class AndroidGraphics implements Graphics {
   void fillPoly(InternalTransform local, float[] positions, int color, float alpha) {
     colorShader.prepare(color, alpha);
 
+    //FIXME: Rewrite to take advantage of GL_TRIANGLE_STRIP
     int idx = colorShader.beginPrimitive(4, 6); // FIXME: This won't scale for
                                                 // non-line polys, will it?
     int points = positions.length / 2;
@@ -680,10 +688,12 @@ class AndroidGraphics implements Graphics {
   }
 
   private void initGL() {
-    gl20.glDisable(GL20.GL_CULL_FACE); // Could speed up by not disabling this.
+    gl20.glDisable(GL20.GL_CULL_FACE);
     gl20.glEnable(GL20.GL_BLEND);
     gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     gl20.glClearColor(0, 0, 0, 1);
+//    gl20.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 4);
+//    gl20.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 4);
   }
 
   private boolean useShader(Shader shader) {
@@ -697,15 +707,40 @@ class AndroidGraphics implements Graphics {
     return false;
   }
 
-  void pauseNotify() {
-    wasPaused = true;
+  void checkGlError(String op) {
+    if (CHECK_ERRORS) {
+      int error;
+      while ((error = gl20.glGetError()) != GL20.GL_NO_ERROR) {
+      PlayN.log().error(this.getClass().getName() + " -- " + op + ": glError " + error);
+      }
+    }
   }
 
-  void checkGlError(String op) {
-    // int error;
-    // while ((error = gl20.glGetError()) != GL20.GL_NO_ERROR) {
-    // Log.e(this.getClass().getName(), op + ": glError " + error);
-    // throw new RuntimeException(op + ": glError " + error);
-    // }
+  void addSurface(Surface surface) {
+    surfaces.add(surface);
+  }
+
+  void removeSurface(Surface surface) {
+    surfaces.remove(surface);
+  }
+ 
+  void refreshSurfaces() {
+    for (Surface surface : surfaces) {
+      if (surface != null) {
+        Asserts.check(surface instanceof AndroidSurface);
+        AndroidSurface asurf = (AndroidSurface) surface;
+        asurf.checkRefreshGL();
+      }
+    }
+  }
+  
+  void storeSurfaces() {
+    for (Surface surface : surfaces) {
+      if (surface != null) {
+        Asserts.check(surface instanceof AndroidSurface);
+        AndroidSurface asurf = (AndroidSurface) surface;
+        asurf.storePixels();
+      }
+    }
   }
 }

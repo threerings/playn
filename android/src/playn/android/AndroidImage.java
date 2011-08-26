@@ -42,6 +42,11 @@ class AndroidImage implements CanvasImage {
   private Bitmap canvasBitmap;
   private List<ResourceCallback<Image>> callbacks = new ArrayList<ResourceCallback<Image>>();
   private int width, height, tex, pow2tex;
+  //timeUpdated is used to check if the context has been reloaded since last draw.  As such, it
+  //is set to the time the context was last reloaded when a new image is created.
+  //TODO(jonagill) Or could we just check against 0 as well as GameViewGL.timeContextCreated() to establish
+  //if we need to reload the image?
+  private int timeUpdated;
   private String path;
 
   public AndroidImage(String path, Bitmap bitmap) {
@@ -49,17 +54,21 @@ class AndroidImage implements CanvasImage {
     bitmapRef = new SoftReference<Bitmap>(bitmap);
     width = bitmap.getWidth();
     height = bitmap.getHeight();
+    timeUpdated = GameViewGL.timeContextCreated();
   }
 
   public AndroidImage(int w, int h, boolean alpha) {
     //TODO(jonagill): What's the deal with the configs here?
+    //TODO(jonagill): Could this cause issues with the bitmap falling out of memory?
     Bitmap newBitmap = Bitmap.createBitmap(w, h, alpha
         ? AndroidPlatform.instance.preferredBitmapConfig : Bitmap.Config.ARGB_8888);
     bitmapRef = new SoftReference<Bitmap>(newBitmap);
     width = w;
     height = h;
+    timeUpdated = GameViewGL.timeContextCreated();
   }
 
+  @Override
   public void addCallback(ResourceCallback<Image> callback) {
     callbacks.add(callback);
     if (isReady()) {
@@ -67,6 +76,7 @@ class AndroidImage implements CanvasImage {
     }
   }
 
+  @Override
   public Canvas canvas() {
     if (canvas == null) {
       canvasBitmap = getBitmap();
@@ -88,18 +98,22 @@ class AndroidImage implements CanvasImage {
     canvas.clearDirty();
   }
 
+  @Override
   public int height() {
     return height;
   }
 
+  @Override
   public int width() {
     return width;
   }
   
+  @Override
   public boolean isReady() {
     return bitmapRef != null || canvas != null;
   }
 
+  @Override
   public void replaceWith(Image image) {
     Asserts.checkArgument(image instanceof AndroidImage);
     AndroidImage aimg = (AndroidImage) image;
@@ -183,15 +197,16 @@ class AndroidImage implements CanvasImage {
   }
 
   private void loadTexture(AndroidGraphics gfx) {
-    if (tex != 0 && gfx.gl20.glIsTexture(tex)) {
+    if (tex != 0 && gfx.gl20.glIsTexture(tex) && timeUpdated == GameViewGL.timeContextCreated()) {
       return;
     }
     tex = gfx.createTexture(false, false);
     gfx.updateTexture(tex, getBitmap());
+    timeUpdated = GameViewGL.timeContextCreated();
   }
 
   private void scaleTexture(AndroidGraphics gfx, boolean repeatX, boolean repeatY) {
-    if (pow2tex != 0) {
+    if (pow2tex != 0 && gfx.gl20.glIsTexture(pow2tex) && timeUpdated == GameViewGL.timeContextCreated()) {
       return;
     }
 

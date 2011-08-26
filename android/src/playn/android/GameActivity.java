@@ -15,6 +15,7 @@
  */
 package playn.android;
 
+import playn.core.Keyboard;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -69,7 +70,7 @@ public abstract class GameActivity extends Activity {
     // size.
     viewLayout = new AndroidLayoutView(this);
     gameView = new GameViewGL(gl20, this, context);
-    viewLayout.addView((View) gameView);
+    viewLayout.addView(gameView);
     viewLayout.setGameView(gameView);
 
     // Build the Window and View
@@ -146,7 +147,7 @@ public abstract class GameActivity extends Activity {
     return context;
   }
 
-  protected boolean isHoneycombOrLater() {
+  boolean isHoneycombOrLater() {
     return android.os.Build.VERSION.SDK_INT >= 11;
   }
 
@@ -154,7 +155,7 @@ public abstract class GameActivity extends Activity {
   protected void onDestroy() {
     super.onDestroy();
     wakeLock.release();
-    platform().audio().destroy();
+    platform().audio().stop();
   }
 
   @Override
@@ -181,11 +182,14 @@ public abstract class GameActivity extends Activity {
     // TODO: Notify game
   }
 
+  /**
+   * Called automatically to handle keyboard events. Automatically passes through
+   * the parsed keyboard event to {@GameViewGL} for processing in the {@Keyboard}
+   * Listener instance on the render thread.
+   */
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    if (platform() != null && platform().keyboard() != null) {
-      platform().keyboard().onKeyDown(event.getEventTime(), keyCode);
-    }
+    gameView.onKeyDown(new Keyboard.Event.Impl(event.getEventTime(), keyCode));
     // Don't prevent volume controls from propagating to the system.
     if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
       return false;
@@ -195,9 +199,7 @@ public abstract class GameActivity extends Activity {
 
   @Override
   public boolean onKeyUp(int keyCode, KeyEvent event) {
-    if (platform() != null && platform().keyboard() != null) {
-      platform().keyboard().onKeyUp(event.getEventTime(), keyCode);
-    }
+    gameView.onKeyUp(new Keyboard.Event.Impl(event.getEventTime(), keyCode));
     if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
       return false;
     }
@@ -206,8 +208,8 @@ public abstract class GameActivity extends Activity {
 
   /**
    * Called automatically to handle touch events. Automatically passes through
-   * the parsed MotionEvent to AndroidTouch.Listener and AndroidPointer.Listener
-   * instances.
+   * the parsed MotionEvent to {@GameViewGL} for processing in the {@Touch}
+   * and {@Pointer} Listener instances on the render thread.
    */
   @Override
   public boolean onTouchEvent(MotionEvent event) {

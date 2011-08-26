@@ -68,6 +68,7 @@ public final class AndroidHttpClient implements HttpClient {
    * Interceptor throws an exception if the executing thread is blocked
    */
   private static final HttpRequestInterceptor sThreadCheckInterceptor = new HttpRequestInterceptor() {
+    @Override
     public void process(HttpRequest request, HttpContext context) {
       if (Boolean.TRUE.equals(sThreadBlocked.get())) {
         throw new RuntimeException("This thread forbids HTTP requests");
@@ -142,46 +143,56 @@ public final class AndroidHttpClient implements HttpClient {
     getConnectionManager().shutdown();
   }
 
+  @Override
   public HttpParams getParams() {
     return delegate.getParams();
   }
 
+  @Override
   public ClientConnectionManager getConnectionManager() {
     return delegate.getConnectionManager();
   }
 
+  @Override
   public HttpResponse execute(HttpUriRequest request) throws IOException {
     return delegate.execute(request);
   }
 
+  @Override
   public HttpResponse execute(HttpUriRequest request, HttpContext context) throws IOException {
     return delegate.execute(request, context);
   }
 
+  @Override
   public HttpResponse execute(HttpHost target, HttpRequest request) throws IOException {
     return delegate.execute(target, request);
   }
 
+  @Override
   public HttpResponse execute(HttpHost target, HttpRequest request, HttpContext context)
       throws IOException {
     return delegate.execute(target, request, context);
   }
 
+  @Override
   public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler)
       throws IOException {
     return delegate.execute(request, responseHandler);
   }
 
+  @Override
   public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler,
       HttpContext context) throws IOException {
     return delegate.execute(request, responseHandler, context);
   }
 
+  @Override
   public <T> T execute(HttpHost target, HttpRequest request,
       ResponseHandler<? extends T> responseHandler) throws IOException {
     return delegate.execute(target, request, responseHandler);
   }
 
+  @Override
   public <T> T execute(HttpHost target, HttpRequest request,
       ResponseHandler<? extends T> responseHandler, HttpContext context) throws IOException {
     return delegate.execute(target, request, responseHandler, context);

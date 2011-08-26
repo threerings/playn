@@ -17,9 +17,11 @@ package playn.android;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import playn.core.PlayN;
 import android.util.Log;
 
 public class GameLoop implements Runnable {
+  private static final boolean LOG_FPS = true;
   private static final int MAX_DELTA = 100;
 
   private AtomicBoolean running = new AtomicBoolean();
@@ -30,6 +32,9 @@ public class GameLoop implements Runnable {
   private int updateRate;
   private int accum;
   private int lastTime;
+
+  private float totalTime;
+  private int framesPainted;
 
   private float paintAlpha;
 
@@ -47,10 +52,10 @@ public class GameLoop implements Runnable {
 
   public void pause() {
     Log.i("playn", "Pausing game loop");
-    gfx.pauseNotify();
     running.set(false);
   }
 
+  @Override
   public void run() {
     // The thread can be stopped between runs.
     if (!running.get())
@@ -75,6 +80,15 @@ public class GameLoop implements Runnable {
 
     paintAlpha = (updateRate == 0) ? 0 : accum / updateRate;
     paint();
+
+    if (LOG_FPS) {
+      totalTime += delta / 1000;
+      framesPainted++;
+      if (totalTime > 1) {
+        PlayN.log().debug("FPS: " + framesPainted / totalTime);
+        totalTime = framesPainted = 0;
+      }
+    }
   }
 
   private int time() {
@@ -92,7 +106,7 @@ public class GameLoop implements Runnable {
     gfx.bindFramebuffer();
     AndroidPlatform.instance.game.paint(paintAlpha); // Run the game's custom
                                                      // layer-painting code
-    gfx.updateLayers(); // Actually draw to the screen
+    gfx.paintLayers(); // Actually draw to the screen
   }
 
 }

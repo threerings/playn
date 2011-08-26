@@ -23,6 +23,7 @@ import playn.core.PlayN;
 import playn.java.JavaJson;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -68,7 +69,7 @@ public class AndroidPlatform implements Platform {
     net = new AndroidNet();
     pointer = new AndroidPointer();
     touch = new AndroidTouch();
-    touchHandler = new AndroidTouchEventHandler();
+    touchHandler = new AndroidTouchEventHandler(activity.gameView());
     assetManager = new AndroidAssetManager();
     analytics = new AndroidAnalytics();
     storage = new AndroidStorage(activity);
@@ -85,7 +86,7 @@ public class AndroidPlatform implements Platform {
   private Config mapDisplayPixelFormat() {
     int format = activity.getWindowManager().getDefaultDisplay().getPixelFormat();
     ActivityManager activityManager = (ActivityManager) activity.getApplication().getSystemService(
-        Activity.ACTIVITY_SERVICE);
+        Context.ACTIVITY_SERVICE);
     int memoryClass = activityManager.getMemoryClass();
 
     // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
@@ -193,9 +194,6 @@ public class AndroidPlatform implements Platform {
 
   void update(float delta) {
     if (game != null) {
-      keyboard.processQueuedEvents();
-      pointer.processQueuedEvents();
-      touch.processQueuedEvents();
       game.update(delta);
     }
   }

@@ -19,49 +19,29 @@ import playn.core.Touch;
 
 public class AndroidTouch implements Touch {
   private Listener listener;
-  private static final int MAX_STORED_EVENTS_PER_TYPE = 3;
-  private Event[][] storedStartEvents = new Event[MAX_STORED_EVENTS_PER_TYPE][];
-  private Event[][] storedMoveEvents = new Event[MAX_STORED_EVENTS_PER_TYPE][];
-  private Event[][] storedEndEvents = new Event[MAX_STORED_EVENTS_PER_TYPE][];
-  private int storedStartIndex, storedMoveIndex, storedEndIndex;
-
-  synchronized void onTouchStart(Event[] touches) {
-    if (listener != null && storedStartIndex < MAX_STORED_EVENTS_PER_TYPE)
-      storedStartEvents[storedStartIndex++] = touches;
-  }
-
-  synchronized void onTouchMove(Event[] touches) {
-    if (listener != null && storedMoveIndex < MAX_STORED_EVENTS_PER_TYPE)
-      storedMoveEvents[storedMoveIndex++] = touches;
-  }
-
-  synchronized void onTouchEnd(Event[] touches) {
-    if (listener != null && storedEndIndex < MAX_STORED_EVENTS_PER_TYPE)
-      storedMoveEvents[storedEndIndex++] = touches;
-  }
 
   @Override
   public synchronized void setListener(Listener listener) {
     this.listener = listener;
   }
 
-  synchronized void processQueuedEvents() {
-    if (listener != null) {
-      for (int i = 0; i < MAX_STORED_EVENTS_PER_TYPE; i++) {
-        if (storedStartEvents[i] != null) {
-          listener.onTouchStart(storedStartEvents[i]);
-          storedStartEvents[i] = null;
-        }
-        if (storedMoveEvents[i] != null) {
-          listener.onTouchMove(storedMoveEvents[i]);
-          storedMoveEvents[i] = null;
-        }
-        if (storedEndEvents[i] != null) {
-          listener.onTouchEnd(storedEndEvents[i]);
-          storedEndEvents[i] = null;
-        }
-        storedStartIndex = storedMoveIndex = storedEndIndex = 0;
-      }
-    }
+  /*
+   * The methods below are called from the GL render thread
+   */
+
+  void onTouchStart(Event[] touches) {
+    if (listener != null)
+      listener.onTouchStart(touches);
   }
+
+  void onTouchMove(Event[] touches) {
+    if (listener != null)
+      listener.onTouchMove(touches);
+  }
+
+  void onTouchEnd(Event[] touches) {
+    if (listener != null)
+      listener.onTouchEnd(touches);
+  }
+
 }

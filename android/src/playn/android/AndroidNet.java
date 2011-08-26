@@ -30,10 +30,12 @@ import playn.core.Net;
 
 class AndroidNet implements Net {
 
+  @Override
   public void get(String url, Callback callback) {
     doHttp(false, url, null, callback);
   }
 
+  @Override
   public void post(String url, String data, Callback callback) {
     doHttp(true, url, data, callback);
   }

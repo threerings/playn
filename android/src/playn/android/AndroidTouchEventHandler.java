@@ -25,33 +25,36 @@ import android.view.MotionEvent;
  * them into an array of Touch.Events for the Listener.
  */
 class AndroidTouchEventHandler {
+  private final GameViewGL gameView;
   private float xScreenOffset = 0;
   private float yScreenOffset = 0;
 
+  AndroidTouchEventHandler(GameViewGL gameView) {
+    this.gameView = gameView;
+  }
+
   /**
    * Default Android touch behavior. Parses the immediate MotionEvent and passes
-   * it to listener and the appropriate method in
-   * AndroidPlatform.instance().pointer(). Ignores historical values.
+   * it to the correct methods in {@GameViewGL} for processing
+   * on the GL render thread. Ignores historical values.
    */
   public boolean onMotionEvent(MotionEvent event) {
-    AndroidPointer pointer = AndroidPlatform.instance.pointer();
-    AndroidTouch touch = AndroidPlatform.instance.touch();
     double time = event.getEventTime();
     int action = event.getAction();
     Touch.Event[] touches = parseMotionEvent(event);
     Touch.Event pointerEvent = touches[0];
     switch (action) {
       case (MotionEvent.ACTION_DOWN):
-        touch.onTouchStart(touches);
-        pointer.onPointerStart(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
+        gameView.onTouchStart(touches);
+        gameView.onPointerStart(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;
       case (MotionEvent.ACTION_UP):
-        touch.onTouchEnd(touches);
-        pointer.onPointerEnd(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
+        gameView.onTouchEnd(touches);
+      gameView.onPointerEnd(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;
       case (MotionEvent.ACTION_MOVE):
-        touch.onTouchMove(touches);
-        pointer.onPointerMove(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
+        gameView.onTouchMove(touches);
+        gameView.onPointerDrag(new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y()));
         break;
       case (MotionEvent.ACTION_CANCEL):
         break;

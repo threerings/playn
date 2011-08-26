@@ -15,6 +15,8 @@
  */
 package playn.android;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,29 +31,98 @@ import playn.core.gl.GL20;
 class AndroidSurface implements Surface {
 
   private final AndroidGraphics gfx;
-  private final int fbuf;
-  private final int width;
-  private final int height;
+  private final int width, height;
+  private int tex, fbuf, timeUpdated;
   private final List<InternalTransform> transformStack = new ArrayList<InternalTransform>();
+  private ByteBuffer pixelBuffer;
 
   private int fillColor;
   private AndroidPattern fillPattern;
 
-  AndroidSurface(AndroidGraphics gfx, int fbuf, int width, int height) {
+  AndroidSurface(AndroidGraphics gfx, int width, int height) {
     this.gfx = gfx;
-    this.fbuf = fbuf;
     this.width = width;
     this.height = height;
+    refreshGL();
     transformStack.add(new StockInternalTransform());
+  }
+
+  private void refreshGL() {
+    gfx.flush();
+    AndroidGL20 gl20 = gfx.gl20;
+    if (tex != 0 && gl20.glIsTexture(tex)) gfx.destroyTexture(tex);
+    tex = gfx.createTexture(false, false);
+    gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
+        GL20.GL_UNSIGNED_BYTE, null);
+
+    int[] fbufBuffer = new int[1];
+    gl20.glGenFramebuffers(1, fbufBuffer, 0);
+    fbuf = fbufBuffer[0];
+    gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
+    gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, GL20.GL_TEXTURE_2D,
+        tex, 0);
+    clear();
+    //Redraw color buffer after context is lost.
+    if (pixelBuffer != null) {
+      int bufferTex = gfx.createTexture(false, false);
+      gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+      //Currently just draws a black quad — glTexImage2D is not reading pixelBuffer correctly.
+//      gfx.drawTexture(bufferTex, width, height, StockInternalTransform.IDENTITY, width, height, false, false, 1);
+      gfx.destroyTexture(bufferTex);
+      pixelBuffer = null;
+    }
+    gfx.bindFramebuffer();
+
+    timeUpdated = GameViewGL.timeContextCreated();
+    gfx.addSurface(this);
+  }
+
+  void checkRefreshGL() {
+    if(!gfx.gl20.glIsTexture(tex) || timeUpdated != GameViewGL.timeContextCreated()) {
+      refreshGL();
+    }
+  }
+
+  void storePixels() {
+    try {
+    gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
+    pixelBuffer = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
+    //TODO(jonagill): Is GL20.GL_RGBA supported on all devices?  Online examples suggest so, but the Blue Book says
+    //only GL_RGB is supported across all.  Typo, perhaps?
+    gfx.gl20.glReadPixels(0, 0, width, height, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+    gfx.bindFramebuffer();
+    gfx.checkGlError("store Pixels");
+    }catch (OutOfMemoryError e) {
+      pixelBuffer = null;
+    }
   }
 
   @Override
   public void clear() {
     gfx.bindFramebuffer(fbuf, width, height);
-
     gfx.gl20.glClearColor(0, 0, 0, 0);
     gfx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
-    // TODO(jonagill) Do we need another clear color call?
+  }
+  
+  void destroy() {
+    gfx.gl20.glDeleteBuffers(1, new int[] {fbuf}, 0);
+    gfx.destroyTexture(tex);
+    fbuf = 0;
+    gfx.removeSurface(this);
+  }
+  
+  /*
+   * Called when garbage collected
+   */
+  @Override
+  protected void finalize() throws Throwable {
+    gfx.removeSurface(this);
+    super.finalize();
+  }
+  
+  int tex() {
+    checkRefreshGL();
+    return tex;
   }
 
   /*
@@ -79,12 +150,12 @@ class AndroidSurface implements Surface {
             false, 1);
       }
     }
-    // gfx.bindFramebuffer();
   }
 
   @Override
   public void drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy,
       float sw, float sh) {
+    checkRefreshGL();
     gfx.bindFramebuffer(fbuf, width, height);
 
     Asserts.checkArgument(image instanceof AndroidImage);
@@ -97,15 +168,16 @@ class AndroidSurface implements Surface {
             sw, sh, 1);
       }
     }
-    // gfx.bindFramebuffer();
   }
 
+  @Override
   public void drawImageCentered(Image img, float x, float y) {
     drawImage(img, x - img.width() / 2, y - img.height() / 2);
   }
 
   @Override
   public void drawLine(float x0, float y0, float x1, float y1, float width) {
+    checkRefreshGL();
     gfx.bindFramebuffer(fbuf, this.width, this.height);
 
     float dx = x1 - x0, dy = y1 - y0;
@@ -123,11 +195,11 @@ class AndroidSurface implements Surface {
     pos[6] = x0 + dy;
     pos[7] = y0 - dx;
     gfx.fillPoly(topTransform(), pos, fillColor, 1);
-    // gfx.bindFramebuffer();
   }
 
   @Override
   public void fillRect(float x, float y, float width, float height) {
+    checkRefreshGL();
     gfx.bindFramebuffer(fbuf, this.width, this.height);
 
     if (fillPattern != null) {
@@ -137,7 +209,6 @@ class AndroidSurface implements Surface {
     } else {
       gfx.fillRect(topTransform(), x, y, width, height, fillColor, 1);
     }
-    // gfx.bindFramebuffer();
   }
 
   @Override
@@ -173,6 +244,7 @@ class AndroidSurface implements Surface {
     topTransform().setTransform(m00, m01, m10, m11, tx, ty);
   }
 
+  @Override
   public void setFillColor(int color) {
     // TODO: Add it to the state stack.
     this.fillColor = color;

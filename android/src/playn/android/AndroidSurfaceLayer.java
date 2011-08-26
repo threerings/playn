@@ -19,49 +19,25 @@ import playn.core.Asserts;
 import playn.core.InternalTransform;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
-import playn.core.gl.GL20;
-import android.util.Log;
 
 class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
 
   private AndroidSurface surface;
 
-  private int fbuf, tex;
   private final int width, height;
 
   AndroidSurfaceLayer(AndroidGraphics gfx, int width, int height) {
     super(gfx);
     this.width = width;
     this.height = height;
-    gfx.flush();
-
-    AndroidGL20 gl20 = gfx.gl20;
-    tex = gfx.createTexture(false, false);
-    gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
-        GL20.GL_UNSIGNED_BYTE, null);
-
-    int[] fbufBuffer = new int[1];
-    gl20.glGenFramebuffers(1, fbufBuffer, 0);
-    fbuf = fbufBuffer[0];
-    Log.w("playn", "Fbuf " + fbuf);
-    gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
-    gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, GL20.GL_TEXTURE_2D,
-        tex, 0);
-    // gl20.glBindTexture(GL20.GL_TEXTURE_2D, 0);
-    gfx.bindFramebuffer();
-
-    surface = new AndroidSurface(gfx, fbuf, width, height);
-    surface.clear();
+    surface = new AndroidSurface(gfx, width, height);
 
   }
 
   @Override
   public void destroy() {
     super.destroy();
-    gfx.destroyTexture(tex);
-    gfx.gl20.glDeleteBuffers(1, new int[] {fbuf}, 0);
-
-    tex = fbuf = 0;
+    surface.destroy();
     surface = null;
   }
 
@@ -79,7 +55,7 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
     // flipped
     // (This happens because it uses the same vertex program as everything else,
     // which flips vertically to put the origin at the top-left).
-    gfx.drawTexture(tex, width, height, localTransform(parentTransform), 0, height, width, -height,
+    gfx.drawTexture(surface.tex(), width, height, localTransform(parentTransform), 0, height, width, -height,
         false, false, parentAlpha * alpha);
   }
 
@@ -104,4 +80,5 @@ class AndroidSurfaceLayer extends AndroidLayer implements SurfaceLayer {
   public float scaledHeight() {
     return transform().scaleY() * height();
   }
+
 }
