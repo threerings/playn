@@ -28,7 +28,7 @@ class AndroidTouchEventHandler {
   private final GameViewGL gameView;
   private float xScreenOffset = 0;
   private float yScreenOffset = 0;
-
+  
   AndroidTouchEventHandler(GameViewGL gameView) {
     this.gameView = gameView;
   }

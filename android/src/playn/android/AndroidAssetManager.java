@@ -21,21 +21,23 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 
+import playn.core.AbstractAssetManager;
+import playn.core.Image;
+import playn.core.ResourceCallback;
+import playn.core.Sound;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import playn.core.AbstractAssetManager;
-import playn.core.Image;
-import playn.core.ResourceCallback;
-import playn.core.Sound;
 
 public class AndroidAssetManager extends AbstractAssetManager {
 
@@ -57,7 +59,7 @@ public class AndroidAssetManager extends AbstractAssetManager {
       throw new IOException("Unable to loader resource: " + path);
     return is;
   }
-
+  
   @Override
   protected Image doGetImage(String path) {
     return new AndroidImage(path, doGetBitmap(path));
@@ -143,8 +145,8 @@ public class AndroidAssetManager extends AbstractAssetManager {
   @Override
   protected Sound doGetSound(String path) {
     try {
-      InputStream in = openAsset(path + ".wav");
-      return AndroidPlatform.instance.audio().getSound(path + ".wav", in);
+      InputStream in = openAsset(path + ".mp3");
+      return AndroidPlatform.instance.audio().getSound(path + ".mp3", in);
     } catch (IOException e) {
       log().error("Unable to load sound: " + path, e);
       return new ErrorSound(path);
