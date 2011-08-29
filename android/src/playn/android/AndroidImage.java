@@ -197,9 +197,10 @@ class AndroidImage implements CanvasImage {
   }
 
   private void loadTexture(AndroidGraphics gfx) {
-    if (tex != 0 && gfx.gl20.glIsTexture(tex) && timeUpdated == GameViewGL.timeContextCreated()) {
+    if (tex != -1 && gfx.gl20.glIsTexture(tex) && timeUpdated == GameViewGL.timeContextCreated()) {
       return;
     }
+    if (tex != 0) gfx.destroyTexture(tex);
     tex = gfx.createTexture(false, false);
     gfx.updateTexture(tex, getBitmap());
     timeUpdated = GameViewGL.timeContextCreated();

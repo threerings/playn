@@ -16,9 +16,11 @@
 package playn.android;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.graphics.Bitmap;
+import android.opengl.GLUtils;
 
 import playn.core.Asserts;
 import playn.core.Image;
@@ -66,8 +68,8 @@ class AndroidSurface implements Surface {
     if (pixelBuffer != null) {
       int bufferTex = gfx.createTexture(false, false);
       gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
-      //Currently just draws a black quad — glTexImage2D is not reading pixelBuffer correctly.
-//      gfx.drawTexture(bufferTex, width, height, StockInternalTransform.IDENTITY, width, height, false, false, 1);
+      gfx.drawTexture(bufferTex, width, height, StockInternalTransform.IDENTITY, 0, height, width, -height, false, false, 1);
+      gfx.flush();
       gfx.destroyTexture(bufferTex);
       pixelBuffer = null;
     }
@@ -82,13 +84,11 @@ class AndroidSurface implements Surface {
       refreshGL();
     }
   }
-
+  
   void storePixels() {
     try {
     gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
-    pixelBuffer = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.nativeOrder());
-    //TODO(jonagill): Is GL20.GL_RGBA supported on all devices?  Online examples suggest so, but the Blue Book says
-    //only GL_RGB is supported across all.  Typo, perhaps?
+    pixelBuffer = ByteBuffer.allocate(width * height * 4);
     gfx.gl20.glReadPixels(0, 0, width, height, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
     gfx.bindFramebuffer();
     gfx.checkGlError("store Pixels");

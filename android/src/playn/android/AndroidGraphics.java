@@ -45,6 +45,7 @@ import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
+import android.opengl.GLUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -567,7 +568,7 @@ class AndroidGraphics implements Graphics {
     // Paint all the layers
     rootLayer.paint(StockInternalTransform.IDENTITY, 1);
     checkGlError("updateLayers");
-
+    
     // Guarantee a flush
     useShader(null);
   }
@@ -577,8 +578,12 @@ class AndroidGraphics implements Graphics {
     initGL();
     refreshSurfaces();
   }
+  
+  public static Bitmap testBitmap = null;
 
   void updateTexture(int texture, Bitmap image) {
+      testBitmap = image;
+    
     gl20.glBindTexture(GL20.GL_TEXTURE_2D, texture);
     texImage2D(GL20.GL_TEXTURE_2D, 0, image, 0);
     checkGlError("updateTexture end");
