@@ -15,6 +15,8 @@
  */
 package playn.android;
 
+import java.io.File;
+
 import playn.core.Keyboard;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -153,9 +155,14 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onDestroy() {
-    super.onDestroy();
+    File cacheDir = getCacheDir();
+    File[] tempFiles = cacheDir.listFiles();
+    for (File file : tempFiles) {
+      file.delete();
+    }
     wakeLock.release();
     platform().audio().stop();
+    super.onDestroy();
   }
 
   @Override

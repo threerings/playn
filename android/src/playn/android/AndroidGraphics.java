@@ -656,7 +656,6 @@ class AndroidGraphics implements Graphics {
     checkGlError("fillRect done");
   }
 
-
   /*
    * Currently only used by AndroidSurface.drawLine()
    */
@@ -724,7 +723,6 @@ class AndroidGraphics implements Graphics {
    * Methods to store and refresh surfaces when the GL context
    * is destroyed and refreshed.
    */
-
   void addSurface(Surface surface) {
     if (surface != null) surfaces.add(surface);
   }

@@ -82,6 +82,7 @@ class AndroidSurface implements Surface {
             width, -height, false, false, 1);
         gfx.destroyTexture(bufferTex);
         pixelBuffer = null;
+        cachedPixels.delete();
         cachedPixels = null;
       } catch (IOException e) {
         log().error("Error reading cached surface pixels from file.");
