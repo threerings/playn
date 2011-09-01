@@ -15,7 +15,6 @@
  */
 package playn.android;
 
-import static playn.core.PlayN.log;
 import playn.core.Keyboard;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -26,6 +25,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -117,7 +117,7 @@ public abstract class GameActivity extends Activity {
                 + "      android:configChanges=\"keyboardHidden|orientation\"").show();
       }
     } catch (NameNotFoundException e) {
-      log().warn("Cannot access game AndroidManifest.xml file.");
+      Log.w("playn", "Cannot access game AndroidManifest.xml file.");
     }
   }
 
@@ -160,7 +160,7 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onPause() {
-    if (AndroidPlatform.DEBUG_LOGS) log().debug("onPause");
+    if (AndroidPlatform.DEBUG_LOGS) Log.d("playn", "onPause");
     gameView.notifyVisibilityChanged(View.INVISIBLE);
     if (platform() != null)
       platform().audio().pause();
@@ -172,7 +172,7 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onResume() {
-    if (AndroidPlatform.DEBUG_LOGS) log().debug("onResume");
+    if (AndroidPlatform.DEBUG_LOGS) Log.d("playn", "onResume");
     gameView.notifyVisibilityChanged(View.VISIBLE);
     if (platform() != null)
       platform().audio().resume();

@@ -38,7 +38,6 @@ class AndroidAudio implements Audio {
      * implementation is currently the only version of AndroidSound we
      * have written, so we'll use it here regardless of format.
      */
-
     try {
       sound = new AndroidCompressedSound(in, extension);
       sounds.add(sound);
@@ -46,7 +45,6 @@ class AndroidAudio implements Audio {
       sound = null;
     }
     return sound;
-
   }
 
   public void stop() {
