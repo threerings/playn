@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,12 +15,15 @@
  */
 package playn.android;
 
+import static playn.core.PlayN.log;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import android.graphics.Bitmap;
-import android.opengl.GLUtils;
 
 import playn.core.Asserts;
 import playn.core.Image;
@@ -34,9 +37,9 @@ class AndroidSurface implements Surface {
 
   private final AndroidGraphics gfx;
   private final int width, height;
-  private int tex, fbuf, timeUpdated;
+  private int tex = -1, fbuf = -1;
   private final List<InternalTransform> transformStack = new ArrayList<InternalTransform>();
-  private ByteBuffer pixelBuffer;
+  private File cachedPixels;
 
   private int fillColor;
   private AndroidPattern fillPattern;
@@ -52,74 +55,97 @@ class AndroidSurface implements Surface {
   private void refreshGL() {
     gfx.flush();
     AndroidGL20 gl20 = gfx.gl20;
-    if (tex != 0 && gl20.glIsTexture(tex)) gfx.destroyTexture(tex);
+    //Generate a texture for the framebuffer object's color buffer
+    if (tex != -1 && gl20.glIsTexture(tex)) gfx.destroyTexture(tex);
     tex = gfx.createTexture(false, false);
     gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
         GL20.GL_UNSIGNED_BYTE, null);
-
+    //Generate the framebuffer and attach the texture
     int[] fbufBuffer = new int[1];
     gl20.glGenFramebuffers(1, fbufBuffer, 0);
     fbuf = fbufBuffer[0];
     gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
     gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, GL20.GL_TEXTURE_2D,
         tex, 0);
+    //Clear the framebuffer of junk pixels.
     clear();
-    //Redraw color buffer after context is lost.
-    if (pixelBuffer != null) {
-      int bufferTex = gfx.createTexture(false, false);
-      gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
-      gfx.drawTexture(bufferTex, width, height, StockInternalTransform.IDENTITY, 0, height, width, -height, false, false, 1);
-      gfx.flush();
-      gfx.destroyTexture(bufferTex);
-      pixelBuffer = null;
+    // Redraw color buffer after the GL context is lost and refreshed.
+    if (cachedPixels != null) {
+      try {
+        ByteBuffer pixelBuffer = ByteBuffer.allocate(width * height * 4);
+        FileInputStream in = new FileInputStream(cachedPixels);
+        in.read(pixelBuffer.array());
+        int bufferTex = gfx.createTexture(false, false);
+        gl20.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, width, height, 0, GL20.GL_RGBA,
+            GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+        gfx.drawTexture(bufferTex, width, height, StockInternalTransform.IDENTITY, 0, height,
+            width, -height, false, false, 1);
+        gfx.destroyTexture(bufferTex);
+        pixelBuffer = null;
+        cachedPixels = null;
+      } catch (IOException e) {
+        log().error("Error reading cached surface pixels from file.");
+      }
     }
     gfx.bindFramebuffer();
 
-    timeUpdated = GameViewGL.timeContextCreated();
+    //Add this surface to a list of all surfaces to be stored and refreshed.
     gfx.addSurface(this);
   }
 
   void checkRefreshGL() {
-    if(!gfx.gl20.glIsTexture(tex) || timeUpdated != GameViewGL.timeContextCreated()) {
+    if (tex == -1 || fbuf == -1 || !gfx.gl20.glIsFramebuffer(fbuf) || !gfx.gl20.glIsTexture(tex)) {
       refreshGL();
     }
   }
-  
+
+  /*
+   * Store the color buffer when the GL context is going to be lost.
+   */
+
   void storePixels() {
     try {
-    gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
-    pixelBuffer = ByteBuffer.allocate(width * height * 4);
-    gfx.gl20.glReadPixels(0, 0, width, height, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
-    gfx.bindFramebuffer();
-    gfx.checkGlError("store Pixels");
-    }catch (OutOfMemoryError e) {
+      gfx.gl20.glBindFramebuffer(GL20.GL_FRAMEBUFFER, fbuf);
+      ByteBuffer pixelBuffer = ByteBuffer.allocate(width * height * 4);
+      gfx.gl20.glReadPixels(0, 0, width, height, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixelBuffer);
+      try {
+        cachedPixels = new File(AndroidPlatform.instance.activity.getCacheDir(), "surface-"
+            + Integer.toHexString(hashCode()));
+        FileOutputStream out = new FileOutputStream(cachedPixels);
+        out.write(pixelBuffer.array());
+        out.close();
+      } catch (IOException e) {
+        log().error("IOException writing cached Surface to file.");
+        cachedPixels = null;
+      }
       pixelBuffer = null;
+      gfx.bindFramebuffer();
+      gfx.checkGlError("store Pixels");
+    } catch (OutOfMemoryError e) {
+      log().error("OutOfMemoryError reading cached Surface to buffer.");
+      cachedPixels = null;
     }
+    //Force a GL refresh before using this surface again.
+    gfx.destroyTexture(tex);
+    gfx.gl20.glDeleteBuffers(1, new int[] { fbuf }, 0);
+    tex = fbuf = -1;
   }
 
   @Override
   public void clear() {
+    checkRefreshGL();
     gfx.bindFramebuffer(fbuf, width, height);
     gfx.gl20.glClearColor(0, 0, 0, 0);
     gfx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
   }
-  
+
   void destroy() {
     gfx.gl20.glDeleteBuffers(1, new int[] {fbuf}, 0);
     gfx.destroyTexture(tex);
-    fbuf = 0;
+    tex = fbuf = -1;
     gfx.removeSurface(this);
   }
-  
-  /*
-   * Called when garbage collected
-   */
-  @Override
-  protected void finalize() throws Throwable {
-    gfx.removeSurface(this);
-    super.finalize();
-  }
-  
+
   int tex() {
     checkRefreshGL();
     return tex;
@@ -276,4 +302,11 @@ class AndroidSurface implements Surface {
   private InternalTransform topTransform() {
     return transformStack.get(transformStack.size() - 1);
   }
+
+  @Override
+  protected void finalize() throws Throwable {
+    destroy();
+    super.finalize();
+  }
+
 }

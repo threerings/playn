@@ -46,13 +46,7 @@ class AndroidCanvasLayer extends AndroidLayer implements CanvasLayer {
       return;
 
     int tex = image.ensureTexture(gfx, false, false);
-    if (tex != 0) {
-
-      if (image.canvasDirty()) {
-        image.clearDirty();
-        gfx.updateTexture(tex, image.getBitmap());
-      }
-
+    if (tex != -1) {
       InternalTransform xform = localTransform(parentTransform);
       float childAlpha = parentAlpha * alpha;
       gfx.drawTexture(tex, image.width(), image.height(), xform, width(), height(), false,

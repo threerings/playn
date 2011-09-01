@@ -15,7 +15,7 @@
  */
 package playn.android;
 
-import static playn.core.PlayN.log;
+import static playn.core.PlayN.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -204,7 +204,7 @@ public class AndroidAssetManager extends AbstractAssetManager {
     }
   }
 
-  // taken from
+  // Taken from
   // http://android-developers.blogspot.com/2010/07/multithreading-for-performance.html
   public Bitmap downloadBitmap(String url) {
     final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");

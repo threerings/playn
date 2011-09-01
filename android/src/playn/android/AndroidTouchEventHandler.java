@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -28,7 +28,7 @@ class AndroidTouchEventHandler {
   private final GameViewGL gameView;
   private float xScreenOffset = 0;
   private float yScreenOffset = 0;
-  
+
   AndroidTouchEventHandler(GameViewGL gameView) {
     this.gameView = gameView;
   }
@@ -66,7 +66,7 @@ class AndroidTouchEventHandler {
 
   /**
    * Performs the actual parsing of the MotionEvent event.
-   * 
+   *
    * @param event The MotionEvent to process
    * @param historical Whether or not to parse historical touches (currently
    *          never called as true, but the functionality is still here in case

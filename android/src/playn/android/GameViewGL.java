@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -14,6 +14,8 @@
  * the License.
  */
 package playn.android;
+
+import static playn.core.PlayN.log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -28,7 +30,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback {
-  private static int timeContextCreated;
+  private static volatile int contextId = 1;
 
   public final AndroidGL20 gl20;
   private final AndroidRendererGL renderer;
@@ -46,8 +48,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-      timeContextCreated = (int) System.currentTimeMillis();
-      //EGLContext lost, so surfaces need to be rebuilt and redrawn.
+      contextId++;
+      // EGLContext lost, so surfaces need to be rebuilt and redrawn.
       if (gfx != null) {
         gfx.refreshGL();
       }
@@ -56,7 +58,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
       gl20.glViewport(0, 0, width, height);
-      Log.i("playn", "Surface dimensions changed to ( " + width + " , " + height + ")");
+      if (AndroidPlatform.DEBUG_LOGS)
+        log().debug("Surface dimensions changed to ( " + width + " , " + height + ")");
     }
 
     @Override
@@ -86,7 +89,6 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     }
   }
 
-
   public GameViewGL(AndroidGL20 _gl20, GameActivity activity, Context context) {
     super(context);
     this.gl20 = _gl20;
@@ -96,8 +98,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     setFocusable(true);
     setEGLContextClientVersion(2);
     if (activity.isHoneycombOrLater()) {
-      //FIXME:  Need to use android3.0 as a Maven artifact for this to work
-//      setPreserveEGLContextOnPause(true);
+      // FIXME: Need to use android3.0 as a Maven artifact for this to work
+      // setPreserveEGLContextOnPause(true);
     }
     this.setRenderer(renderer = new AndroidRendererGL());
     setRenderMode(RENDERMODE_CONTINUOUSLY);
@@ -111,35 +113,34 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
       int width = platform.graphics().width();
       int height = platform.graphics().height();
       if (width == 0 || height == 0) {
-        Log.e("playn", "Invalid game size set: (" + width + " , " + height + ")");
+        log().error("Invalid game size set: (" + width + " , " + height + ")");
       } else {
         int minWidth = getSuggestedMinimumWidth();
         int minHeight = getSuggestedMinimumHeight();
         width = width > minWidth ? width : minWidth;
         height = height > minHeight ? height : minHeight;
         setMeasuredDimension(width, height);
-        Log.i("playn", "Using game-specified sizing. (" + width + " , " + height + ")");
+        if (AndroidPlatform.DEBUG_LOGS)
+          log().debug("Using game-specified sizing. (" + width + " , " + height + ")");
         return;
       }
     }
 
-    Log.i("playn", "Using default sizing.");
+    if (AndroidPlatform.DEBUG_LOGS) log().debug("Using default sizing.");
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
   }
-
 
   void gameSizeSet() {
     gameSizeSet = true;
   }
 
-  static int timeContextCreated() {
-    return timeContextCreated;
+  static int contextId() {
+    return contextId;
   }
 
   /*
    * Input and lifecycle functions called by the UI thread.
    */
-
   public void notifyVisibilityChanged(int visibility) {
     Log.i("playn", "notifyVisibilityChanged: " + visibility);
     if (visibility == INVISIBLE) {
@@ -152,16 +153,17 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
       onResume();
     }
   }
-  
+
   @Override
   public void onPause() {
-      queueEvent(new Runnable() {
-          // This method will be called on the rendering
-          // thread:
-          @Override
-          public void run() {
-              renderer.onPause();
-          }});
+    queueEvent(new Runnable() {
+      // This method will be called on the rendering
+      // thread:
+      @Override
+      public void run() {
+        renderer.onPause();
+      }
+    });
     super.onPause();
   }
 
@@ -197,11 +199,9 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
     queueEvent(new onTouchEndRunnable(touches));
   }
 
-
   /*
    * Runnables for posting inputs to the GL thread for processing
    */
-
   private class onPointerStartRunnable implements Runnable {
     private Pointer.Event event;
 
@@ -212,7 +212,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     @Override
     public void run() {
-        if (pointer != null) pointer.onPointerStart(event);
+      if (pointer != null)
+        pointer.onPointerStart(event);
     }
   }
 
@@ -226,7 +227,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     @Override
     public void run() {
-      if (pointer != null) pointer.onPointerDrag(event);
+      if (pointer != null)
+        pointer.onPointerDrag(event);
     }
   }
 
@@ -240,7 +242,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     @Override
     public void run() {
-      if (pointer != null) pointer.onPointerEnd(event);
+      if (pointer != null)
+        pointer.onPointerEnd(event);
     }
   }
 
@@ -254,7 +257,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     @Override
     public void run() {
-        if (touch != null) touch.onTouchStart(touches);
+      if (touch != null)
+        touch.onTouchStart(touches);
     }
   }
 
@@ -268,7 +272,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     @Override
     public void run() {
-        if (touch != null) touch.onTouchMove(touches);
+      if (touch != null)
+        touch.onTouchMove(touches);
     }
   }
 
@@ -282,7 +287,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     @Override
     public void run() {
-        if (touch != null) touch.onTouchEnd(touches);
+      if (touch != null)
+        touch.onTouchEnd(touches);
     }
   }
 
@@ -296,7 +302,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     @Override
     public void run() {
-      if (keyboard != null) keyboard.onKeyDown(event);
+      if (keyboard != null)
+        keyboard.onKeyDown(event);
     }
   }
 
@@ -310,7 +317,8 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
 
     @Override
     public void run() {
-      if (keyboard != null) keyboard.onKeyUp(event);
+      if (keyboard != null)
+        keyboard.onKeyUp(event);
     }
   }
 }

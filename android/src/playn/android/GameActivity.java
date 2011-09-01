@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,6 +15,7 @@
  */
 package playn.android;
 
+import static playn.core.PlayN.log;
 import playn.core.Keyboard;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,7 +26,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -117,14 +117,14 @@ public abstract class GameActivity extends Activity {
                 + "      android:configChanges=\"keyboardHidden|orientation\"").show();
       }
     } catch (NameNotFoundException e) {
-      Log.w("GameActivity", "Cannot access game AndroidManifest.xml file.");
+      log().warn("Cannot access game AndroidManifest.xml file.");
     }
   }
 
   /**
    * Determines whether or not a game should run in portrait orientation or not.
    * Defaults to false. Override this method to return true to use portrait.
-   * 
+   *
    * @return Whether or not the game will run in portrait orientation
    */
   public boolean usePortraitOrientation() {
@@ -160,7 +160,7 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onPause() {
-    Log.i("playn", "onPause");
+    if (AndroidPlatform.DEBUG_LOGS) log().debug("onPause");
     gameView.notifyVisibilityChanged(View.INVISIBLE);
     if (platform() != null)
       platform().audio().pause();
@@ -172,7 +172,7 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onResume() {
-    Log.i("playn", "onResume");
+    if (AndroidPlatform.DEBUG_LOGS) log().debug("onResume");
     gameView.notifyVisibilityChanged(View.VISIBLE);
     if (platform() != null)
       platform().audio().resume();

@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,13 +15,12 @@
  */
 package playn.android;
 
+import static playn.core.PlayN.log;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import playn.core.PlayN;
-import android.util.Log;
-
 public class GameLoop implements Runnable {
-  private static final boolean LOG_FPS = true;
+  private static final boolean LOG_FPS = false;
   private static final int MAX_DELTA = 100;
 
   private AtomicBoolean running = new AtomicBoolean();
@@ -44,14 +43,16 @@ public class GameLoop implements Runnable {
 
   public void start() {
     if (!running.get()) {
-      Log.i("playn", "Starting game loop");
+      if (AndroidPlatform.DEBUG_LOGS)
+        log().debug("Starting game loop");
       this.updateRate = AndroidPlatform.instance.game.updateRate();
       running.set(true);
     }
   }
 
   public void pause() {
-    Log.i("playn", "Pausing game loop");
+    if (AndroidPlatform.DEBUG_LOGS)
+      log().debug("Pausing game loop");
     running.set(false);
   }
 
@@ -85,7 +86,7 @@ public class GameLoop implements Runnable {
       totalTime += delta / 1000;
       framesPainted++;
       if (totalTime > 1) {
-        PlayN.log().debug("FPS: " + framesPainted / totalTime);
+        log().info("FPS: " + framesPainted / totalTime);
         totalTime = framesPainted = 0;
       }
     }

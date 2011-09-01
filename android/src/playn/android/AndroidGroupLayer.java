@@ -91,7 +91,6 @@ class AndroidGroupLayer extends AndroidLayer implements GroupLayer, ParentLayer 
     impl.depthChanged(this, layer, oldDepth);
   }
 
-  // TODO(jonagill) Test this -- copied verbatim from HTMLGroupLayerGL
   @Override
   public void paint(InternalTransform parentTransform, float parentAlpha) {
     gfx.checkGlError("GroupLayer.paint");

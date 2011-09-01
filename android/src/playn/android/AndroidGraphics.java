@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,6 +16,7 @@
 package playn.android;
 
 import static android.opengl.GLUtils.texImage2D;
+import static playn.core.PlayN.log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -36,7 +37,6 @@ import playn.core.ImageLayer;
 import playn.core.InternalTransform;
 import playn.core.Path;
 import playn.core.Pattern;
-import playn.core.PlayN;
 import playn.core.StockInternalTransform;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
@@ -45,7 +45,6 @@ import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
-import android.opengl.GLUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -309,7 +308,7 @@ class AndroidGraphics implements Graphics {
       colorsArray[1] = (float) ((color >> 8) & 0xff) / 255;
       colorsArray[2] = (float) ((color >> 0) & 0xff) / 255;
       // Still can't work out how to use glUniform4fv without generating a
-      // glError
+      // glError, so passing the array through as individual floats
       gl20.glUniform4f(uColor, colorsArray[0], colorsArray[1], colorsArray[2], colorsArray[3]);
 
       lastColor = color;
@@ -388,7 +387,7 @@ class AndroidGraphics implements Graphics {
   }
 
   /**
-   * @return The height of the Android View containing the game (generally the
+   * @return The height of the AndroidLayoutView containing the GameView (generally the
    *         entire display height) in pixels.
    */
   @Override
@@ -397,7 +396,7 @@ class AndroidGraphics implements Graphics {
   }
 
   /**
-   * @return The width of the Android View containing the game (generally the
+   * @return The width of the AndroidLayoutView containing the GameView (generally the
    *         entire display width) in pixels.
    */
   @Override
@@ -435,7 +434,7 @@ class AndroidGraphics implements Graphics {
   }
 
   /**
-   * @return The height of the game itself in pixels. Defaults to the value of
+   * @return The height of the GameView itself in pixels. Defaults to the value of
    *         screenHeight(), but can be set using setSize()
    */
   @Override
@@ -444,7 +443,7 @@ class AndroidGraphics implements Graphics {
   }
 
   /**
-   * @return The width of the game itself in pixels. Defaults to the value of
+   * @return The width of the GameView itself in pixels. Defaults to the value of
    *         screenWidth(), but can be set using setSize()
    */
   @Override
@@ -505,7 +504,7 @@ class AndroidGraphics implements Graphics {
   /**
    * Called by AndroidViewLayout to make sure that AndroidGraphics is
    * initialized with non-zero screen dimensions.
-   * 
+   *
    * @param width
    * @param height
    */
@@ -547,14 +546,16 @@ class AndroidGraphics implements Graphics {
     gl20.glTexParameterf(GL20.GL_TEXTURE_2D, GL20.GL_TEXTURE_WRAP_T, repeatY ? GL20.GL_REPEAT
         : GL20.GL_CLAMP_TO_EDGE);
     ++texCount;
-    Log.d("playn", texCount + " textures created.");
+    if (AndroidPlatform.DEBUG_LOGS) log().debug(texCount + " textures created.");
     return texture;
   }
 
   void destroyTexture(int texture) {
-    gl20.glDeleteTextures(1, IntBuffer.wrap(new int[] {texture}));
+    //Flush in case this texture is queued up to be drawn
+    flush();
+    gl20.glDeleteTextures(1, new int[] {texture}, 0);
     --texCount;
-    Log.d("playn", texCount + " textures remain.");
+    if (AndroidPlatform.DEBUG_LOGS) log().debug(texCount + " textures remain.");
   }
 
   void paintLayers() {
@@ -568,7 +569,7 @@ class AndroidGraphics implements Graphics {
     // Paint all the layers
     rootLayer.paint(StockInternalTransform.IDENTITY, 1);
     checkGlError("updateLayers");
-    
+
     // Guarantee a flush
     useShader(null);
   }
@@ -578,12 +579,8 @@ class AndroidGraphics implements Graphics {
     initGL();
     refreshSurfaces();
   }
-  
-  public static Bitmap testBitmap = null;
 
   void updateTexture(int texture, Bitmap image) {
-      testBitmap = image;
-    
     gl20.glBindTexture(GL20.GL_TEXTURE_2D, texture);
     texImage2D(GL20.GL_TEXTURE_2D, 0, image, 0);
     checkGlError("updateTexture end");
@@ -659,12 +656,16 @@ class AndroidGraphics implements Graphics {
     checkGlError("fillRect done");
   }
 
+
+  /*
+   * Currently only used by AndroidSurface.drawLine()
+   */
   void fillPoly(InternalTransform local, float[] positions, int color, float alpha) {
     colorShader.prepare(color, alpha);
 
-    //FIXME: Rewrite to take advantage of GL_TRIANGLE_STRIP
+    // FIXME: Rewrite to take advantage of GL_TRIANGLE_STRIP
     int idx = colorShader.beginPrimitive(4, 6); // FIXME: This won't scale for
-                                                // non-line polys, will it?
+                                                // non-line polys.
     int points = positions.length / 2;
     for (int i = 0; i < points; ++i) {
       float dx = positions[i * 2];
@@ -697,8 +698,6 @@ class AndroidGraphics implements Graphics {
     gl20.glEnable(GL20.GL_BLEND);
     gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     gl20.glClearColor(0, 0, 0, 1);
-//    gl20.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 4);
-//    gl20.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 4);
   }
 
   private boolean useShader(Shader shader) {
@@ -716,36 +715,37 @@ class AndroidGraphics implements Graphics {
     if (CHECK_ERRORS) {
       int error;
       while ((error = gl20.glGetError()) != GL20.GL_NO_ERROR) {
-      PlayN.log().error(this.getClass().getName() + " -- " + op + ": glError " + error);
+        log().error(this.getClass().getName() + " -- " + op + ": glError " + error);
       }
     }
   }
 
+  /*
+   * Methods to store and refresh surfaces when the GL context
+   * is destroyed and refreshed.
+   */
+
   void addSurface(Surface surface) {
-    surfaces.add(surface);
+    if (surface != null) surfaces.add(surface);
   }
 
   void removeSurface(Surface surface) {
     surfaces.remove(surface);
   }
- 
+
   void refreshSurfaces() {
     for (Surface surface : surfaces) {
-      if (surface != null) {
-        Asserts.check(surface instanceof AndroidSurface);
-        AndroidSurface asurf = (AndroidSurface) surface;
-        asurf.checkRefreshGL();
-      }
+      Asserts.check(surface instanceof AndroidSurface);
+      AndroidSurface asurf = (AndroidSurface) surface;
+      asurf.checkRefreshGL();
     }
   }
-  
+
   void storeSurfaces() {
     for (Surface surface : surfaces) {
-      if (surface != null) {
-        Asserts.check(surface instanceof AndroidSurface);
-        AndroidSurface asurf = (AndroidSurface) surface;
-        asurf.storePixels();
-      }
+      Asserts.check(surface instanceof AndroidSurface);
+      AndroidSurface asurf = (AndroidSurface) surface;
+      asurf.storePixels();
     }
   }
 }

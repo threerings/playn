@@ -120,12 +120,12 @@ class AndroidImageLayer extends AndroidLayer implements ImageLayer {
   public void paint(InternalTransform parentTransform, float parentAlpha) {
     if (!visible())
       return;
-
+    
     gfx.checkGlError("AndroidImageLayer.paint start");
-    // TODO(jgw): Assert exclusive source-rect vs. repeat.
+    if (sourceRectSet) Asserts.check(repeatX == false && repeatY == false);
 
     int tex = image.ensureTexture(gfx, repeatX, repeatY);
-    if (tex != 0) {
+    if (tex != -1) {
       InternalTransform xform = localTransform(parentTransform);
       float childAlpha = parentAlpha * alpha;
 
