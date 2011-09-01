@@ -44,7 +44,7 @@ class AndroidPointer implements Pointer {
     }
   }
 
-  synchronized void onPointerEnd(Event event) {
+  void onPointerEnd(Event event) {
     if (listener != null) {
       inDragSequence = false;
       listener.onPointerEnd(event);
