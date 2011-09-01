@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,14 +15,12 @@
  */
 package playn.android;
 
-import static playn.core.PlayN.*;
+import static playn.core.PlayN.log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -59,7 +57,7 @@ public class AndroidAssetManager extends AbstractAssetManager {
       throw new IOException("Unable to loader resource: " + path);
     return is;
   }
-  
+
   @Override
   protected Image doGetImage(String path) {
     return new AndroidImage(path, doGetBitmap(path));
@@ -142,11 +140,14 @@ public class AndroidAssetManager extends AbstractAssetManager {
     }
   }
 
+  // FIXME: This should be much more intelligent than appending .wav to the path.
+  // The current AndroidSound implementation using MediaPlayer (AndroidCompressedSound)
+  // can already read many more formats than just .wav
   @Override
   protected Sound doGetSound(String path) {
     try {
-      InputStream in = openAsset(path + ".mp3");
-      return AndroidPlatform.instance.audio().getSound(path + ".mp3", in);
+      InputStream in = openAsset(path + ".wav");
+      return AndroidPlatform.instance.audio().getSound(path + ".wav", in);
     } catch (IOException e) {
       log().error("Unable to load sound: " + path, e);
       return new ErrorSound(path);
