@@ -18,6 +18,24 @@ package flash.display;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
+import flash.geom.Matrix;
+
 final public class Graphics extends JavaScriptObject {
   protected Graphics() {}
+
+  public native void beginFill(int i) /*-{
+    this.beginFill(i);
+  }-*/;
+
+  public native void drawRect(float sx, float sy, float sw, float sh) /*-{
+    this.drawRect(sx, sy, sw, sh);    
+  }-*/;
+
+  public native void endFill() /*-{
+    this.endFill();
+  }-*/;
+
+  public native void beginBitmapFill(BitmapData bitmapData, Matrix geom, boolean repeat, boolean smooth) /*-{
+      this.beginBitmapFill(bitmapData, geom, repeat, smooth);
+  }-*/;
 }

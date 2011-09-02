@@ -77,11 +77,11 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
       this.beginPath();
     }-*/;
 
-    public native void moveto(int x, int y) /*-{
+    public native void moveTo(double x, double y) /*-{
       this.moveTo(x, y);
     }-*/;
 
-    public native void lineto(int x, int y) /*-{
+    public native void lineTo(double x, double y) /*-{
       this.lineTo(x, y);
     }-*/;
 
@@ -92,6 +92,11 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
      public native void setStrokeStyle(String color) /*-{
       this.strokeStyle = color;
     }-*/;
+    
+     public native void setFillStyle(String color) /*-{
+      this.fillStyle = color;
+    }-*/;
+    
     /**
      * @param bitmapData
      * @param x
@@ -153,8 +158,52 @@ public class FlashCanvasLayer extends FlashLayer implements CanvasLayer {
     public native void setTransform(float m11, float m12, float m21, float m22, float dx, float dy) /*-{
     // TODO Auto-generated method stub
       this.setTransform(m11, m12, m21, m22, dx, dy);
-    }-*/; 
+    }-*/;
+
+    public native void fillText(String text, float x, float y) /*-{
+      this.fillText(text, x, y);
+    }-*/;
     
+    public native void fillRect(float x, float y, float w, float h) /*-{
+      this.fillRect(x, y, w, h);
+    }-*/;
+    
+    public native void strokeText(String text, float x, float y) /*-{
+      this.strokeText(text, x, y);
+    }-*/;
+
+    public native void arcTo(double curX, double curY, double x, double y, double radius)  /*-{
+      this.arcTo(curX, curY, x, y, radius);
+    }-*/;
+
+    public native void quadraticCurveTo(
+        double cpx, double cpy, double x, double y) /*-{
+      this.quadraticCurveTo(cpx, cpy, x, y);
+    }-*/;
+
+    public native void close() /*-{
+      this.close();
+    }-*/;
+
+    public native void fill() /*-{
+      this.fill();
+    }-*/;
+
+    public native void strokeRect(float x, float y, float w, float h) /*-{
+      this.strokeRect(x, y, w, h);
+    }-*/;
+
+    public native BitmapData bitmapData() /*-{
+      return this.canvas.bitmapData;
+    }-*/;
+
+    public native void clearRect(int x, int y, int width, int height) /*-{
+      this.clearRect(x, y, width, height);      
+    }-*/;
+
+    public native void setLineWidth(float width) /*-{
+      this.lineWidth = width;
+    }-*/;
   }
 
   @Override

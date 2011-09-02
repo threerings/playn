@@ -28,7 +28,7 @@ public class Pea {
   private float angle;
 
   public Pea(final GroupLayer peaLayer, final float x, final float y) {
-    Image image = HelloGame.peaImage;
+    Image image = assetManager().getImage(IMAGE);
     layer = graphics().createImageLayer(image);
 
     // Add a callback for when the image loads.
@@ -52,6 +52,5 @@ public class Pea {
   public void update(float delta) {
     angle += delta;
     layer.setRotation(angle);
-    layer.setScale((float)Math.sin(angle) + 1.1f);
   }
 }

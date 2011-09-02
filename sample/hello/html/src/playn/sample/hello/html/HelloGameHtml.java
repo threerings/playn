@@ -15,8 +15,6 @@
  */
 package playn.sample.hello.html;
 
-import playn.html.HtmlAssetManager;
-
 import playn.core.PlayN;
 import playn.html.HtmlGame;
 import playn.html.HtmlPlatform;
@@ -26,8 +24,8 @@ public class HelloGameHtml extends HtmlGame {
 
   @Override
   public void start() {
-    HtmlAssetManager assets = HtmlPlatform.register().assetManager();
-    assets.setPathPrefix("hellogame/");
+    HtmlPlatform platform = HtmlPlatform.register();
+    platform.assetManager().setPathPrefix("hellogame/");
     PlayN.run(new HelloGame());
   }
 }

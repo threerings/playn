@@ -17,6 +17,7 @@
 package playn.flash;
 
 import flash.display.DisplayObject;
+import flash.display.InteractiveObject;
 import flash.gwt.FlashImport;
 
 import playn.core.AbstractLayer;
@@ -29,10 +30,11 @@ public class FlashLayer extends AbstractLayer {
   protected final DisplayObject displayObject;
 
   /**
-   * @param sprite
+   *
    */
   public FlashLayer(DisplayObject displayObject) {
     this.displayObject = displayObject;
+//    ((InteractiveObject) displayObject).setMouseEnabled(false);
   }
 
   @Override

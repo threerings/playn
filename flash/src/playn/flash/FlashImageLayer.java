@@ -16,11 +16,18 @@
 
 package playn.flash;
 
+import flash.display.BitmapData;
+import flash.display.Graphics;
+import flash.display.Shape;
+import flash.geom.Matrix;
+import flash.geom.Point;
+import flash.geom.Rectangle;
 import playn.core.Asserts;
 
 import flash.display.Bitmap;
 import flash.display.Sprite;
 
+import playn.core.CanvasImage;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Image;
@@ -29,31 +36,71 @@ import playn.core.ImageLayer;
 // TODO(pdr): fix setWidth, setHeight, setRepeat*, etc.
 public class FlashImageLayer extends FlashLayer implements ImageLayer {
 
-  
+
   private final Image image;
+
+  private BitmapData bitmapData;
+
+  private Rectangle sourceRect;
+
+  private static int NOT_SET = -1;
+
+  float width = NOT_SET;
+
+  float height = NOT_SET;
+
+  private boolean dirty = true;
+  
+  private boolean repeatX;
+
+  private boolean repeatY;
+
+  private BitmapData clippedSource;
 
   /**
    * @param image
    */
   public FlashImageLayer(Image image) {
-    super((Sprite) (Bitmap.create(((FlashImage) image).bitmapData()).cast()));
+    super((Sprite) (Bitmap.create(null).cast()));
     this.image = image;
+    setBitmapData(((FlashImage) image));
+
     image.addCallback(new ResourceCallback<Image>() {
-      
+
       @Override
       public void error(Throwable err) {
-       PlayN.log().error(err.toString());
+        PlayN.log().error(err.toString());
       }
-    
+
       @Override
       public void done(Image resource) {
-        ((Bitmap) display().cast()).setBitmapData(((FlashImage) resource).bitmapData());
+        setBitmapData((FlashImage) resource);
       }
     });
   }
 
+  private void setBitmapData(FlashImage resource) {
+    bitmapData = resource.bitmapData();
+    applySourceRect();
+  }
+
+  private void applySourceRect() {
+    if (sourceRect == null || bitmapData == null) {
+      clippedSource = bitmapData;
+    } else {
+      clippedSource = BitmapData
+          .create(sourceRect.getWidth(), sourceRect.getHeight(), true,
+              0x00000000);
+      clippedSource
+          .copyPixels(bitmapData, sourceRect, Point.create(0, 0), null, null,
+              true);
+    }
+    dirty = true;
+    ((Bitmap) display()).setBitmapData(clippedSource);
+  }
+
   /**
-   * 
+   *
    */
   public FlashImageLayer() {
     super(Bitmap.create(null));
@@ -65,8 +112,34 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void clearHeight() {
-    // TODO Auto-generated method stub
+    height = NOT_SET;
+    dirty = true;
+  }
 
+  private void applySettingIfDirty() {
+    if (dirty && image != null) {
+      float dw = width();
+      float dh = height();
+
+      if (repeatX || repeatY) {
+        float anchorWidth = repeatX ? dw : sourceRect != null ? sourceRect.getWidth() : image.width();
+        float anchorHeight = repeatY ? dh : sourceRect != null ? sourceRect.getHeight() : image.height();
+
+        Shape shape = Shape.create((int) anchorWidth, (int) anchorHeight);
+        Graphics g = shape.getGraphics();
+        g.beginBitmapFill(clippedSource, Matrix.create(), true, true);
+        g.drawRect(0, 0, anchorWidth, anchorHeight);
+        g.endFill();
+        BitmapData data = BitmapData.create((int) dw, (int) dh, true, 0x00000000);
+        data.draw(shape);
+        ((Bitmap) display()).setBitmapData(data);
+      } else {
+        ((Bitmap) display()).setBitmapData(clippedSource);
+      } 
+      display().setWidth((int) dw);
+      display().setHeight((int) dh);
+      dirty = false;
+    }
   }
 
   /* (non-Javadoc)
@@ -74,8 +147,10 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void clearSourceRect() {
-    // TODO Auto-generated method stub
-
+    sourceRect = null;
+    dirty = true;
+    applySourceRect();
+    applySettingIfDirty();
   }
 
   /* (non-Javadoc)
@@ -83,8 +158,8 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void clearWidth() {
-    // TODO Auto-generated method stub
-
+    width = NOT_SET;
+    dirty = true;
   }
 
   /* (non-Javadoc)
@@ -92,7 +167,6 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public Image image() {
-    // TODO Auto-generated method stub
     return image;
   }
 
@@ -101,8 +175,8 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void setHeight(float height) {
-    // TODO Auto-generated method stub
-
+    this.height = height;
+    dirty = true;
   }
 
   /* (non-Javadoc)
@@ -110,9 +184,7 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void setImage(Image image) {
-    ((Bitmap) display().cast()).setBitmapData(((FlashImage) image).bitmapData());
-
-
+    setBitmapData((FlashImage) image);
   }
 
   /* (non-Javadoc)
@@ -120,8 +192,8 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void setRepeatX(boolean repeat) {
-    // TODO Auto-generated method stub
-
+    repeatX = repeat;
+    dirty = true;
   }
 
   /* (non-Javadoc)
@@ -129,8 +201,8 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void setRepeatY(boolean repeat) {
-    // TODO Auto-generated method stub
-
+    repeatY = repeat;
+    dirty = true;
   }
 
   /* (non-Javadoc)
@@ -138,8 +210,10 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void setSourceRect(float sx, float sy, float sw, float sh) {
-    // TODO Auto-generated method stub
-
+    sourceRect = Rectangle.create(sx, sy, sw, sh);
+    dirty = true;
+    applySourceRect();
+    applySettingIfDirty();
   }
 
   /* (non-Javadoc)
@@ -147,8 +221,8 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void setWidth(float width) {
-    // TODO Auto-generated method stub
-
+    this.width = width;
+    dirty = true;
   }
 
   /* (non-Javadoc)
@@ -156,21 +230,21 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
    */
   @Override
   public void setSize(float width, float height) {
-    // TODO Auto-generated method stub
-
+    setWidth(width);
+    setHeight(height);
   }
 
 
   @Override
   public float width() {
     Asserts.checkNotNull(image, "Image must not be null");
-    return image.width();
+    return width != NOT_SET ? width : sourceRect != null ? sourceRect.getWidth() : image.width();
   }
 
   @Override
   public float height() {
     Asserts.checkNotNull(image, "Image must not be null");
-    return image.height();
+    return height != NOT_SET ? height : sourceRect != null ? sourceRect.getHeight() : image.height();
   }
 
   @Override
@@ -181,5 +255,11 @@ public class FlashImageLayer extends FlashLayer implements ImageLayer {
   @Override
   public float scaledHeight() {
     return transform().scaleY() * height();
+  }
+
+  @Override
+  public void update() {
+    applySettingIfDirty();
+    super.update();
   }
 }
