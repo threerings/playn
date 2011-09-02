@@ -161,7 +161,7 @@ public abstract class GameActivity extends Activity {
       file.delete();
     }
     wakeLock.release();
-    platform().audio().stop();
+    platform().audio().onDestroy();
     super.onDestroy();
   }
 
@@ -170,7 +170,7 @@ public abstract class GameActivity extends Activity {
     if (AndroidPlatform.DEBUG_LOGS) Log.d("playn", "onPause");
     gameView.notifyVisibilityChanged(View.INVISIBLE);
     if (platform() != null)
-      platform().audio().pause();
+      platform().audio().onPause();
     wakeLock.release();
     super.onPause();
 
@@ -182,7 +182,7 @@ public abstract class GameActivity extends Activity {
     if (AndroidPlatform.DEBUG_LOGS) Log.d("playn", "onResume");
     gameView.notifyVisibilityChanged(View.VISIBLE);
     if (platform() != null)
-      platform().audio().resume();
+      platform().audio().onResume();
     wakeLock.acquire();
     super.onResume();
 

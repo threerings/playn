@@ -47,21 +47,21 @@ class AndroidAudio implements Audio {
     return sound;
   }
 
-  public void stop() {
+  public void onDestroy() {
     for (AndroidSound sound : sounds) {
-      sound.stop();
+      sound.onDestroy();
     }
   }
 
-  public void pause() {
+  public void onPause() {
     for (AndroidSound sound : sounds) {
-      sound.pause();
+      sound.onPause();
     }
   }
 
-  public void resume() {
+  public void onResume() {
     for (AndroidSound sound : sounds) {
-      sound.resume();
+      sound.onResume();
     }
   }
 }

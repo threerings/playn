@@ -15,6 +15,8 @@
  */
 package playn.android;
 
+import static playn.core.PlayN.log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,12 +24,19 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnErrorListener;
+import android.util.Log;
 
+/**
+ * An implementation of AndroidSound using the Android MediaPlayer
+ * class.
+ */
 public class AndroidCompressedSound extends AndroidSound {
   private File cachedFile;
-  private boolean paused, loaded, playOnLoad;
+  private boolean paused, prepared, looping, playOnPrepare;
   private float volume = 0.99f;
-  private final MediaPlayer mp;
+  private int position;
+  private MediaPlayer mp;
 
   public AndroidCompressedSound(InputStream in, String extension) throws IOException {
     cachedFile = new File(AndroidPlatform.instance.activity.getFilesDir(), "sound-" + Integer.toHexString(hashCode())
@@ -49,12 +58,121 @@ public class AndroidCompressedSound extends AndroidSound {
       in.close();
     }
 
-    FileInputStream ins = new FileInputStream(cachedFile);
-
     try {
-      mp = new MediaPlayer();
+      resetMp();
+    }catch(IOException e) {
+      log().error("IOException thrown building MediaPlayer for sound.");
+    }
+  }
+
+  /**
+   * Play the sound. Calling multiple times in succession will reset
+   * playback each time instead of playing multiple instances of
+   * the sound.
+   */
+  @Override
+  public boolean play() {
+    if (!prepared) {
+      playOnPrepare = true;
+    } else {
+      mp.seekTo(position);  //Play from stored position if there is one
+      mp.start();
+      position = 0;
+    }
+    return true;
+  }
+
+  /**
+   * Stop playback and reset the playhead position.
+   */
+  @Override
+  public void stop() {
+    if (mp == null) return;
+    mp.pause();
+    mp.seekTo(0);
+  }
+
+  @Override
+  public void setLooping(boolean looping) {
+    this.looping = looping;
+    if (mp != null) mp.setLooping(looping);
+  }
+
+  @Override
+  public void setVolume(float volume) {
+    this.volume = volume < 0 ? 0 : volume >= 1 ? 0.99f : volume;
+    if (mp != null) mp.setVolume(this.volume, this.volume);
+  }
+
+  @Override
+  public boolean isPlaying() {
+    return mp == null ? false : mp.isPlaying();
+  }
+
+  /*
+   * The following methods are called by AndroidAudio
+   * during the Activity lifecycle
+   */
+  @Override
+  void onPause() {
+    if (mp == null) {
+      return;
+    } else {
+      if (mp.isPlaying()) {
+        position = mp.getCurrentPosition();
+        paused = true;
+      }
+      mp.release();
+    }
+  }
+
+  @Override
+  void onResume() {
+    try {
+      resetMp();
+      if (paused) { //If the sound was playing when onPause() was called
+        paused = false;
+        play();  //Queue up to play when prepared.
+      }
+    }catch (IOException e) {
+      log().error("IOException thrown resetting MediaPlayer for sound in onResume()");
+    }
+  }
+
+  @Override
+  void onDestroy() {
+    cachedFile.delete();
+    if (mp != null) {
+      mp.stop();
+      mp.release();
+    }
+  }
+
+  void prepared() {
+    prepared = true;
+    Log.d("playn", "Prepared");
+    if (playOnPrepare) {
+      playOnPrepare = false;
+      play();
+    }
+  }
+
+  private void resetMp() throws IOException {
+    mp = new MediaPlayer();
+    prepared = false;
+    FileInputStream ins = new FileInputStream(cachedFile);
+    try {
       mp.setDataSource(ins.getFD());
       mp.setOnPreparedListener(new SoundPreparedListener(this));
+      mp.setOnErrorListener(new OnErrorListener() {
+        @Override
+        public boolean onError(MediaPlayer mp, int what, int extra) {
+          log().error("Error preparing MediaPlayer while loading sound.");
+          return false;
+        }
+      });
+      mp.setLooping(looping);
+      mp.setVolume(volume, volume);
       mp.prepareAsync();
     } finally {
       ins.close();
@@ -62,62 +180,8 @@ public class AndroidCompressedSound extends AndroidSound {
   }
 
   @Override
-  public boolean play() {
-    if (!loaded) playOnLoad = true;
-    else {
-      if (paused) mp.stop(); //Restart the sound if paused to differentiate from resume()
-      mp.start();
-    }
-    return true;
-  }
-
-  @Override
-  public void stop() {
-    mp.stop();
-  }
-
-  @Override
-  public void setLooping(boolean looping) {
-    mp.setLooping(looping);
-  }
-
-  @Override
-  public void setVolume(float volume) {
-    this.volume = Math.max(0.99f, volume);
-    mp.setVolume(this.volume, this.volume);
-  }
-
-  @Override
-  public boolean isPlaying() {
-    return mp.isPlaying();
-  }
-
-  @Override
-  void pause() {
-    if (!paused) {
-      if (mp.isPlaying()) mp.pause();
-      paused = true;
-    }
-  }
-
-  @Override
-  void resume() {
-    if (paused) {
-      mp.start();
-      paused = false;
-    }
-  }
-
-  void loaded() {
-    loaded = true;
-    if (playOnLoad) {
-      play();
-    }
-  }
-
-  @Override
   public void finalize() {
-    cachedFile.delete();
+    onDestroy();
   }
 
   private class SoundPreparedListener implements MediaPlayer.OnPreparedListener {
@@ -129,7 +193,7 @@ public class AndroidCompressedSound extends AndroidSound {
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        if (sound != null) sound.loaded();
+        if (sound != null) sound.prepared();
     }
   }
 }

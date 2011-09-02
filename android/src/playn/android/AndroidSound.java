@@ -34,7 +34,9 @@ abstract class AndroidSound implements Sound {
   @Override
   public abstract boolean isPlaying();
 
-  abstract void pause();
+  abstract void onPause();
 
-  abstract void resume();
+  abstract void onResume();
+
+  abstract void onDestroy();
 }
