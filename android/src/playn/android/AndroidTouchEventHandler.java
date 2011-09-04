@@ -34,36 +34,30 @@ class AndroidTouchEventHandler {
   }
 
   /**
-   * Special implementation of Touch.Event.Impl that has a shared static preventDefault state.
-   * <p>
-   * Note: Call AndroidTouchEventImpl.init() before using to initialize the shared state.
+   * Special implementation of Touch.Event.Impl for keeping track of changes to preventDefault
    */
   static class AndroidTouchEventImpl extends Touch.Event.Impl {
-    public static boolean preventDefault;
+    final boolean[] preventDefault;
 
-    public AndroidTouchEventImpl(double time, float x, float y, int id) {
+    public AndroidTouchEventImpl(double time, float x, float y, int id, boolean[] preventDefault) {
       super(time, x, y, id);
+      this.preventDefault = preventDefault;
     }
 
-    public AndroidTouchEventImpl(double time, float x, float y, int id, float pressure, float size) {
+    public AndroidTouchEventImpl(double time, float x, float y, int id, float pressure, float size,
+        boolean[] preventDefault) {
       super(time, x, y, id, pressure, size);
+      this.preventDefault = preventDefault;
     }
 
     @Override
     public void setPreventDefault(boolean preventDefault) {
-      AndroidTouchEventImpl.preventDefault = preventDefault;
+      this.preventDefault[0] = preventDefault;
     }
 
     @Override
     public boolean getPreventDefault() {
-      return AndroidTouchEventImpl.preventDefault;
-    }
-
-    /**
-     * Initialize the shared state
-     */
-    public static void init() {
-      preventDefault = false;
+      return preventDefault[0];
     }
   }
 
@@ -75,11 +69,10 @@ class AndroidTouchEventHandler {
   public boolean onMotionEvent(MotionEvent nativeEvent) {
     double time = nativeEvent.getEventTime();
     int action = nativeEvent.getAction();
-    Touch.Event[] touches = parseMotionEvent(nativeEvent);
+    boolean[] preventDefault = {false};
 
+    Touch.Event[] touches = parseMotionEvent(nativeEvent, preventDefault);
     Touch.Event pointerEvent = touches[0];
-    
-    AndroidTouchEventImpl.init();
     Pointer.Event.Impl event;
 
     switch (action) {
@@ -87,17 +80,17 @@ class AndroidTouchEventHandler {
         gameView.onTouchStart(touches);
         event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
         gameView.onPointerStart(event);
-        return (AndroidTouchEventImpl.preventDefault || event.getPreventDefault());
+        return (preventDefault[0] || event.getPreventDefault());
       case (MotionEvent.ACTION_UP):
         gameView.onTouchEnd(touches);
         event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
         gameView.onPointerEnd(event);
-        return (AndroidTouchEventImpl.preventDefault || event.getPreventDefault());
+        return (preventDefault[0] || event.getPreventDefault());
       case (MotionEvent.ACTION_MOVE):
         gameView.onTouchMove(touches);
         event = new Pointer.Event.Impl(time, pointerEvent.x(), pointerEvent.y());
         gameView.onPointerDrag(event);
-        return (AndroidTouchEventImpl.preventDefault || event.getPreventDefault());
+        return (preventDefault[0] || event.getPreventDefault());
       case (MotionEvent.ACTION_CANCEL):
         break;
       case (MotionEvent.ACTION_OUTSIDE):
@@ -108,14 +101,12 @@ class AndroidTouchEventHandler {
 
   /**
    * Performs the actual parsing of the MotionEvent event.
-   *
+   * 
    * @param event The MotionEvent to process
-   * @param historical Whether or not to parse historical touches (currently
-   *          never called as true, but the functionality is still here in case
-   *          this feature is ever added to other platforms)
-   * @return The processed array of individual AndroidTouchEvents.
+   * @param preventDefault Shared preventDefault state among returned {@link AndroidTouchEventImpl}
+   * @return Processed array of {@link AndroidTouchEventImpl}s which share a preventDefault state.
    */
-  private Touch.Event[] parseMotionEvent(MotionEvent event) {
+  private Touch.Event[] parseMotionEvent(MotionEvent event, boolean[] preventDefault) {
     calculateOffsets();
     int eventPointerCount = event.getPointerCount();
     Touch.Event[] touches = new Touch.Event[eventPointerCount];
@@ -129,7 +120,7 @@ class AndroidTouchEventHandler {
       pressure = event.getPressure(pointerIndex);
       size = event.getSize(pointerIndex);
       id = event.getPointerId(pointerIndex);
-      touches[t] = new AndroidTouchEventImpl(time, x, y, id, pressure, size);
+      touches[t] = new AndroidTouchEventImpl(time, x, y, id, pressure, size, preventDefault);
     }
     return touches;
   }

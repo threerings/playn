@@ -25,32 +25,24 @@ class HtmlTouch extends HtmlInput implements Touch {
   boolean inTouchSequence = false; // true when we are in a touch sequence (after touch start but before touch end)
 
   /**
-   * Special implementation of Event.Impl that has a shared static preventDefault state.
-   * <p>
-   * Note: Call HtmlTouchEventImpl.init() before using to initialize the shared state.
+   * Special implementation of Event.Impl for keeping track of changes to preventDefault
    */
   static class HtmlTouchEventImpl extends Event.Impl {
-    public static boolean preventDefault;
+    final boolean[] preventDefault;
 
-    public HtmlTouchEventImpl(double time, float x, float y, int id) {
+    public HtmlTouchEventImpl(double time, float x, float y, int id, boolean[] preventDefault) {
       super(time, x, y, id);
+      this.preventDefault = preventDefault;
     }
 
     @Override
     public void setPreventDefault(boolean preventDefault) {
-      HtmlTouchEventImpl.preventDefault = preventDefault;
+      this.preventDefault[0] = preventDefault;
     }
 
     @Override
     public boolean getPreventDefault() {
-      return HtmlTouchEventImpl.preventDefault;
-    }
-
-    /**
-     * Initialize the shared state
-     */
-    public static void init() {
-      preventDefault = false;
+      return preventDefault[0];
     }
   }
 
@@ -69,8 +61,7 @@ class HtmlTouch extends HtmlInput implements Touch {
           }
 
           inTouchSequence = true;
-
-          HtmlTouchEventImpl.init();
+          boolean[] preventDefault = {false};
 
           // Convert the JsArray<Native Touch> to an array of Touch.Events
           Event[] touches = new Event[nativeTouchesLen];
@@ -79,10 +70,10 @@ class HtmlTouch extends HtmlInput implements Touch {
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
             int id = getTouchIdentifier(nativeEvent, t);
-            touches[t] = new HtmlTouchEventImpl(PlayN.currentTime(), x, y, id);
+            touches[t] = new HtmlTouchEventImpl(PlayN.currentTime(), x, y, id, preventDefault);
           }
           listener.onTouchStart(touches);
-          if (HtmlTouchEventImpl.preventDefault) {
+          if (preventDefault[0]) {
             nativeEvent.preventDefault();
           }
         }
@@ -97,7 +88,7 @@ class HtmlTouch extends HtmlInput implements Touch {
           JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getTouches();
           int nativeTouchesLen = nativeTouches.length();
 
-          HtmlTouchEventImpl.init();
+          boolean[] preventDefault = {false};
 
           // Convert the JsArray<Native Touch> to an array of Touch.Events
           Event[] touches = new Event[nativeTouchesLen];
@@ -106,10 +97,10 @@ class HtmlTouch extends HtmlInput implements Touch {
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
             int id = getTouchIdentifier(nativeEvent, t);
-            touches[t] = new HtmlTouchEventImpl(PlayN.currentTime(), x, y, id);
+            touches[t] = new HtmlTouchEventImpl(PlayN.currentTime(), x, y, id, preventDefault);
           }
           listener.onTouchEnd(touches);
-          if (HtmlTouchEventImpl.preventDefault) {
+          if (preventDefault[0]) {
             nativeEvent.preventDefault();
           }
 
@@ -127,7 +118,7 @@ class HtmlTouch extends HtmlInput implements Touch {
           JsArray<com.google.gwt.dom.client.Touch> nativeTouches = nativeEvent.getTouches();
           int nativeTouchesLen = nativeTouches.length();
 
-          HtmlTouchEventImpl.init();
+          boolean[] preventDefault = {false};
 
           // Convert the JsArray<Native Touch> to an array of Touch.Events
           Event[] touches = new Event[nativeTouchesLen];
@@ -136,10 +127,10 @@ class HtmlTouch extends HtmlInput implements Touch {
             float x = touch.getRelativeX(rootElement);
             float y = touch.getRelativeY(rootElement);
             int id = getTouchIdentifier(nativeEvent, t);
-            touches[t] = new HtmlTouchEventImpl(PlayN.currentTime(), x, y, id);
+            touches[t] = new HtmlTouchEventImpl(PlayN.currentTime(), x, y, id, preventDefault);
           }
           listener.onTouchMove(touches);
-          if (HtmlTouchEventImpl.preventDefault) {
+          if (preventDefault[0]) {
             nativeEvent.preventDefault();
           }
         }
