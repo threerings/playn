@@ -30,7 +30,6 @@ public class AndroidKeyboard implements Keyboard {
    */
   boolean onKeyDown(Event event) {
     if (listener != null) {
-      listener.onKeyDown(event);
       return event.getPreventDefault();
     }
     return false;
