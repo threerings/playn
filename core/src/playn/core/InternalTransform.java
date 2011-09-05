@@ -19,7 +19,7 @@ import pythagoras.f.Transform;
  * Exposes internals of our transform to the graphics backends.
  */
 public interface InternalTransform extends Transform {
-	
+
   /** Returns the m00 (x-scale) component of the affine transform matrix. */
   float m00();
 
@@ -31,40 +31,22 @@ public interface InternalTransform extends Transform {
 
   /** Returns the m11 (y-scale) component of the affine transform matrix. */
   float m11();
-  
-  /** Returns to tx (x-translation) component of the affine transform matrix. */
-  float tx();
-  
-  /** Returns to ty (y-translation) component of the affine transform matrix. */
-  float ty();
 
-  /**
-   * TODO
-   */
-  float scaleX();
-  
-  /**
-   * TODO
-   */
-  float scaleY();
-  
   /**
    * Configures this transform to be equal to the supplied other.
    */
-  Transform set(Transform other);
-  
-  Transform setTransform (float m00, float m01, float m10, float m11, float tx, float ty);
+  InternalTransform set(Transform other);
 
   /**
    * Concatenates the supplied layer transform onto this transform, accounting for the specified
    * origin offset.
    */
-  Transform concatenate(Transform other, float originX, float originY);
+  InternalTransform concatenate(Transform other, float originX, float originY);
 
   /**
    * Concatenates the supplied transform onto this transform, accounting for the specified origin
    * offset.
    */
-  Transform concatenate(float m00, float m01, float m10, float m11, float tx, float ty,
+  InternalTransform concatenate(float m00, float m01, float m10, float m11, float tx, float ty,
       float originX, float originY);
 }

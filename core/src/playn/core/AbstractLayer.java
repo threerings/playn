@@ -143,7 +143,7 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public InternalTransform transform() {
+  public Transform transform() {
     return transform;
   }
 
