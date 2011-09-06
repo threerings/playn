@@ -15,12 +15,8 @@
  */
 package playn.showcase.core.text;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
-import playn.core.Game;
 import playn.core.Layer;
 import playn.core.SurfaceLayer;
 import playn.core.GroupLayer;
