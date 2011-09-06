@@ -18,7 +18,6 @@ package playn.showcase.core.swirl;
 import static playn.core.PlayN.assetManager;
 import static playn.core.PlayN.graphics;
 import static playn.core.PlayN.pointer;
-import playn.core.Game;
 import playn.core.GroupLayer;
 import playn.core.Image;
 import playn.core.ImageLayer;
