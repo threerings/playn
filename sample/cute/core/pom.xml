@@ -12,6 +12,10 @@
   <artifactId>playn-cute-core</artifactId>
   <name>PlayN Cute Core</name>
 
+  <properties>
+    <exec.mainClass>playn.sample.cute.java.CuteGameJava</exec.mainClass>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
