@@ -12,6 +12,10 @@
   <artifactId>playn-showcase-core</artifactId>
   <name>PlayN Showcase Core</name>
 
+  <properties>
+    <exec.mainClass>playn.showcase.java.ShowcaseJava</exec.mainClass>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
