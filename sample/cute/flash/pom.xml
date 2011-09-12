@@ -14,8 +14,8 @@
   <packaging>war</packaging>
 
   <properties>
-    <gwt.module>playn.sample.cute.CuteGame</gwt.module>
-    <gwt.name>cute</gwt.name>
+    <gwt.module>playn.sample.cute.CuteGameFlash</gwt.module>
+    <gwt.name>cuteflash</gwt.name>
     <flexsdk.dir>${project.build.directory}${file.separator}flex4sdk</flexsdk.dir>
   </properties>
 
