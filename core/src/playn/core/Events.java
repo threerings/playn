@@ -70,6 +70,22 @@ public class Events {
       public boolean getPreventDefault() {
         return preventDefault;
       }
+
+      protected String name() {
+          return "Events.Input";
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder builder = new StringBuilder(name()).append('[');
+        addFields(builder);
+        return builder.append(']').toString();
+      }
+
+      protected void addFields(StringBuilder builder) {
+        builder.append("time=").append(time).append(", preventDefault=").append(preventDefault);
+      }
+
     }
   }
 
@@ -102,6 +118,17 @@ public class Events {
         super(time);
         this.x = x;
         this.y = y;
+      }
+
+      @Override
+      protected String name() {
+        return "Events.Position";
+      }
+
+      @Override
+      protected void addFields(StringBuilder builder) {
+        super.addFields(builder);
+        builder.append(", x=").append(x).append(", y=").append(y);
       }
     }
   }
