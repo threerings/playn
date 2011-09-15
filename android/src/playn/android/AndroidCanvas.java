@@ -22,6 +22,7 @@ import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
+import playn.core.TextLayout;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -109,6 +110,11 @@ class AndroidCanvas implements playn.core.Canvas {
   public void drawText(String text, float x, float y) {
     canvas.drawText(text, x, y, currentState().prepareFill());
     dirty = true;
+  }
+
+  @Override
+  public void drawText(TextLayout layout, float x, float y) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

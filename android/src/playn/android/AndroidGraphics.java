@@ -29,6 +29,7 @@ import java.util.Set;
 import playn.core.Asserts;
 import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
+import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.Graphics;
 import playn.core.GroupLayer;
@@ -40,6 +41,8 @@ import playn.core.Pattern;
 import playn.core.StockInternalTransform;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
+import playn.core.TextFormat;
+import playn.core.TextLayout;
 import playn.core.gl.GL20;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
@@ -390,6 +393,16 @@ class AndroidGraphics implements Graphics {
    * @return The height of the AndroidLayoutView containing the GameView (generally the
    *         entire display height) in pixels.
    */
+  @Override
+  public Font createFont(String name, Font.Style style, float size) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public TextLayout layoutText(String text, TextFormat format) {
+    throw new UnsupportedOperationException();
+  }
+
   @Override
   public int screenHeight() {
     return screenHeight;

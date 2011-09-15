@@ -25,6 +25,7 @@ import playn.core.Gradient;
 import playn.core.Image;
 import playn.core.Path;
 import playn.core.Pattern;
+import playn.core.TextLayout;
 
 class FlashCanvas implements Canvas {
 
@@ -95,6 +96,11 @@ class FlashCanvas implements Canvas {
     context2d.strokeText(text, x, y);
     context2d.fillText(text, x, y);
     dirty = true;
+  }
+
+  @Override
+  public void drawText(TextLayout layout, float x, float y) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

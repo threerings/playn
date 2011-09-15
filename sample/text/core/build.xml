@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project name="text" default="compile">
+  <property name="java.classname" value="playn.sample.text.java.TextGameJava"/>
+  <property name="html.classname" value="playn.sample.text.TextGame"/>
+  <property name="html.index" value="TextGame.html"/>
+  <import file="../../build-common.xml"/>
+</project>
