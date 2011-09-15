@@ -18,13 +18,13 @@ package playn.sample.payments.java;
 import playn.core.PlayN;
 import playn.java.JavaAssetManager;
 import playn.java.JavaPlatform;
-import playn.sample.payments.core.PaymentsDemoGame;
+import playn.sample.payments.core.PaymentsDemo;
 
-public class PaymentsDemoGameJava {
+public class PaymentsDemoJava {
 
   public static void main(String[] args) {
     JavaAssetManager assets = JavaPlatform.register().assetManager();
     assets.setPathPrefix("src/playn/sample/payments/resources");
-    PlayN.run(new PaymentsDemoGame());
+    PlayN.run(new PaymentsDemo());
   }
 }

@@ -23,9 +23,9 @@ import playn.html.HtmlPlatform;
 import playn.payments.core.InAppPayments;
 import playn.payments.core.InAppPaymentsFactory;
 import playn.payments.html.HtmlInAppPayments;
-import playn.sample.payments.core.PaymentsDemoGame;
+import playn.sample.payments.core.PaymentsDemo;
 
-public class PaymentsDemoGameHtml extends HtmlGame {
+public class PaymentsDemoHtml extends HtmlGame {
 
   @Override
   public void start() {
@@ -34,7 +34,7 @@ public class PaymentsDemoGameHtml extends HtmlGame {
     InAppPaymentsFactory.buildInAppPayments(payments);
 
     HtmlAssetManager assets = HtmlPlatform.register().assetManager();
-    assets.setPathPrefix("paymentsdemogame/");
-    PlayN.run(new PaymentsDemoGame());
+    assets.setPathPrefix("paymentsdemo/");
+    PlayN.run(new PaymentsDemo());
   }
 }

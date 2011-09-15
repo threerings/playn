@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project name="paymentsdemo" default="compile">
-  <property name="java.classname" value="playn.sample.payments.java.PaymentsDemoGameJava"/>
-  <property name="html.classname" value="playn.sample.payments.PaymentsDemoGame"/>
-  <property name="html.index" value="paymentsdemoGame.html"/>
+  <property name="java.classname" value="playn.sample.payments.java.PaymentsDemoJava"/>
+  <property name="html.classname" value="playn.sample.payments.PaymentsDemo"/>
+  <property name="html.index" value="PaymentsDemo.html"/>
   <import file="../build-common.xml"/>
 </project>
