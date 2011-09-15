@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -42,7 +42,7 @@ public class SpriteLoader {
    * Return a {@link Sprite}, given a path to the image and a path to the json sprite description.
    * <p>
    * json data should be in the following format:
-   * 
+   *
    * <pre>
    * {@code {
    *   "sprites": [
@@ -101,7 +101,7 @@ public class SpriteLoader {
    * Return a {@link Sprite}, given a path to the json sprite description.
    * <p>
    * json data should be in the following format:
-   * 
+   *
    * <pre>
    * {@code {
    *   "urls": ["images/peasprites2.png", "images/peasprites3.png"],
@@ -163,7 +163,7 @@ public class SpriteLoader {
    * Parse a json sprite sheet and add the sprite images to the sheet.
    * <p>
    * If images is null, the images urls are parsed from the json.
-   * 
+   *
    * @param image Image to associate with each {@link SpriteImage}, or null to parse from the json
    * @param sheet Sprite to store the {@link SpritesImage}s
    * @param json json to parse
