@@ -14,7 +14,7 @@
   <packaging>war</packaging>
 
   <properties>
-    <gwt.module>playn.sample.payments.PaymentsDemoHtml</gwt.module>
+    <gwt.module>playn.sample.payments.PaymentsDemo</gwt.module>
     <gwt.name>paymentsdemo</gwt.name>
   </properties>
 
@@ -41,6 +41,12 @@
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-payments-server</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>allen_sauer</groupId>
+      <artifactId>gwt-log</artifactId>
+      <version>3.1.4</version>
     </dependency>
 
     <dependency>

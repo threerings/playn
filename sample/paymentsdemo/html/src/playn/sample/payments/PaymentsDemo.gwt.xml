@@ -11,11 +11,11 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
 -->
-<module rename-to='paymentsdemo>
+<module rename-to='paymentsdemo'>
   <inherits name='playn.payments.Payments'/>
-  
+
   <inherits name="playn.logging.Enhanced" />
   <set-property name="log_DivLogger" value="ENABLED" />
   <set-property name="log_ConsoleLogger" value="DISABLED" />
