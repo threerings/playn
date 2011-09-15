@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>playn.sample.payments</groupId>
-    <artifactId>paymentsdemo</artifactId>
+    <groupId>com.googlecode.playn</groupId>
+    <artifactId>playn-paymentsdemo</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>paymentsdemo-core</artifactId>
-  <name>paymentsdemo-core</name>
+  <artifactId>playn-paymentsdemo-core</artifactId>
+  <name>PlayN Payments Demo Core</name>
+
+  <properties>
+    <exec.mainClass>playn.sample.payments.java.PaymentsDemoJava</exec.mainClass>
+  </properties>
 
   <dependencies>
     <dependency>

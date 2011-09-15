@@ -1,5 +1,5 @@
 <!--
- * Copyright 2010 The PlayN Authors
+ * Copyright 2011 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
 -->
-<module rename-to='paymentsdemogame'>
-  <inherits name='playn.payments.Payments'/>
-  
-  <inherits name="playn.logging.Enhanced" />
-  <set-property name="log_DivLogger" value="ENABLED" />
-  <set-property name="log_ConsoleLogger" value="DISABLED" />
-
-  <source path='core'/>
-  <source path='html'/>
-
-  <public path="resources" />
-
-  <entry-point class='playn.sample.payments.html.PaymentsDemoGameHtml'/>
-</module>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PaymentsDemo</title>
+  </head>
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script type="text/javascript">
+    google.load('payments', '1.0', {
+      'packages': ['sandbox_config']
+    });
+  </script>
+  <body bgcolor="black">
+    <script src="paymentsdemo/paymentsdemo.nocache.js"></script>
+  </body>
+</html>

@@ -30,7 +30,7 @@ import playn.payments.core.InAppPayments.PurchaseRequest;
 import playn.payments.core.InAppPayments.PurchaseResponse;
 import playn.payments.core.InAppPaymentsFactory;
 
-public class PaymentsDemoGame implements Game {
+public class PaymentsDemo implements Game {
 
   private static String purchaseJWT = null;
   private InAppPayments inappPayments = InAppPaymentsFactory.payments();
