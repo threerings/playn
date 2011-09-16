@@ -82,7 +82,8 @@ public class TextDemo extends Demo {
       "And wrapped manually at newlines.\nLike this.";
     TextLayout layout = graphics().layoutText(
       text, new TextFormat().withFont(font).withWrapWidth(200).
-                             withEffect(TextFormat.Effect.shadow(0x33000000, -2, -2)));
+                             withEffect(TextFormat.Effect.shadow(0x33000000, -2, -2)).
+                             withTextColor(0xFF660000));
     Layer layer = createTextLayer(layout);
     layer.setTranslation(xpos, ypos);
     base.add(layer);
@@ -92,7 +93,8 @@ public class TextDemo extends Demo {
     text = "Wrapped text can be center-justified, if so desired.";
     layout = graphics().layoutText(
       text, new TextFormat().withFont(font).withWrapping(200, TextFormat.Alignment.CENTER).
-                             withEffect(TextFormat.Effect.shadow(0x33000000, 2, 2)));
+                             withEffect(TextFormat.Effect.shadow(0x33000000, 2, 2)).
+                             withTextColor(0xFF006600));
     layer = createTextLayer(layout);
     layer.setTranslation(xpos, ypos);
     base.add(layer);
@@ -102,7 +104,8 @@ public class TextDemo extends Demo {
     text = "Or it can be flush to the right, if that's how you like to justify yourself.";
     layout = graphics().layoutText(
       text, new TextFormat().withFont(font).withWrapping(200, TextFormat.Alignment.RIGHT).
-                             withEffect(TextFormat.Effect.outline(0xFFFFFFFF)));
+                             withEffect(TextFormat.Effect.outline(0xFFFFFFFF)).
+                             withTextColor(0xFF000066));
     layer = createTextLayer(layout);
     layer.setTranslation(xpos, ypos);
     base.add(layer);
