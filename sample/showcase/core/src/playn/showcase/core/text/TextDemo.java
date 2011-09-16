@@ -18,8 +18,8 @@ package playn.showcase.core.text;
 import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
 import playn.core.Layer;
-import playn.core.SurfaceLayer;
 import playn.core.GroupLayer;
+import playn.core.ImageLayer;
 import playn.core.Font;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
@@ -47,11 +47,12 @@ public class TextDemo extends Demo {
     bgtile.canvas().setStrokeColor(0xFFFFFFFF);
     bgtile.canvas().strokeRect(0, 0, 64, 64);
 
-    SurfaceLayer bgsurf = graphics().createSurfaceLayer(graphics().width(), graphics().height());
-    bgsurf.surface().setFillPattern(graphics().createPattern(bgtile));
-    bgsurf.surface().fillRect(0, 0, graphics().width(), graphics().height());
-    // TODO: I think bgsurf.surface().clear() should also work, but doesn't
-    base.add(bgsurf);
+    ImageLayer bg = graphics().createImageLayer(bgtile);
+    bg.setRepeatX(true);
+    bg.setRepeatY(true);
+    bg.setWidth(graphics().width());
+    bg.setHeight(graphics().height());
+    base.add(bg);
 
     // add some text to said soothing background
     final float MARGIN = 10;
