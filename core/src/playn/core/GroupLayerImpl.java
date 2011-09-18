@@ -16,38 +16,42 @@
 
 package playn.core;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.ListIterator;
 
 /**
  * Provides implementations for per-platform concrete {@link GroupLayer}s. Because of single
  * inheritance (and lack of traits) we have to delegate this implementation rather than provide an
  * abstract base class.
  */
+// TODO(pdr): write a custom LinkedList implementation with an auxiliary hash table for
+//            O(1) Layer->ListIterator operations. This will let us early-out in depthChanged
+//            if the depth doesn't actually change.
 public class GroupLayerImpl<L extends AbstractLayer>
 {
   /** This group's children. */
-  public List<L> children = new ArrayList<L>();
-
+  public List<L> children = new LinkedList<L>();
+  
   /**
    * @return the index into the children array at which the layer was inserted (based on depth).
    */
   public int add(GroupLayer self, L child) {
+    int index = 0;
+
     // check whether the last child has the same depth as this child, in which case append this
     // child to our list; this is a fast path for when all children have the same depth
-    int count = children.size(), index;
-    if (count == 0 || children.get(count-1).depth() == child.depth()) {
-      index = count;
+    if (children.isEmpty() || ((LinkedList<L>)children).getLast().depth() <= child.depth()) {
+      index = children.size();
+      children.add(child);
     } else {
-      // otherwise find the appropriate insertion point via binary search
-      index = findInsertion(child.depth());
+      index = orderedAdd(child);
     }
 
     // remove the child from any existing parent, preventing multiple parents
     if (child.parent() != null) {
       child.parent().remove(child);
     }
-    children.add(index, child);
     child.setParent(self);
     child.onAdd();
     return index;
@@ -65,12 +69,10 @@ public class GroupLayerImpl<L extends AbstractLayer>
   }
 
   public void remove(GroupLayer self, L child) {
-    int index = findChild(child, child.depth());
-    if (index < 0) {
+    if (!children.remove(child)) {
       throw new UnsupportedOperationException(
-        "Could not remove Layer because it is not a child of the GroupLayer");
+          "Could not remove Layer because it is not a child of the GroupLayer");
     }
-    remove(index);
   }
 
   // TODO: remove this when GroupLayer.remove(int) is removed
@@ -80,7 +82,7 @@ public class GroupLayerImpl<L extends AbstractLayer>
 
   public void clear(GroupLayer self) {
     while (!children.isEmpty()) {
-      remove(children.size() - 1);
+      remove(0);
     }
   }
 
@@ -114,13 +116,8 @@ public class GroupLayerImpl<L extends AbstractLayer>
     // making AbstractLayer and ParentLayer more complex than is worth it
     @SuppressWarnings("unchecked") L child = (L)layer;
 
-    // it would be great if we could move an element from one place in an ArrayList to another
-    // (portably), but instead we have to remove and re-add
-    int oldIndex = findChild(child, oldDepth);
-    children.remove(oldIndex);
-    int newIndex = findInsertion(child.depth());
-    children.add(newIndex, child);
-    return newIndex;
+    children.remove(child);
+    return orderedAdd(child);
   }
 
   private void remove(int index) {
@@ -129,47 +126,23 @@ public class GroupLayerImpl<L extends AbstractLayer>
     child.setParent(null);
   }
 
-  // uses depth to improve upon a full linear search
-  private int findChild(L child, float depth) {
-    // findInsertion will find us some element with the same depth as the to-be-removed child
-    int startIdx = findInsertion(depth);
-    // search down for our child
-    for (int ii = startIdx-1; ii >= 0; ii--) {
-      L c = children.get(ii);
-      if (c == child) {
-        return ii;
-      }
-      if (c.depth() != depth) {
-        break;
-      }
-    }
-    // search up for our child
-    for (int ii = startIdx, ll = children.size(); ii < ll; ii++) {
-      L c = children.get(ii);
-      if (c == child) {
-        return ii;
-      }
-      if (c.depth() != depth) {
-        break;
-      }
-    }
-    return -1;
-  }
+  /**
+   * Insert the child in the ordered linked list, returning the position it was added at.
+   */
+  private int orderedAdd(L child) {
+    float childDepth = child.depth();
+    int index = 0;
 
-  // who says you never have to write binary search?
-  private int findInsertion(float depth) {
-    int low = 0, high = children.size()-1;
-    while (low <= high) {
-      int mid = (low + high) >>> 1;
-      float midDepth = children.get(mid).depth();
-      if (depth > midDepth) {
-        low = mid + 1;
-      } else if (depth < midDepth) {
-        high = mid - 1;
-      } else {
-        return mid;
+    ListIterator<L> iter = children.listIterator();
+    while (iter.hasNext()) {
+      if (childDepth <= iter.next().depth()) {
+        iter.previous();
+        break;
       }
+      index++;
     }
-    return low;
+    iter.add(child);
+
+    return index;
   }
 }
