@@ -14,7 +14,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>core</module> 
+    <module>core</module>
     <module>html</module>
     <module>flash</module>
     <module>android</module>

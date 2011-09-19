@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -58,7 +58,7 @@ public class PeaWorld implements ContactListener {
 
   private static boolean showDebugDraw = false;
   private DebugDrawBox2D debugDraw;
-  
+
   public PeaWorld(GroupLayer scaledLayer) {
     staticLayerBack = graphics().createGroupLayer();
     scaledLayer.add(staticLayerBack);
@@ -66,7 +66,7 @@ public class PeaWorld implements ContactListener {
     scaledLayer.add(dynamicLayer);
     staticLayerFront = graphics().createGroupLayer();
     scaledLayer.add(staticLayerFront);
-    
+
     // create the physics world
     Vec2 gravity = new Vec2(0.0f, 10.0f);
     world = new World(gravity, true);
@@ -138,11 +138,11 @@ public class PeaWorld implements ContactListener {
   public void processContacts() {
     while (!contacts.isEmpty()) {
       Contact contact = contacts.pop();
-      
+
       // handle collision
       PhysicsEntity entityA = bodyEntityLUT.get(contact.m_fixtureA.m_body);
       PhysicsEntity entityB = bodyEntityLUT.get(contact.m_fixtureB.m_body);
-      
+
       if (entityA != null && entityB != null) {
         if (entityA instanceof PhysicsEntity.HasContactListener) {
           ((PhysicsEntity.HasContactListener) entityA).contact(entityB);
