@@ -16,6 +16,13 @@
     <exec.mainClass>playn.showcase.java.ShowcaseJava</exec.mainClass>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>sonatype-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
@@ -27,6 +34,12 @@
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-java</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.threerings</groupId>
+      <artifactId>tripleplay</artifactId>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
