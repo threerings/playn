@@ -16,6 +16,7 @@
 
 package playn.core;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -34,7 +35,7 @@ public class GroupLayerImpl<L extends AbstractLayer>
    */
   public int add(GroupLayer self, L child) {
     // if this child has equal or greater depth to the last child, we can append directly and avoid
-    // a log(N) search; this is helpful when all children have the same depth
+    // a log(N) search; this is helpful when adding a Layer to the last index
     int count = children.size(), index;
     if (count == 0 || children.get(count-1).depth() <= child.depth()) {
       index = count;
@@ -47,9 +48,7 @@ public class GroupLayerImpl<L extends AbstractLayer>
     if (child.parent() != null) {
       child.parent().remove(child);
     }
-    children.add(index, child);
-    child.setParent(self);
-    child.onAdd();
+    addChild(self, index, child);
     return index;
   }
 
@@ -59,29 +58,31 @@ public class GroupLayerImpl<L extends AbstractLayer>
     if (child.parent() != null) {
       child.parent().remove(child);
     }
-    children.add(index, child);
-    child.setParent(self);
-    child.onAdd();
+    addChild(self, index, child);
   }
 
   public void remove(GroupLayer self, L child) {
-    int index = findChild(child, child.depth());
-    if (index < 0) {
+    int index = child.parentIndex();
+    if (index < 0 || child.parent() != self) {
       throw new UnsupportedOperationException(
         "Could not remove Layer because it is not a child of the GroupLayer");
     }
-    remove(index);
+    removeChild(self, index);
   }
 
   // TODO: remove this when GroupLayer.remove(int) is removed
   public void remove(GroupLayer self, int index) {
-    remove(index);
+    removeChild(self, index);
   }
 
   public void clear(GroupLayer self) {
-    while (!children.isEmpty()) {
-      remove(children.size() - 1);
+    for (int i = children.size() - 1; i >= 0; i--) {
+      L child = children.get(i);
+      child.onRemove();
+      child.setParent(null);
+      child.setParentIndex(-1);
     }
+    children.clear();
   }
 
   public void destroy(GroupLayer self) {
@@ -114,57 +115,51 @@ public class GroupLayerImpl<L extends AbstractLayer>
     // making AbstractLayer and ParentLayer more complex than is worth it
     @SuppressWarnings("unchecked") L child = (L)layer;
 
-    // locate the child whose depth changed
-    int oldIndex = findChild(child, oldDepth);
-
-    // fast path for depth changes that don't change ordering
+    int oldIndex = child.parentIndex();
     float newDepth = child.depth();
-    boolean leftCorrect = (oldIndex == 0 || children.get(oldIndex-1).depth() <= newDepth);
-    boolean rightCorrect = (oldIndex == children.size()-1 ||
-                            children.get(oldIndex+1).depth() >= newDepth);
-    if (leftCorrect && rightCorrect) {
-      return oldIndex;
+    int size = children.size();
+    boolean ascending = (newDepth > oldDepth);
+    int nextIndex = oldIndex;
+
+    // swap children until we reach one end of the array or find the correct location for the child
+    while ((ascending && ++nextIndex < size) || (!ascending && --nextIndex >= 0)) {
+      child = children.get(nextIndex);
+      if ((ascending && child.depth > newDepth) || (!ascending && child.depth < newDepth))
+        break;
+      Collections.swap(children, oldIndex, nextIndex);
+      children.get(oldIndex).setParentIndex(oldIndex);
+      oldIndex = nextIndex;
     }
 
-    // it would be great if we could move an element from one place in an ArrayList to another
-    // (portably), but instead we have to remove and re-add
-    children.remove(oldIndex);
-    int newIndex = findInsertion(newDepth);
-    children.add(newIndex, child);
-    return newIndex;
+    children.get(oldIndex).setParentIndex(oldIndex);
+
+    return oldIndex;
   }
 
-  private void remove(int index) {
+  /**
+   * Add a child to children and update each child's parentIndex.
+   */
+  private void addChild(GroupLayer self, int index, L child) {
+    children.add(index, child);
+    for (int i = children.size() - 1; i > index; i--) {
+      children.get(i).setParentIndex(i);
+    }
+    child.setParent(self);
+    child.setParentIndex(index);
+    child.onAdd();
+  }
+
+  /**
+   * Remove a child from children and update each child's parentIndex.
+   */
+  private void removeChild(GroupLayer self, int index) {
     L child = children.remove(index);
+    for (int i = children.size() - 1; i >= index; index--) {
+      children.get(i).setParentIndex(i);
+    }
     child.onRemove();
     child.setParent(null);
-  }
-
-  // uses depth to improve upon a full linear search
-  private int findChild(L child, float depth) {
-    // findInsertion will find us some element with the same depth as the to-be-removed child
-    int startIdx = findInsertion(depth);
-    // search down for our child
-    for (int ii = startIdx-1; ii >= 0; ii--) {
-      L c = children.get(ii);
-      if (c == child) {
-        return ii;
-      }
-      if (c.depth() != depth) {
-        break;
-      }
-    }
-    // search up for our child
-    for (int ii = startIdx, ll = children.size(); ii < ll; ii++) {
-      L c = children.get(ii);
-      if (c == child) {
-        return ii;
-      }
-      if (c.depth() != depth) {
-        break;
-      }
-    }
-    return -1;
+    child.setParentIndex(-1);
   }
 
   // who says you never have to write binary search?

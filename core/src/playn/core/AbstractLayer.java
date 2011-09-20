@@ -36,6 +36,7 @@ public abstract class AbstractLayer implements Layer {
   }
 
   private GroupLayer parent;
+  private int parentIndex;
 
   protected InternalTransform transform;
   protected float originX, originY;
@@ -46,6 +47,7 @@ public abstract class AbstractLayer implements Layer {
   protected AbstractLayer() {
     transform = createTransform();
     alpha = 1;
+    parentIndex = -1;
     setFlag(Flag.VISIBLE, true);
   }
 
@@ -177,5 +179,19 @@ public abstract class AbstractLayer implements Layer {
 
   protected InternalTransform createTransform() {
     return new StockInternalTransform();
+  }
+
+  /**
+   * Return the index of this {@link Layer} in its {@link AbstractLayer#parent()}'s array.
+   */
+  protected int parentIndex() {
+    return parentIndex;
+  }
+
+  /**
+   * Set the index of this {@link Layer} in its {@link AbstractLayer#parent()}'s array.
+   */
+  protected void setParentIndex(int index) {
+    parentIndex = index;
   }
 }
