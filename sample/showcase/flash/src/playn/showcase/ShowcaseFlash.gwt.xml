@@ -17,6 +17,8 @@
   <inherits name='playn.PlayNFlash'/>
   <!-- for the peas sample -->
   <inherits name="org.jbox2d.GwtBox2D" />
+  <!-- for the menu UI -->
+  <inherits name='tripleplay.TriplePlay'/>
 
   <source path='core'/>
   <source path='flash'/>
