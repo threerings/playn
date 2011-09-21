@@ -24,6 +24,7 @@ import playn.core.Net;
 import playn.core.Pointer;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
+import playn.core.util.Callback;
 
 public class CuteGame implements Game, Keyboard.Listener {
 
@@ -65,7 +66,7 @@ public class CuteGame implements Game, Keyboard.Listener {
     // TODO(jgw): Until net is filled in everywhere, create a simple grass world.
 
     /*
-    platform().net().get("/rpc?map", new Net.Callback() {
+    platform().net().get("/rpc?map", new Callback<String>() {
       @Override
       public void success(String json) {
         DataObject data = platform().parseData(json);
@@ -309,7 +310,7 @@ public class CuteGame implements Game, Keyboard.Listener {
   }
 
   private void post(String payload) {
-    net().post("/rpc", payload, new Net.Callback() {
+    net().post("/rpc", payload, new Callback<String>() {
       @Override
       public void success(String response) {
         // Nada.
