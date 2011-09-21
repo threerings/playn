@@ -68,14 +68,14 @@ public class CuteGame implements Game, Keyboard.Listener {
     /*
     platform().net().get("/rpc?map", new Callback<String>() {
       @Override
-      public void success(String json) {
+      public void onSuccess(String json) {
         DataObject data = platform().parseData(json);
         world = new CuteWorld(plat, data);
         initStuff();
       }
 
       @Override
-      public void failure(Throwable error) {
+      public void onFailure(Throwable error) {
         platform().log("error loading map");
       }
     });
@@ -312,12 +312,12 @@ public class CuteGame implements Game, Keyboard.Listener {
   private void post(String payload) {
     net().post("/rpc", payload, new Callback<String>() {
       @Override
-      public void success(String response) {
+      public void onSuccess(String response) {
         // Nada.
       }
 
       @Override
-      public void failure(Throwable error) {
+      public void onFailure(Throwable error) {
         // TODO
       }
     });
