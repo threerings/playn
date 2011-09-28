@@ -48,6 +48,10 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
+        <!-- we need class metadata, override PlayN's disabling of such -->
+        <configuration>
+          <disableClassMetadata>false</disableClassMetadata>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-eclipse-plugin</artifactId>
