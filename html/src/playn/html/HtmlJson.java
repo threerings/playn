@@ -200,24 +200,8 @@ class HtmlJson implements Json {
       return this[index];
     }-*/;
 
-    public final TypedArray<Boolean> getBooleanArray(int index) {
-      return asBooleanArray(getArray(index));
-    }
-
-    public final TypedArray<Integer> getIntArray(int index) {
-      return asIntArray(getArray(index));
-    }
-
-    public final TypedArray<Double> getNumberArray(int index) {
-      return asNumberArray(getArray(index));
-    }
-
-    public final TypedArray<String> getStringArray(int index) {
-      return asStringArray(getArray(index));
-    }
-
-    public final TypedArray<Object> getObjectArray(int index) {
-      return asObjectArray(getArray(index));
+    public final <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
+      return asTypedArray(getArray(index), arrayType);
     }
 
     @Override
@@ -263,28 +247,8 @@ class HtmlJson implements Json {
     }-*/;
 
     @Override
-    public final TypedArray<Boolean> getBooleanArray(String key) {
-      return asBooleanArray(getArray(key));
-    }
-
-    @Override
-    public final TypedArray<Integer> getIntArray(String key) {
-      return asIntArray(getArray(key));
-    }
-
-    @Override
-    public final TypedArray<Double> getNumberArray(String key) {
-      return asNumberArray(getArray(key));
-    }
-
-    @Override
-    public final TypedArray<String> getStringArray(String key) {
-      return asStringArray(getArray(key));
-    }
-
-    @Override
-    public final TypedArray<Object> getObjectArray(String key) {
-      return asObjectArray(getArray(key));
+    public final <T> TypedArray<T> getArray(String key, Class<T> arrayType) {
+      return asTypedArray(getArray(key), arrayType);
     }
 
     @Override
@@ -319,8 +283,28 @@ class HtmlJson implements Json {
     return object;
   }
 
+  @SuppressWarnings("unchecked")
+  private static <T> TypedArray<T> asTypedArray(Array jsa, Class<T> type) {
+    if (jsa == null) {
+      return null;
+    } else if (type == Json.Object.class) {
+      return (TypedArray<T>) asObjectArray(jsa);
+    } else if (type == Boolean.class) {
+      return (TypedArray<T>) asBooleanArray(jsa);
+    } else if (type == Integer.class) {
+      return (TypedArray<T>) asIntArray(jsa);
+    } else if (type == Double.class) {
+      return (TypedArray<T>) asNumberArray(jsa);
+    } else if (type == String.class) {
+      return (TypedArray<T>) asStringArray(jsa);
+    } else {
+      throw new IllegalArgumentException("Only json types may be used for TypedArray, not '" +
+        type.getName() + "'");
+    }
+  }
+
   private static TypedArray<Boolean> asBooleanArray(final Array jsa) {
-    return jsa == null ? null : new TypedArray<Boolean>() {
+    return new TypedArray<Boolean>() {
       @Override
       public int length() {
         return jsa.length();
@@ -333,7 +317,7 @@ class HtmlJson implements Json {
   }
 
   private static TypedArray<Integer> asIntArray(final Array jsa) {
-    return jsa == null ? null : new TypedArray<Integer>() {
+    return new TypedArray<Integer>() {
       @Override
       public int length() {
         return jsa.length();
@@ -346,7 +330,7 @@ class HtmlJson implements Json {
   }
 
   private static TypedArray<Double> asNumberArray(final Array jsa) {
-    return jsa == null ? null : new TypedArray<Double>() {
+    return new TypedArray<Double>() {
       @Override
       public int length() {
         return jsa.length();
@@ -359,7 +343,7 @@ class HtmlJson implements Json {
   }
 
   private static TypedArray<String> asStringArray(final Array jsa) {
-    return jsa == null ? null : new TypedArray<String>() {
+    return new TypedArray<String>() {
       @Override
       public int length() {
         return jsa.length();
@@ -372,7 +356,7 @@ class HtmlJson implements Json {
   }
 
   private static TypedArray<Object> asObjectArray(final Array jsa) {
-    return jsa == null ? null : new TypedArray<Object>() {
+    return new TypedArray<Object>() {
       @Override
       public int length() {
         return jsa.length();
