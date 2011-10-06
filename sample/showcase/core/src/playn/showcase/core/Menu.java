@@ -97,7 +97,7 @@ public class Menu extends Demo
 
       int key = 1;
       for (final Demo demo : showcase.demos) {
-        Button button = new Button().setText(key++ + " - " + demo.name());
+        Button button = new Button(key++ + " - " + demo.name());
         buttons.add(button);
         button.clicked().connect(new UnitSlot() {
           public void onEmit() {
