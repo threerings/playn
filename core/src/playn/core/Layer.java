@@ -257,10 +257,7 @@ public interface Layer {
     public static Point screenToLayer(Layer layer, IPoint point, Point into) {
       Layer parent = layer.parent();
       IPoint cur = (parent == null) ? point : screenToLayer(parent, point, into);
-      into = layer.transform().inverseTransform(cur, into);
-      into.x += layer.originX();
-      into.y += layer.originY();
-      return into;
+      return parentToLayer(layer, cur, into);
     }
 
     /**
@@ -268,8 +265,20 @@ public interface Layer {
      * relative to the specified layer.
      */
     public static Point screenToLayer(Layer layer, float x, float y) {
-      Point into = new Point(x, y);
-      return screenToLayer(layer, into.set(x, y), into);
+        Point into = new Point(x, y);
+        return screenToLayer(layer, into, into);
+    }
+
+    /**
+     * Converts the supplied point from coordinates relative to its parent
+     * to coordinates relative to the specified layer. The results are stored
+     * into {@code into}, which is returned for convenience.
+     */
+    public static Point parentToLayer(Layer layer, IPoint point, Point into) {
+      into = layer.transform().inverseTransform(point, into);
+      into.x += layer.originX();
+      into.y += layer.originY();
+      return into;
     }
 
     /**
@@ -290,8 +299,7 @@ public interface Layer {
      * Returns true if a coordinate on the screen touches a {@link Layer.HasSize}.
      */
     public static boolean hitTest(Layer.HasSize layer, float x, float y) {
-      Point point = new Point(x, y);
-      screenToLayer(layer, point, point);
+      Point point = screenToLayer(layer, x, y);
       return (
           point.x() >= 0 &&  point.y() >= 0 &&
           point.x() <= layer.width() && point.y() <= layer.height());
