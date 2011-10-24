@@ -15,12 +15,15 @@
  */
 package playn.sample.cute.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static playn.core.PlayN.*;
+import playn.core.Key;
 
 import playn.core.Game;
 import playn.core.Json;
 import playn.core.Keyboard;
-import playn.core.Net;
 import playn.core.Pointer;
 import playn.core.Surface;
 import playn.core.SurfaceLayer;
@@ -29,6 +32,16 @@ import playn.core.util.Callback;
 public class CuteGame implements Game, Keyboard.Listener {
 
   private static final int NUM_STARS = 10;
+
+  private static Map<Key, Integer> ADD_TILE_KEYS = new HashMap<Key, Integer>();
+  static {
+    int idx = 0;
+    for (Key key : new Key[] {
+        Key.K1, Key.K2, Key.K3, Key.K4, Key.K5, Key.K6, Key.K7, Key.K8,
+        Key.W, Key.D, Key.S, Key.A, Key.T, Key.Y, Key.H, Key.N, Key.B, Key.V, Key.F, Key.R }) {
+      ADD_TILE_KEYS.put(key, idx++);
+    }
+  }
 
   private SurfaceLayer gameLayer;
 
@@ -133,92 +146,52 @@ public class CuteGame implements Game, Keyboard.Listener {
 
   @Override
   public void onKeyDown(Keyboard.Event event) {
-    switch (event.keyCode()) {
-      case Keyboard.KEY_SPACE:
+    Integer tileIdx = ADD_TILE_KEYS.get(event.key());
+    if (tileIdx != null) {
+      addTile((int) catGirl.x, (int) catGirl.y, tileIdx);
+      return;
+    }
+
+    switch (event.key()) {
+      case SPACE:
         controlJump = true;
         break;
-
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-        addTile((int) catGirl.x, (int) catGirl.y, event.keyCode() - '1');
-        break;
-
-      case 'W':
-        addTile((int) catGirl.x, (int) catGirl.y, 8);
-        break;
-      case 'D':
-        addTile((int) catGirl.x, (int) catGirl.y, 9);
-        break;
-      case 'S':
-        addTile((int) catGirl.x, (int) catGirl.y, 10);
-        break;
-      case 'A':
-        addTile((int) catGirl.x, (int) catGirl.y, 11);
-        break;
-
-      case 'T':
-        addTile((int) catGirl.x, (int) catGirl.y, 12);
-        break;
-      case 'Y':
-        addTile((int) catGirl.x, (int) catGirl.y, 13);
-        break;
-      case 'H':
-        addTile((int) catGirl.x, (int) catGirl.y, 14);
-        break;
-      case 'N':
-        addTile((int) catGirl.x, (int) catGirl.y, 15);
-        break;
-      case 'B':
-        addTile((int) catGirl.x, (int) catGirl.y, 16);
-        break;
-      case 'V':
-        addTile((int) catGirl.x, (int) catGirl.y, 17);
-        break;
-      case 'F':
-        addTile((int) catGirl.x, (int) catGirl.y, 18);
-        break;
-      case 'R':
-        addTile((int) catGirl.x, (int) catGirl.y, 19);
-        break;
-
-      case Keyboard.KEY_ESC:
+      case ESCAPE:
         removeTopTile((int) catGirl.x, (int) catGirl.y);
         break;
-
-      case Keyboard.KEY_LEFT:
+      case LEFT:
         controlLeft = true;
         break;
-      case Keyboard.KEY_UP:
+      case UP:
         controlUp = true;
         break;
-      case Keyboard.KEY_RIGHT:
+      case RIGHT:
         controlRight = true;
         break;
-      case Keyboard.KEY_DOWN:
+      case DOWN:
         controlDown = true;
         break;
     }
   }
 
   @Override
+  public void onKeyTyped(Keyboard.TypedEvent event) {
+    // nada
+  }
+
+  @Override
   public void onKeyUp(Keyboard.Event event) {
-    switch (event.keyCode()) {
-      case Keyboard.KEY_LEFT:
+    switch (event.key()) {
+      case LEFT:
         controlLeft = false;
         break;
-      case Keyboard.KEY_UP:
+      case UP:
         controlUp = false;
         break;
-      case Keyboard.KEY_RIGHT:
+      case RIGHT:
         controlRight = false;
         break;
-      case Keyboard.KEY_DOWN:
+      case DOWN:
         controlDown = false;
         break;
     }
