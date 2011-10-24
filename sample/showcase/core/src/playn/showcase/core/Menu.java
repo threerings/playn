@@ -17,6 +17,7 @@ package playn.showcase.core;
 
 import playn.core.CanvasLayer;
 import playn.core.GroupLayer;
+import playn.core.Key;
 import playn.core.Keyboard;
 import playn.core.Platform;
 
@@ -42,9 +43,8 @@ public class Menu extends Demo
 {
   private final Keyboard.Listener keyListener = new Keyboard.Adapter() {
     public void onKeyDown(Keyboard.Event event) {
-      // TODO: use proper key codes
-      int keyCode = event.keyCode();
-      int demoIndex = keyCode - '1';
+      // this is a bit hacky, but serves our purpose
+      int demoIndex = event.key().ordinal() - Key.K0.ordinal();
       if (demoIndex >= 0 && demoIndex < showcase.demos.size()) {
         showcase.activateDemo(showcase.demos.get(demoIndex));
       }
@@ -93,7 +93,7 @@ public class Menu extends Demo
       Group buttons;
       root.add(new Label("PlayN Demos:"),
                buttons = new Group(AxisLayout.vertical().offStretch()),
-               new Label("ESC key returns to menu from demo"));
+               new Label("ESC/BACK key returns to menu from demo"));
 
       int key = 1;
       for (final Demo demo : showcase.demos) {
@@ -126,7 +126,8 @@ public class Menu extends Demo
         ypos += 25;
       }
       ypos += 25;
-      bg.canvas().drawText("Press # key to run demo, ESC key returns to menu from demo", 25, ypos);
+      bg.canvas().drawText(
+        "Press # key to run demo, ESC/BACK key returns to menu from demo", 25, ypos);
     }
   }
 
