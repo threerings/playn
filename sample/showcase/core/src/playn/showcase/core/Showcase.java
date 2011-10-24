@@ -16,9 +16,12 @@
 package playn.showcase.core;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import playn.core.Game;
+import playn.core.Key;
 import playn.core.Keyboard;
 import playn.core.PlayN;
 
@@ -33,6 +36,7 @@ import playn.showcase.core.text.TextDemo;
  */
 public class Showcase implements Game
 {
+  private Set<Key> backKeys = EnumSet.of(Key.ESCAPE, Key.BACK);
   private Demo activeDemo;
   private Demo menuDemo = new Menu(this);
 
@@ -57,8 +61,8 @@ public class Showcase implements Game
   public void init() {
     PlayN.keyboard().setListener(new Keyboard.Adapter() {
       public void onKeyDown(Keyboard.Event event) {
-        if (event.keyCode() == Keyboard.KEY_ESC) {
-          activateDemo(menuDemo);
+        if (backKeys.contains(event.key())) {
+            activateDemo(menuDemo);
         } else {
           Keyboard.Listener delegate = activeDemo.keyboardListener();
           if (delegate != null) {
