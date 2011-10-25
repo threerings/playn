@@ -86,8 +86,8 @@
             <configuration>
               <tasks>
                 <!-- Dependency plugin discards file permissions so we need to set them manually -->
-                <chmod file="${project.build.directory}/flex4sdk/bin/mxmlc" perm="ugo+rx"/>
-	     </tasks>
+                <chmod file="${flexsdk.dir}/bin/mxmlc" perm="ugo+rx"/>
+              </tasks>
             </configuration>
           </execution>
         </executions>
@@ -96,9 +96,9 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-	<configuration>
-	  <extraJvmArgs>-Dflexsdk.home=${flexsdk.dir}</extraJvmArgs>
-	</configuration>
+        <configuration>
+          <extraJvmArgs>-Dflexsdk.home=${flexsdk.dir}</extraJvmArgs>
+        </configuration>
       </plugin>
 
       <plugin>
