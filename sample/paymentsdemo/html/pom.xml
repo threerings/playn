@@ -44,9 +44,9 @@
     </dependency>
 
     <dependency>
-      <groupId>allen_sauer</groupId>
+      <groupId>com.allen-sauer.gwt.log</groupId>
       <artifactId>gwt-log</artifactId>
-      <version>3.1.4</version>
+      <version>3.1.6</version>
     </dependency>
 
     <dependency>
