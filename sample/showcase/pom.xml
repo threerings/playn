@@ -16,7 +16,9 @@
   <modules>
     <module>core</module>
     <module>html</module>
+<!--
     <module>flash</module>
+-->
     <module>android</module>
   </modules>
 </project>
