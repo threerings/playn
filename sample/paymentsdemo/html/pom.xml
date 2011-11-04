@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-paymentsdemo</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>playn-paymentsdemo-html</artifactId>
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>com.googlecode.playn</groupId>
       <artifactId>playn-paymentsdemo-core</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
