@@ -44,7 +44,7 @@ public class Menu extends Demo
   private final Keyboard.Listener keyListener = new Keyboard.Adapter() {
     public void onKeyDown(Keyboard.Event event) {
       // this is a bit hacky, but serves our purpose
-      int demoIndex = event.key().ordinal() - Key.K0.ordinal();
+      int demoIndex = event.key().ordinal() - Key.K1.ordinal();
       if (demoIndex >= 0 && demoIndex < showcase.demos.size()) {
         showcase.activateDemo(showcase.demos.get(demoIndex));
       }
