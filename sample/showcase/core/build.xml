@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<project name="showcase" default="compile">
-  <property name="java.classname" value="playn.showcase.java.ShowcaseJava"/>
-  <property name="html.classname" value="playn.showcase.Showcase"/>
-  <property name="html.index" value="Showcase.html"/>
-  <import file="../../build-common.xml"/>
-</project>
