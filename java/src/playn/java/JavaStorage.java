@@ -29,7 +29,8 @@ import playn.core.Storage;
  * TODO(pdr): probably want better handling on where the file is stored
  */
 class JavaStorage implements Storage {
-  private static String tempFile = System.getProperty("java.io.tmpdir") + "playn.tmp";
+  private static String tempDir = System.getProperty("java.io.tmpdir");
+  private static String tempFile = "playn.tmp";
   private boolean isPersisted = false; // false by default
   private Properties properties;
 
@@ -61,7 +62,7 @@ class JavaStorage implements Storage {
 
   private void maybePersistProperties(Properties properties) {
     try {
-      properties.store(new FileOutputStream(tempFile), null);
+      properties.store(new FileOutputStream(new File(tempDir, tempFile)), null);
       isPersisted = true;
     } catch (Exception e) {
       PlayN.log().info("Error persisting properties: " + e.getMessage());
@@ -73,7 +74,7 @@ class JavaStorage implements Storage {
     Properties properties = new Properties();
     if (new File(tempFile).exists()) {
       try {
-        properties.load(new FileInputStream(tempFile));
+        properties.load(new FileInputStream(new File(tempDir, tempFile)));
         isPersisted = true;
       } catch(Exception e) {
         PlayN.log().info("Error retrieving file: " + e.getMessage());
