@@ -140,6 +140,7 @@ public class Vec3 {
 		return new Vec3(this);
 	}
 	
+	@Override
 	public String toString() {
 		return "(" + x + "," + y + "," + z + ")";
 	}

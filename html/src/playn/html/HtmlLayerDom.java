@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -86,6 +86,7 @@ class HtmlLayerDom extends AbstractLayer {
     elem.getStyle().setDisplay(visible ? Display.BLOCK : Display.NONE);
   }
 
+  @Override
   public void setOrigin(float x, float y) {
     super.setOrigin(x, y);
   }
@@ -128,8 +129,11 @@ class HtmlLayerDom extends AbstractLayer {
     elem.getStyle().setProperty(transformName, matrix);
   }
 
-  @Override protected InternalTransform createTransform() {
-    return new HtmlInternalTransform();
+  @Override
+  protected InternalTransform createTransform() {
+    // only use HtmlInternalTransform on browsers that support typed arrays
+    return HtmlPlatform.hasTypedArraySupport ?
+      new HtmlInternalTransform() : super.createTransform();
   }
 
   private String xlate(float x) {

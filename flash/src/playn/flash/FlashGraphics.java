@@ -1,11 +1,11 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -19,9 +19,10 @@ import flash.display.StageScaleMode;
 import flash.display.Sprite;
 
 import playn.core.Asserts;
-import playn.core.PlayN;
 import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
+import playn.core.Font;
+import playn.core.PlayN;
 import playn.core.Gradient;
 import playn.core.Graphics;
 import playn.core.GroupLayer;
@@ -30,6 +31,8 @@ import playn.core.ImageLayer;
 import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.SurfaceLayer;
+import playn.core.TextFormat;
+import playn.core.TextLayout;
 
 class FlashGraphics implements Graphics {
 
@@ -44,13 +47,13 @@ class FlashGraphics implements Graphics {
     int b = (color >> 0) & 0xff;
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
   }
-  
+
 
   protected FlashGraphics() {
     rootLayer = FlashGroupLayer.getRoot();
     setSize (screenWidth(), screenHeight());
     Sprite.getRootSprite().getStage().setScaleMode(StageScaleMode.EXACT_FIT);
-    PlayN.log().info("Graphics System Initialized: Dimensions (" 
+    PlayN.log().info("Graphics System Initialized: Dimensions ("
         + screenWidth() + " x " + screenHeight() + ")");
   }
 
@@ -62,7 +65,7 @@ class FlashGraphics implements Graphics {
 
   @Override
   public CanvasLayer createCanvasLayer(int width, int height) {
-    return new FlashCanvasLayer(width, height);  
+    return new FlashCanvasLayer(width, height);
   }
 
   @Override
@@ -110,6 +113,16 @@ class FlashGraphics implements Graphics {
     Asserts.checkArgument(colors.length == positions.length);
 
     return new FlashGradient();
+  }
+
+  @Override
+  public Font createFont(String name, Font.Style style, float size) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public TextLayout layoutText(String text, TextFormat format) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

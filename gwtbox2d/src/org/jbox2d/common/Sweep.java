@@ -66,7 +66,8 @@ public class Sweep {
 	/** World angles */
 	public float a0, a;
 	
-	public String toString() {
+	@Override
+  public String toString() {
 		String s = "Sweep:\nlocalCenter: " + localCenter + "\n";
 		s += "c0: " + c0 + ", c: " + c + "\n";
 		s += "a0: " + a0 + ", a: " + a + "\n";
@@ -99,7 +100,7 @@ public class Sweep {
 	 * 
 	 * @param xf
 	 *            the result is placed here - must not be null
-	 * @param t
+	 * @param alpha
 	 *            the normalized time in [0,1].
 	 */
 	public final void getTransform(final Transform xf, final float alpha) {

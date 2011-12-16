@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -28,30 +28,41 @@ class FlashMouse implements Mouse {
   FlashMouse() {
     // Mouse handlers.
     FlashPlatform.captureEvent(Sprite.MOUSEDOWN, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
-        evt.preventDefault();
+      @Override
+      public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseDown(
-            new ButtonEvent.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY(),
-                                 getMouseButton(evt)));
+          ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(),
+              nativeEvent.getStageX(), nativeEvent.getStageY(), getMouseButton(nativeEvent));
+          listener.onMouseDown(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEUP, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
+      @Override
+      public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseUp(
-            new ButtonEvent.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY(),
-                // TODO: fix to handle release of right button / middle button
-                                 Mouse.BUTTON_LEFT));
+          ButtonEvent.Impl event = new ButtonEvent.Impl(PlayN.currentTime(),
+              nativeEvent.getStageX(), nativeEvent.getStageY(), getMouseButton(nativeEvent));
+          listener.onMouseUp(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEMOVE, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
+      @Override
+      public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseMove(
-            new MotionEvent.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY()));
+          MotionEvent.Impl event = new MotionEvent.Impl(PlayN.currentTime(),
+              nativeEvent.getStageX(), nativeEvent.getStageY());
+          listener.onMouseMove(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
@@ -64,7 +75,7 @@ class FlashMouse implements Mouse {
 
   /**
    * Return the {@link Mouse} button given a {@link MouseEvent}
-   * 
+   *
    * @param e MouseEvent
    * @return {@link Mouse} button corresponding to the event
    */

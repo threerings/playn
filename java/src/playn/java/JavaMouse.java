@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -31,50 +31,80 @@ class JavaMouse implements Mouse {
 
   JavaMouse(JComponent frame) {
     frame.addMouseMotionListener(new MouseMotionListener() {
-      public void mouseDragged(MouseEvent e) {
+      @Override
+      public void mouseDragged(MouseEvent nativeEvent) {
         // mouseMoved(MouseEvent) does not fire when dragged
         if (listener != null) {
-          listener.onMouseMove(new MotionEvent.Impl(e.getWhen(), e.getX(), e.getY()));
+          MotionEvent.Impl event = new MotionEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY());
+          listener.onMouseMove(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
 
-      public void mouseMoved(MouseEvent e) {
+      @Override
+      public void mouseMoved(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseMove(new MotionEvent.Impl(e.getWhen(), e.getX(), e.getY()));
+          MotionEvent.Impl event = new MotionEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY());
+          listener.onMouseMove(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
     });
 
     frame.addMouseListener(new MouseListener() {
+      @Override
       public void mouseClicked(MouseEvent e) {
       }
 
+      @Override
       public void mouseEntered(MouseEvent e) {
       }
 
+      @Override
       public void mouseExited(MouseEvent e) {
       }
 
-      public void mousePressed(MouseEvent e) {
+      @Override
+      public void mousePressed(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseDown(
-            new ButtonEvent.Impl(e.getWhen(), e.getX(), e.getY(), getMouseButton(e)));
+          ButtonEvent.Impl event = new ButtonEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY(), getMouseButton(nativeEvent));
+          listener.onMouseDown(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
 
-      public void mouseReleased(MouseEvent e) {
+      @Override
+      public void mouseReleased(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseUp(
-            new ButtonEvent.Impl(e.getWhen(), e.getX(), e.getY(), getMouseButton(e)));
+          ButtonEvent.Impl event = new ButtonEvent.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY(), getMouseButton(nativeEvent));
+          listener.onMouseUp(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
     });
 
     frame.addMouseWheelListener(new MouseWheelListener() {
       @Override
-      public void mouseWheelMoved(MouseWheelEvent e) {
+      public void mouseWheelMoved(MouseWheelEvent nativeEvent) {
         if (listener != null) {
-          listener.onMouseWheelScroll(new WheelEvent.Impl(e.getWhen(), e.getWheelRotation()));
+          WheelEvent.Impl event = new WheelEvent.Impl(nativeEvent.getWhen(),
+              nativeEvent.getWheelRotation());
+          listener.onMouseWheelScroll(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
     });
@@ -87,7 +117,7 @@ class JavaMouse implements Mouse {
 
   /**
    * Return the {@link Mouse} button given a {@link MouseEvent}
-   * 
+   *
    * @param e MouseEvent
    * @return {@link Mouse} button corresponding to the event
    */

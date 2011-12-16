@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -29,30 +29,44 @@ class FlashPointer implements Pointer {
   FlashPointer() {
     // Mouse handlers.
     FlashPlatform.captureEvent(Sprite.MOUSEDOWN, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
-        evt.preventDefault();  
+      @Override
+      public void handleEvent(MouseEvent nativeEvent) {
         mouseDown = true;
         if (listener != null) {
-          listener.onPointerStart(
-            new Event.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY()));
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
+              nativeEvent.getStageY());
+          listener.onPointerStart(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEUP, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
+      @Override
+      public void handleEvent(MouseEvent nativeEvent) {
         mouseDown = false;
         if (listener != null) {
-          listener.onPointerEnd(
-            new Event.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY()));
+          Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
+              nativeEvent.getStageY());
+          listener.onPointerEnd(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.preventDefault();
+          }
         }
       }
     });
     FlashPlatform.captureEvent(Sprite.MOUSEMOVE, new EventHandler<MouseEvent>() {
-      public void handleEvent(MouseEvent evt) {
+      @Override
+      public void handleEvent(MouseEvent nativeEvent) {
         if (listener != null) {
           if (mouseDown) {
-            listener.onPointerDrag(
-              new Event.Impl(PlayN.currentTime(), evt.getStageX(), evt.getStageY()));
+            Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
+                nativeEvent.getStageY());
+            listener.onPointerDrag(event);
+            if (event.getPreventDefault()) {
+              nativeEvent.preventDefault();
+            }
           }
         }
       }

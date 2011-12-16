@@ -11,12 +11,14 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package playn.java;
 
 import playn.core.Asserts;
+import playn.core.CanvasImage;
 import playn.core.CanvasLayer;
+import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.Graphics;
 import playn.core.GroupLayer;
@@ -24,8 +26,9 @@ import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Path;
 import playn.core.Pattern;
-import playn.core.CanvasImage;
 import playn.core.SurfaceLayer;
+import playn.core.TextFormat;
+import playn.core.TextLayout;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -99,6 +102,16 @@ class JavaGraphics implements Graphics {
   @Override
   public Gradient createRadialGradient(float x, float y, float r, int[] colors, float[] positions) {
     return JavaGradient.createRadial(x, y, r, positions, colors);
+  }
+
+  @Override
+  public Font createFont(String name, Font.Style style, float size) {
+    return new JavaFont(name, style, size);
+  }
+
+  @Override
+  public TextLayout layoutText(String text, TextFormat format) {
+    return new JavaTextLayout(frame, text, format);
   }
 
   @Override

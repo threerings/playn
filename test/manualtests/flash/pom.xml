@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-manualtests</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>playn-manualtests-flash</artifactId>
@@ -48,7 +48,7 @@
         <artifactId>maven-war-plugin</artifactId>
         <version>2.1.1</version>
         <configuration>
-          <webXml>war/WEB-INF/web.xml</webXml>
+          <warSourceDirectory>war</warSourceDirectory>
         </configuration>
       </plugin>
 
@@ -56,7 +56,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.2</version>
         <executions>
           <execution>
             <id>unpack</id>
@@ -92,7 +91,7 @@
             <configuration>
               <tasks>
                 <!-- Dependency plugin discards file permissions so we need to set them manually -->
-                <chmod file="${project.build.directory}/flex4sdk/bin/mxmlc" perm="ugo+rx"/>
+                <chmod file="${flexsdk.dir}/bin/mxmlc" perm="ugo+rx"/>
 	     </tasks>
             </configuration>
           </execution>

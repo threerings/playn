@@ -45,10 +45,10 @@ class FlashSound implements Sound {
      * @param volume
      */
     public native void setVolume(float volume) /*-{
-      this.soundTransform.volume = volume;     
-    }-*/;  
+      this.soundTransform.volume = volume;
+    }-*/;
   }
-  
+
   @FlashImport({"flash.net.URLRequest", "flash.media.Sound"})
   final static class NativeSound extends JavaScriptObject {
 
@@ -103,7 +103,7 @@ class FlashSound implements Sound {
     if (soundChannel != null) {
       soundChannel.setVolume(volume);
     }
-    
+
   }
 
   /* (non-Javadoc)
@@ -114,6 +114,7 @@ class FlashSound implements Sound {
     soundChannel = sound.play(looping);
     isPlaying = true;
     soundChannel.addEventListener(SoundChannel.SOUND_COMPLETE, new EventHandler<Event>() {
+      @Override
       public void handleEvent(Event evt) {
         isPlaying = false;
       }

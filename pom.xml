@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
   <groupId>com.googlecode.playn</groupId>
   <artifactId>playn-project</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <name>PlayN Project</name>
   <url>http://code.google.com/p/playn</url>
   <description>Cross platform game library for N≥4 platforms.</description>
@@ -15,7 +20,14 @@
     <url>http://code.google.com/p/playn/issues/list</url>
   </issueManagement>
 
+  <scm>
+    <connection>scm:git:https://code.google.com/p/playn/</connection>
+    <developerConnection>scm:git:https://code.google.com/p/playn/</developerConnection>
+    <url>http://code.google.com/p/playn/</url>
+  </scm>
+
   <modules>
+    <module>archetype</module>
     <module>core</module>
     <module>gwtbox2d</module>
     <module>webgl</module>
@@ -24,22 +36,33 @@
     <module>flash</module>
     <module>android</module>
     <module>server</module>
-    <module>sample</module>
+    <module>payments</module>
     <module>test</module>
   </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <android.version>2.3.3</android.version>
-    <gwt.version>2.3.0</gwt.version>
+    <android.maven.version>3.0.0-alpha-13</android.maven.version>
+    <gae.version>1.6.0</gae.version>
+    <!--
+      App Engine server side log levels:
+      SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST
+    -->
+    <gae.loglevel>INFO</gae.loglevel>
+    <gwt.version>2.4.0</gwt.version>
+    <!--
+      GWT log levels:
+      ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
+    -->
     <gwt.loglevel>INFO</gwt.loglevel>
-    <gwt.outputstyle>OBF</gwt.outputstyle>
+    <gwt.outputstyle>PRETTY</gwt.outputstyle>
     <gwt.modulesuffix />
     <gwt.inplace>false</gwt.inplace>
     <gwt.soyc>false</gwt.soyc>
     <gwt.xdisable>true</gwt.xdisable>
     <gwt.draft>false</gwt.draft>
-    <gwt.workers></gwt.workers>
+    <gwt.workers />
     <maven.test.skip>false</maven.test.skip>
   </properties>
 
@@ -75,18 +98,19 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>gwt-maven-plugin</artifactId>
-          <version>2.3.0-1</version>
+          <version>2.4.0</version>
           <configuration>
-            <logLevel>INFO' -XdisableRunAsync -logLevel 'INFO</logLevel>
-            <style>PRETTY</style>
+            <logLevel>${gwt.loglevel}</logLevel>
+            <style>${gwt.outputstyle}</style>
             <runTarget>${gwt.module}${gwt.modulesuffix}/index.html</runTarget>
             <hostedWebapp>${project.build.directory}/www</hostedWebapp>
             <draftCompile>${gwt.draft}</draftCompile>
             <disableCastChecking>${gwt.xdisable}</disableCastChecking>
             <disableClassMetadata>${gwt.xdisable}</disableClassMetadata>
+            <disableRunAsync>true</disableRunAsync>
             <soyc>${gwt.soyc}</soyc>
             <localWorkers>${gwt.workers}</localWorkers>
-            <extraJvmArgs>-Xmx256m -Dgwt.args="-XdisableRunAsync"</extraJvmArgs>
+            <extraJvmArgs>-Xmx256m</extraJvmArgs>
             <modules>
               <module>${gwt.module}</module>
             </modules>
@@ -145,6 +169,78 @@
             <target>1.6</target>
           </configuration>
         </plugin>
+
+        <!-- this shuts m2eclipse up about the maven-antrun plugin -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <versionRange>[1.3,)</versionRange>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[2.0,)</versionRange>
+                    <goals>
+                      <goal>unpack</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>
+                      com.jayway.maven.plugins.android.generation2
+                    </groupId>
+                    <artifactId>
+                      android-maven-plugin
+                    </artifactId>
+                    <versionRange>
+                      [3.0.0-alpha-13,)
+                    </versionRange>
+                    <goals>
+                      <goal>generate-sources</goal>
+                      <goal>unpack</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <versionRange>[1.0,)</versionRange>
+                    <goals>
+                      <goal>enforce</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -180,6 +276,61 @@
         </dependency>
       </dependencies>
     </profile>
-  </profiles>
 
+    <!-- allows testing of HTML backend via: mvn test -Ptest-html -->
+    <profile>
+      <id>test-html</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>8.0.0.v20110901</version>
+            <configuration>
+              <webApp>
+                ${project.basedir}/html/target/${project.artifactId}-html-${project.version}
+              </webApp>
+            </configuration>
+            <executions>
+              <execution>
+                <id>test-html</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>run-exploded</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- allows testing of Flash backend via: mvn test -Ptest-flash -->
+    <profile>
+      <id>test-flash</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>8.0.0.v20110901</version>
+            <configuration>
+              <webApp>
+                ${project.basedir}/flash/target/${project.artifactId}-flash-${project.version}
+              </webApp>
+            </configuration>
+            <executions>
+              <execution>
+                <id>test-flash</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>run-exploded</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

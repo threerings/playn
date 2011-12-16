@@ -111,7 +111,8 @@ public class PolygonShape extends Shape {
 		m_centroid.setZero();
 	}
 	
-	public final Shape clone() {
+	@Override
+  public final Shape clone() {
 		PolygonShape shape = new PolygonShape();
 		shape.m_centroid.set(this.m_centroid);
 		for (int i = 0; i < shape.m_normals.length; i++) {
@@ -330,7 +331,7 @@ public class PolygonShape extends Shape {
 	}
 	
 	/**
-	 * @see Shape#computeAABB(AABB, Transform, int)
+	 * @see Shape#computeAABB(AABB, Transform)
 	 */
 	@Override
 	public final void computeAABB(final AABB argAabb, final Transform argXf) {
@@ -535,8 +536,7 @@ public class PolygonShape extends Shape {
 
 	
 	/**
-	 * @see org.jbox2d.collision.shapes.Shape#raycast(org.jbox2d.collision.RayCastOutput,
-	 *      org.jbox2d.collision.RayCastInput, org.jbox2d.common.Transform, int)
+	 * @see org.jbox2d.collision.shapes.Shape#raycast(RayCastOutput, RayCastInput, Transform)
 	 */
 	@Override
 	public final boolean raycast(RayCastOutput argOutput, RayCastInput argInput, Transform argXf) {
@@ -707,9 +707,10 @@ public class PolygonShape extends Shape {
 	}
 	
 	/**
-	 * @see Shape#computeMass(MassData)
+	 * @see Shape#computeMass(MassData, float)
 	 */
-	public void computeMass(final MassData massData, float density) {
+	@Override
+  public void computeMass(final MassData massData, float density) {
 		// Polygon mass, centroid, and inertia.
 		// Let rho be the polygon density in mass per unit area.
 		// Then:

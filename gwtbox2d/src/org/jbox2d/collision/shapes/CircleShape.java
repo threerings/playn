@@ -78,7 +78,6 @@ public class CircleShape extends Shape {
 	 * 
 	 * @see Body#createShape(ShapeDef)
 	 * @see CircleDef
-	 * @param def
 	 */
 	public CircleShape() {
 		m_type = ShapeType.CIRCLE;
@@ -86,7 +85,8 @@ public class CircleShape extends Shape {
 		m_radius = 0;
 	}
 	
-	public final Shape clone() {
+	@Override
+  public final Shape clone() {
 		CircleShape shape = new CircleShape();
 		shape.m_p.set(m_p);
 		shape.m_radius = m_radius;
@@ -152,8 +152,7 @@ public class CircleShape extends Shape {
 	// norm(x) = radius
 	
 	/**
-	 * @see Shape#raycast(org.jbox2d.collision.RayCastOutput,
-	 *      org.jbox2d.collision.RayCastInput, org.jbox2d.common.Transform, int)
+	 * @see Shape#raycast(RayCastOutput, RayCastInput, Transform)
 	 */
 	@Override
 	public final boolean raycast(RayCastOutput argOutput, RayCastInput argInput, Transform argTransform) {
@@ -196,7 +195,7 @@ public class CircleShape extends Shape {
 	
 	/**
 	 * @see org.jbox2d.collision.shapes.Shape#computeAABB(org.jbox2d.collision.AABB,
-	 *      org.jbox2d.common.Transform, int)
+	 *      org.jbox2d.common.Transform)
 	 */
 	@Override
 	public final void computeAABB(final AABB argAabb, final Transform argTransform) {

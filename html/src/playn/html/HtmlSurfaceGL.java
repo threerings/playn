@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -48,20 +48,22 @@ class HtmlSurfaceGL implements Surface {
   }
 
   @Override
-  public void clear() {
+  public Surface clear() {
     gfx.bindFramebuffer(fbuf, width, height);
 
     gfx.gl.clearColor(0, 0, 0, 0);
     gfx.gl.clear(COLOR_BUFFER_BIT);
+    return this;
   }
 
   @Override
-  public void drawImage(Image image, float x, float y) {
+  public Surface drawImage(Image image, float x, float y) {
     drawImage(image, x, y, image.width(), image.height());
+    return this;
   }
 
   @Override
-  public void drawImage(Image image, float x, float y, float dw, float dh) {
+  public Surface drawImage(Image image, float x, float y, float dw, float dh) {
     gfx.bindFramebuffer(fbuf, width, height);
 
     Asserts.checkArgument(image instanceof HtmlImage);
@@ -74,10 +76,11 @@ class HtmlSurfaceGL implements Surface {
             false, 1);
       }
     }
+    return this;
   }
 
   @Override
-  public void drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy,
+  public Surface drawImage(Image image, float dx, float dy, float dw, float dh, float sx, float sy,
       float sw, float sh) {
     gfx.bindFramebuffer(fbuf, width, height);
 
@@ -91,14 +94,17 @@ class HtmlSurfaceGL implements Surface {
             sw, sh, 1);
       }
     }
-  }
-
-  public void drawImageCentered(Image img, float x, float y) {
-    drawImage(img, x - img.width()/2, y - img.height()/2);
+    return this;
   }
 
   @Override
-  public void drawLine(float x0, float y0, float x1, float y1, float width) {
+  public Surface drawImageCentered(Image img, float x, float y) {
+    drawImage(img, x - img.width()/2, y - img.height()/2);
+    return this;
+  }
+
+  @Override
+  public Surface drawLine(float x0, float y0, float x1, float y1, float width) {
     gfx.bindFramebuffer(fbuf, this.width, this.height);
 
     float dx = x1 - x0, dy = y1 - y0;
@@ -112,10 +118,11 @@ class HtmlSurfaceGL implements Surface {
     pos[4] = x1 + dy; pos[5] = y1 - dx;
     pos[6] = x0 + dy; pos[7] = y0 - dx;
     gfx.fillPoly(topTransform(), pos, fillColor, 1);
+    return this;
   }
 
   @Override
-  public void fillRect(float x, float y, float width, float height) {
+  public Surface fillRect(float x, float y, float width, float height) {
     gfx.bindFramebuffer(fbuf, this.width, this.height);
 
     if (fillPattern != null) {
@@ -125,6 +132,7 @@ class HtmlSurfaceGL implements Surface {
     } else {
       gfx.fillRect(topTransform(), x, y, width, height, fillColor, 1);
     }
+    return this;
   }
 
   @Override
@@ -133,54 +141,64 @@ class HtmlSurfaceGL implements Surface {
   }
 
   @Override
-  public void restore() {
+  public Surface restore() {
     Asserts.checkState(transformStack.size() > 1, "Unbalanced save/restore");
     transformStack.remove(transformStack.size() - 1);
+    return this;
   }
 
   @Override
-  public void rotate(float angle) {
+  public Surface rotate(float angle) {
     float sr = (float) Math.sin(angle);
     float cr = (float) Math.cos(angle);
     transform(cr, sr, -sr, cr, 0, 0);
+    return this;
   }
 
   @Override
-  public void save() {
+  public Surface save() {
     transformStack.add(new HtmlInternalTransform().set(topTransform()));
+    return this;
   }
 
   @Override
-  public void scale(float sx, float sy) {
+  public Surface scale(float sx, float sy) {
     topTransform().scale(sx, sy);
+    return this;
   }
 
   @Override
-  public void setTransform(float m00, float m01, float m10, float m11, float tx, float ty) {
+  public Surface setTransform(float m00, float m01, float m10, float m11, float tx, float ty) {
     topTransform().setTransform(m00, m01, m10, m11, tx, ty);
+    return this;
   }
 
-  public void setFillColor(int color) {
+  @Override
+  public Surface setFillColor(int color) {
     // TODO: Add it to the state stack.
     this.fillColor = color;
     this.fillPattern = null;
+    return this;
   }
 
   @Override
-  public void setFillPattern(Pattern pattern) {
+  public Surface setFillPattern(Pattern pattern) {
     // TODO: Add it to the state stack.
     Asserts.checkArgument(pattern instanceof HtmlPattern);
     this.fillPattern = (HtmlPattern) pattern;
+    return this;
   }
 
   @Override
-  public void transform(float m00, float m01, float m10, float m11, float tx, float ty) {
+  public Surface transform(float m00, float m01, float m10, float m11, float tx, float ty) {
     topTransform().concatenate(m00, m01, m10, m11, tx, ty, 0, 0);
+    return this;
   }
 
   @Override
-  public void translate(float x, float y) {
+  public Surface translate(float x, float y) {
     topTransform().translate(x, y);
+    return this;
   }
 
   @Override

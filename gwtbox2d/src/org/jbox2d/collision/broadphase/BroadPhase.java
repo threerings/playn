@@ -101,7 +101,7 @@ public class BroadPhase implements TreeCallback {
 	/**
 	 * Destroy a proxy. It is up to the client to remove any pairs.
 	 * 
-	 * @param proxyId
+	 * @param proxy
 	 */
 	public final void destroyProxy(DynamicTreeNode proxy) {
 		unbufferMove(proxy);
@@ -279,7 +279,8 @@ public class BroadPhase implements TreeCallback {
 	/**
 	 * This is called from DynamicTree::query when we are gathering pairs.
 	 */
-	public final boolean treeCallback(DynamicTreeNode proxy) {
+	@Override
+  public final boolean treeCallback(DynamicTreeNode proxy) {
 		
 		// log.debug("Got a proxy back");
 		// A proxy cannot form a pair with itself.

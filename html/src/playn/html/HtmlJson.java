@@ -11,7 +11,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package playn.html;
 
@@ -21,6 +21,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 import playn.core.Asserts;
 import playn.core.Json;
+import playn.core.TypedArrayBuilder;
 
 class HtmlJson implements Json {
 
@@ -31,65 +32,74 @@ class HtmlJson implements Json {
     private ArrayList<Boolean> isFirstValueStack = new ArrayList<Boolean>();
 
     @Override
-    public void array() {
+    public Writer array() {
       maybePrependKey();
       sb.append("[");
       pushInArray(true);
       pushIsFirstValue(true);
+      return this;
     }
 
     @Override
-    public void endArray() {
+    public Writer endArray() {
       sb.append("]");
       popInArray();
       popIsFirstValue();
+      return this;
     }
 
     @Override
-    public void endObject() {
+    public Writer endObject() {
       sb.append("}");
       popInArray();
       popIsFirstValue();
+      return this;
     }
 
     @Override
-    public void key(String key) {
+    public Writer key(String key) {
       Asserts.checkState(this.key == null);
       this.key = key;
+      return this;
     }
 
     @Override
-    public void object() {
+    public Writer object() {
       maybePrependKey(true);
       sb.append("{");
       pushInArray(false);
       pushIsFirstValue(true);
+      return this;
     }
 
     @Override
-    public void value(boolean x) {
+    public Writer value(boolean x) {
       maybePrependKey();
       sb.append(x);
+      return this;
     }
 
     @Override
-    public void value(double x) {
+    public Writer value(double x) {
       maybePrependKey();
       sb.append(x);
+      return this;
     }
 
     @Override
-    public void value(int x) {
+    public Writer value(int x) {
       maybePrependKey();
       sb.append(x);
+      return this;
     }
 
     @Override
-    public void value(String x) {
+    public Writer value(String x) {
       maybePrependKey();
       sb.append("\"");
       sb.append(x);
       sb.append("\"");
+      return this;
     }
 
     @Override
@@ -103,7 +113,7 @@ class HtmlJson implements Json {
 
     /**
      * Prepend the key if not in an array.
-     * 
+     *
      * Note: if this isn't the first key, we output a leading comma as well.
      */
     private void maybePrependKey(boolean isObject) {
@@ -192,6 +202,11 @@ class HtmlJson implements Json {
     }-*/;
 
     @Override
+    public final <T> TypedArray<T> getArray(int index, Class<T> arrayType) {
+      return arrayBuilder.build(getArray(index), arrayType);
+    }
+
+    @Override
     public final native int length() /*-{
       return this.length;
     }-*/;
@@ -232,9 +247,23 @@ class HtmlJson implements Json {
     public final native String getString(String key) /*-{
       return this[key];
     }-*/;
-    
+
     @Override
-    public final native Array getKeys() /*-{
+    public final <T> TypedArray<T> getArray(String key, Class<T> arrayType) {
+      return arrayBuilder.build(getArray(key), arrayType);
+    }
+
+    @Override
+    public final native boolean containsKey(String key) /*-{
+      return this.hasOwnProperty(key);
+    }-*/;
+
+    @Override
+    public final TypedArray<String> getKeys() {
+      return arrayBuilder.build(getNativeKeys(), String.class);
+    }
+
+    private final native Array getNativeKeys() /*-{
       if (Object.prototype.keys) { return this.keys(); }
       var keys = [];
       for (var key in this) if (this.hasOwnProperty(key)) {
@@ -242,12 +271,8 @@ class HtmlJson implements Json {
       }
       return keys;
     }-*/;
-    
-  }
 
-  private static native JavaScriptObject jsonParse(String json) /*-{
-    return JSON.parse(json);
-  }-*/;
+  }
 
   @Override
   public Writer newWriter() {
@@ -259,4 +284,35 @@ class HtmlJson implements Json {
     HtmlObject object = jsonParse(json).cast();
     return object;
   }
+
+  private static native JavaScriptObject jsonParse(String json) /*-{
+    return JSON.parse(json);
+  }-*/;
+
+  private static TypedArrayBuilder<Array> arrayBuilder = new TypedArrayBuilder<Array>() {
+    @Override
+    public int length(Array array) {
+      return array.length();
+    }
+    @Override
+    public Json.Object getObject(Array array, int index) {
+      return array.getObject(index);
+    }
+    @Override
+    public Boolean getBoolean(Array array, int index) {
+      return array.getBoolean(index);
+    }
+    @Override
+    public Integer getInt(Array array, int index) {
+      return array.getInt(index);
+    }
+    @Override
+    public Double getNumber(Array array, int index) {
+      return array.getNumber(index);
+    }
+    @Override
+    public String getString(Array array, int index) {
+      return array.getString(index);
+    }
+  };
 }

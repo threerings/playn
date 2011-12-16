@@ -37,7 +37,6 @@ import playn.core.Mouse;
 import playn.core.Touch;
 import playn.core.Storage;
 import playn.core.RegularExpression;
-import playn.core.Platform.Type;
 
 public class JavaPlatform implements Platform {
   // Maximum delta time to consider between update() calls (in milliseconds). If the delta between
@@ -144,7 +143,7 @@ public class JavaPlatform implements Platform {
   public Analytics analytics() {
     return analytics;
   }
-  
+
   @Override
   public JavaAssetManager assetManager() {
     return assetManager;
@@ -168,7 +167,7 @@ public class JavaPlatform implements Platform {
   public double time() {
     return System.currentTimeMillis();
   }
-  
+
   @Override
   public Type type() {
     return Type.JAVA;
@@ -261,7 +260,7 @@ public class JavaPlatform implements Platform {
 
   /**
    * Sets the title of the window.
-   * 
+   *
    * @param title the window title
    */
   public void setTitle(String title) {

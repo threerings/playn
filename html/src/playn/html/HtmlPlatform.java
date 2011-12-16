@@ -43,16 +43,19 @@ public class HtmlPlatform implements Platform {
   /** Used by {@link #register(Mode)}. */
   public static enum Mode {
     WEBGL {
+      @Override
       public boolean useGL() {
         return true;
       }
     },
     CANVAS {
+      @Override
       public boolean useGL() {
         return false;
       }
     },
     AUTODETECT {
+      @Override
       public boolean useGL() {
         return shouldUseGL();
       }
@@ -61,8 +64,24 @@ public class HtmlPlatform implements Platform {
     public abstract boolean useGL();
   }
 
+  /** Returned by {@link #agentInfo}. */
+  public static class AgentInfo extends JavaScriptObject {
+    public final native boolean isFirefox() /*-{ return this.isFirefox; }-*/;
+    public final native boolean isChrome() /*-{ return this.isChrome; }-*/;
+    public final native boolean isSafari() /*-{ return this.isSafari; }-*/;
+    public final native boolean isOpera() /*-{ return this.isOpera; }-*/;
+    public final native boolean isIE() /*-{ return this.isIE; }-*/;
+    public final native boolean isMacOS() /*-{ return this.isMacOS; }-*/;
+    public final native boolean isLinux() /*-{ return this.isLinux; }-*/;
+    public final native boolean isWindows() /*-{ return this.isWindows; }-*/;
+    protected AgentInfo() {}
+  }
+
   static final int DEFAULT_WIDTH = 640;
   static final int DEFAULT_HEIGHT = 480;
+
+  /** Indicates whether this browser supports JavaScript typed arrays. */
+  static final boolean hasTypedArraySupport = hasTypedArraySupport();
 
   private static final int LOG_FREQ = 2500;
   private static final float MAX_DELTA = 100;
@@ -104,7 +123,7 @@ public class HtmlPlatform implements Platform {
 
   /** Contains precomputed information on the user-agent. Useful for dealing with browser and OS
    * behavioral differences. */
-  static JavaScriptObject agentInfo() {
+  static AgentInfo agentInfo() {
     return agentInfo;
   }
 
@@ -126,7 +145,7 @@ public class HtmlPlatform implements Platform {
   private TimerCallback paintCallback;
   private TimerCallback updateCallback;
 
-  private static JavaScriptObject agentInfo = computeAgentInfo();
+  private static AgentInfo agentInfo = computeAgentInfo();
 
   // Non-instantiable.
   private HtmlPlatform(Mode mode) {
@@ -280,7 +299,7 @@ public class HtmlPlatform implements Platform {
   public double time() {
     return Duration.currentTimeMillis();
   }
-  
+
   @Override
   public Type type() {
     return Type.HTML;
@@ -318,7 +337,7 @@ public class HtmlPlatform implements Platform {
     }, ms);
   }-*/;
 
-  private static native JavaScriptObject computeAgentInfo() /*-{
+  private static native AgentInfo computeAgentInfo() /*-{
     var userAgent = navigator.userAgent.toLowerCase();
     return {
       // browser type flags
@@ -326,6 +345,7 @@ public class HtmlPlatform implements Platform {
       isChrome: userAgent.indexOf("chrome") != -1,
       isSafari: userAgent.indexOf("safari") != -1,
       isOpera: userAgent.indexOf("opera") != -1,
+      isIE: userAgent.indexOf("msie") != -1,
       // OS type flags
       isMacOS: userAgent.indexOf("mac") != -1,
       isLinux: userAgent.indexOf("linux") != -1,
@@ -406,6 +426,10 @@ public class HtmlPlatform implements Platform {
     return !!$wnd.WebGLRenderingContext &&
       // WebGL is slow on Chrome OSX 10.5
       (!/Chrome/.test(navigator.userAgent) || !/OS X 10_5/.test(navigator.userAgent));
+  }-*/;
+
+  private static native boolean hasTypedArraySupport() /*-{
+    return typeof(Float32Array) != 'undefined';
   }-*/;
 
   private static native void disableRightClickImpl(JavaScriptObject target) /*-{

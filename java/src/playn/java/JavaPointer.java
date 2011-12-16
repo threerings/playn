@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -30,35 +30,57 @@ class JavaPointer implements Pointer {
 
   JavaPointer(JComponent frame) {
     frame.addMouseMotionListener(new MouseMotionListener() {
-      public void mouseDragged(MouseEvent e) {
+      @Override
+      public void mouseDragged(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onPointerDrag(new Event.Impl(e.getWhen(), e.getX(), e.getY()));
+          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY());
+          listener.onPointerDrag(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
 
+      @Override
       public void mouseMoved(MouseEvent e) {
       }
     });
 
     frame.addMouseListener(new MouseListener() {
+      @Override
       public void mouseClicked(MouseEvent e) {
       }
 
+      @Override
       public void mouseEntered(MouseEvent e) {
       }
 
+      @Override
       public void mouseExited(MouseEvent e) {
       }
 
-      public void mousePressed(MouseEvent e) {
+      @Override
+      public void mousePressed(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onPointerStart(new Event.Impl(e.getWhen(), e.getX(), e.getY()));
+          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY());
+          listener.onPointerStart(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
 
-      public void mouseReleased(MouseEvent e) {
+      @Override
+      public void mouseReleased(MouseEvent nativeEvent) {
         if (listener != null) {
-          listener.onPointerEnd(new Event.Impl(e.getWhen(), e.getX(), e.getY()));
+          Event.Impl event = new Event.Impl(nativeEvent.getWhen(), nativeEvent.getX(),
+              nativeEvent.getY());
+          listener.onPointerEnd(event);
+          if (event.getPreventDefault()) {
+            nativeEvent.consume();
+          }
         }
       }
     });

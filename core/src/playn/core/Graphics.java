@@ -1,12 +1,12 @@
 /**
  * Copyright 2010 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -83,6 +83,17 @@ public interface Graphics {
    */
   Gradient createRadialGradient(float x, float y, float r, int colors[],
       float positions[]);
+
+  /**
+   * Creates a font with the specified configuration.
+   */
+  Font createFont(String name, Font.Style style, float size);
+
+  /**
+   * Lays out the supplied text using the specified format. The text may subsequently be rendered
+   * on a canvas via {@link Canvas#drawText(TextLayout)}.
+   */
+  TextLayout layoutText(String text, TextFormat format);
 
   /**
    * Gets the height of the available screen real-estate, in pixels.

@@ -11,11 +11,12 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package playn.java;
 
 import playn.core.Net;
+import playn.core.util.Callback;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +30,8 @@ public class JavaNet implements Net {
 
   private static final int BUF_SIZE = 4096;
 
-  public void get(String urlStr, Callback callback) {
+  @Override
+  public void get(String urlStr, Callback<String> callback) {
     // TODO: Make this non-blocking so that it doesn't differ from the html
     // version's behavior.
     try {
@@ -37,15 +39,16 @@ public class JavaNet implements Net {
       InputStream stream = url.openStream();
       InputStreamReader reader = new InputStreamReader(stream);
 
-      callback.success(readFully(reader));
+      callback.onSuccess(readFully(reader));
     } catch (MalformedURLException e) {
-      callback.failure(e);
+      callback.onFailure(e);
     } catch (IOException e) {
-      callback.failure(e);
+      callback.onFailure(e);
     }
   }
 
-  public void post(String urlStr, String data, Callback callback) {
+  @Override
+  public void post(String urlStr, String data, Callback<String> callback) {
     // TODO: Make this non-blocking so that it doesn't differ from the html
     // version's behavior.
     try {
@@ -60,12 +63,12 @@ public class JavaNet implements Net {
       conn.connect();
       conn.getOutputStream().write(data.getBytes("UTF-8"));
       conn.getOutputStream().close();
-      readFully(new InputStreamReader(conn.getInputStream()));
+      callback.onSuccess(readFully(new InputStreamReader(conn.getInputStream())));
       conn.disconnect();
     } catch (MalformedURLException e) {
-      callback.failure(e);
+      callback.onFailure(e);
     } catch (IOException e) {
-      callback.failure(e);
+      callback.onFailure(e);
     }
   }
 

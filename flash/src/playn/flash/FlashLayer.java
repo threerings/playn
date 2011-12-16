@@ -17,7 +17,6 @@
 package playn.flash;
 
 import flash.display.DisplayObject;
-import flash.display.InteractiveObject;
 import flash.gwt.FlashImport;
 
 import playn.core.AbstractLayer;
@@ -26,7 +25,7 @@ import playn.core.InternalTransform;
 @FlashImport({"flash.display.Sprite"})
 public class FlashLayer extends AbstractLayer {
 
-  
+
   protected final DisplayObject displayObject;
 
   /**
@@ -53,15 +52,15 @@ public class FlashLayer extends AbstractLayer {
   }
 
   /**
-   * 
+   *
    */
   protected void updateChildren() {
     // TODO Auto-generated method stub
-    
+
   }
 
    /**
-   * 
+   *
    */
   private void updateDisplay() {
 //    display().setX((int) originX);

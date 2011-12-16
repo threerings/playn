@@ -16,13 +16,12 @@
 
 package flash.display;
 
-import flash.geom.Rectangle;
 import flash.gwt.FlashImport;
 
 @FlashImport({"flash.display.Shape", "flash.geom.Matrix"})
 final public class Shape extends DisplayObject {
    protected Shape() {}
-   
+
 
    public static native Shape create(int w, int h) /*-{
       var shape =  new flash.display.Shape();
@@ -33,13 +32,13 @@ final public class Shape extends DisplayObject {
 
 
    /**
-    * Specifies the Graphics object that belongs to this sprite where vector 
+    * Specifies the Graphics object that belongs to this sprite where vector
     * drawing commands can occur.
     * @return
     */
    public native Graphics getGraphics() /*-{
      return this.graphics;
    }-*/;
-   
+
 
 }

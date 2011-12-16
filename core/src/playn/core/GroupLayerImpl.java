@@ -1,12 +1,12 @@
 /**
  * Copyright 2011 The PlayN Authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -33,10 +33,10 @@ public class GroupLayerImpl<L extends AbstractLayer>
    * @return the index into the children array at which the layer was inserted (based on depth).
    */
   public int add(GroupLayer self, L child) {
-    // check whether the last child has the same depth as this child, in which case append this
-    // child to our list; this is a fast path for when all children have the same depth
+    // if this child has equal or greater depth to the last child, we can append directly and avoid
+    // a log(N) search; this is helpful when all children have the same depth
     int count = children.size(), index;
-    if (count == 0 || children.get(count-1).depth() == child.depth()) {
+    if (count == 0 || children.get(count-1).depth() <= child.depth()) {
       index = count;
     } else {
       // otherwise find the appropriate insertion point via binary search
@@ -114,11 +114,22 @@ public class GroupLayerImpl<L extends AbstractLayer>
     // making AbstractLayer and ParentLayer more complex than is worth it
     @SuppressWarnings("unchecked") L child = (L)layer;
 
+    // locate the child whose depth changed
+    int oldIndex = findChild(child, oldDepth);
+
+    // fast path for depth changes that don't change ordering
+    float newDepth = child.depth();
+    boolean leftCorrect = (oldIndex == 0 || children.get(oldIndex-1).depth() <= newDepth);
+    boolean rightCorrect = (oldIndex == children.size()-1 ||
+                            children.get(oldIndex+1).depth() >= newDepth);
+    if (leftCorrect && rightCorrect) {
+      return oldIndex;
+    }
+
     // it would be great if we could move an element from one place in an ArrayList to another
     // (portably), but instead we have to remove and re-add
-    int oldIndex = findChild(child, oldDepth);
     children.remove(oldIndex);
-    int newIndex = findInsertion(child.depth());
+    int newIndex = findInsertion(newDepth);
     children.add(newIndex, child);
     return newIndex;
   }

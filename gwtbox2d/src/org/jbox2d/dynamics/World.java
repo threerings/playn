@@ -430,7 +430,7 @@ public class World {
 	 * destroy a joint. This may cause the connected bodies to begin colliding.
 	 * 
 	 * @warning This function is locked during callbacks.
-	 * @param joint
+	 * @param j
 	 */
 	public void destroyJoint(Joint j) {
 		assert (isLocked() == false);
@@ -520,7 +520,7 @@ public class World {
 	 * Take a time step. This performs collision detection, integration,
 	 * and constraint solution.
 	 * 
-	 * @param timeStep
+	 * @param dt
 	 *            the amount of time to simulate, this should not vary.
 	 * @param velocityIterations
 	 *            for the velocity constraint solver.
@@ -582,7 +582,7 @@ public class World {
 	 * call this after each call to Step, unless you are performing sub-steps. By default,
 	 * forces will be automatically cleared, so you don't need to call this function.
 	 * 
-	 * @see setAutoClearForces
+	 * @see #clearForces()
 	 */
 	public void clearForces() {
 		for (Body body = m_bodyList; body != null; body = body.getNext()) {
@@ -1353,7 +1353,8 @@ public class World {
 }
 
 class WorldQueryWrapper implements TreeCallback {
-	public boolean treeCallback(DynamicTreeNode node) {
+	@Override
+  public boolean treeCallback(DynamicTreeNode node) {
 		Fixture fixture = (Fixture) node.userData;
 		return callback.reportFixture(fixture);
 	}
@@ -1369,7 +1370,8 @@ class WorldRayCastWrapper implements TreeRayCastCallback {
 	private final Vec2 temp = new Vec2();
 	private final Vec2 point = new Vec2();
 	
-	public float raycastCallback(RayCastInput input, DynamicTreeNode node) {
+	@Override
+  public float raycastCallback(RayCastInput input, DynamicTreeNode node) {
 		Object userData = node.userData;
 		Fixture fixture = (Fixture) userData;
 		boolean hit = fixture.raycast(output, input);
