@@ -34,7 +34,7 @@ class FlashPointer implements Pointer {
         mouseDown = true;
         if (listener != null) {
           Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
-              nativeEvent.getStageY());
+              nativeEvent.getStageY(), false);
           listener.onPointerStart(event);
           if (event.getPreventDefault()) {
             nativeEvent.preventDefault();
@@ -48,7 +48,7 @@ class FlashPointer implements Pointer {
         mouseDown = false;
         if (listener != null) {
           Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
-              nativeEvent.getStageY());
+              nativeEvent.getStageY(), false);
           listener.onPointerEnd(event);
           if (event.getPreventDefault()) {
             nativeEvent.preventDefault();
@@ -62,7 +62,7 @@ class FlashPointer implements Pointer {
         if (listener != null) {
           if (mouseDown) {
             Event.Impl event = new Event.Impl(PlayN.currentTime(), nativeEvent.getStageX(),
-                nativeEvent.getStageY());
+                nativeEvent.getStageY(), false);
             listener.onPointerDrag(event);
             if (event.getPreventDefault()) {
               nativeEvent.preventDefault();

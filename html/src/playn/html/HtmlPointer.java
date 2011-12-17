@@ -103,7 +103,7 @@ class HtmlPointer extends HtmlInput implements Pointer {
             inDragSequence = true;
 
             Event.Impl event = new Event.Impl(PlayN.currentTime(), getRelativeX(nativeEvent,
-                rootElement), getRelativeY(nativeEvent, rootElement));
+                rootElement), getRelativeY(nativeEvent, rootElement), false);
             listener.onPointerStart(event);
             if (event.getPreventDefault()) {
               nativeEvent.preventDefault();
@@ -120,7 +120,7 @@ class HtmlPointer extends HtmlInput implements Pointer {
             inDragSequence = false;
 
             Event.Impl event = new Event.Impl(PlayN.currentTime(), getRelativeX(nativeEvent,
-                rootElement), getRelativeY(nativeEvent, rootElement));
+                rootElement), getRelativeY(nativeEvent, rootElement), false);
             listener.onPointerEnd(event);
             if (event.getPreventDefault()) {
               nativeEvent.preventDefault();
@@ -135,7 +135,7 @@ class HtmlPointer extends HtmlInput implements Pointer {
         public void handleEvent(NativeEvent nativeEvent) {
           if (listener != null && inDragSequence) {
             Event.Impl event = new Event.Impl(PlayN.currentTime(), getRelativeX(nativeEvent,
-                rootElement), getRelativeY(nativeEvent, rootElement));
+                rootElement), getRelativeY(nativeEvent, rootElement), false);
             listener.onPointerDrag(event);
             if (event.getPreventDefault()) {
               nativeEvent.preventDefault();
@@ -153,7 +153,7 @@ class HtmlPointer extends HtmlInput implements Pointer {
     Event.Impl event;
     float x = touch.getRelativeX(rootElement);
     float y = touch.getRelativeY(rootElement);
-    event = new Event.Impl(PlayN.currentTime(), x, y);
+    event = new Event.Impl(PlayN.currentTime(), x, y, true);
     event.setPreventDefault(true);
     return event;
   }
