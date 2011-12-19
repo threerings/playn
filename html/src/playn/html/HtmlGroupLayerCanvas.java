@@ -94,14 +94,10 @@ class HtmlGroupLayerCanvas extends HtmlLayerCanvas implements GroupLayer, Parent
     if (!visible()) return;
 
     ctx.save();
-    ctx.transform(
-        transform.m00(), transform.m01(), transform.m10(), transform.m11(),
-        transform.tx(), transform.ty());
-
+    transform(ctx);
     for (HtmlLayerCanvas child : impl.children) {
       child.paint(ctx, parentAlpha * alpha);
     }
-
     ctx.restore();
   }
 }

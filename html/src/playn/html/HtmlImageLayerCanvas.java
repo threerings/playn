@@ -15,7 +15,9 @@
  */
 package playn.html;
 
+import com.google.gwt.canvas.dom.client.CanvasPattern;
 import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.canvas.dom.client.Context2d.Repetition;
 
 import playn.core.Asserts;
 import playn.core.Image;
@@ -30,6 +32,9 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
   private boolean repeatX, repeatY;
 
   private HtmlImage img;
+  private CanvasPattern pattern;
+  private boolean patternRepeatX;
+  private boolean patternRepeatY;
 
   public HtmlImageLayerCanvas() {
   }
@@ -131,8 +136,17 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
     if (sourceRectSet) {
       ctx.drawImage(img.img, sx, sy, sw, sh, 0, 0, width, height);
     } else {
-      // TODO(jgw): Find some way to make repeat-x/y work.
-      ctx.drawImage(img.img, 0, 0, width, height);
+      if (repeatX || repeatY) {
+        updatePattern(ctx);
+
+        ctx.save();
+        ctx.setFillStyle(pattern);
+        ctx.rect(0, 0, width, height);
+        ctx.fill();
+        ctx.restore();
+      } else {
+        ctx.drawImage(img.img, 0, 0, width, height);
+      }
     }
 
     ctx.restore();
@@ -166,5 +180,29 @@ class HtmlImageLayerCanvas extends HtmlLayerCanvas implements ImageLayer {
   @Override
   public float scaledHeight() {
     return transform().scaleY() * height();
+  }
+
+  private void updatePattern(Context2d ctx) {
+    if ((repeatX == patternRepeatX) && (repeatY == patternRepeatY)) {
+      return;
+    }
+
+    Repetition repeat;
+    if (repeatX) {
+      if (repeatY) {
+        repeat = Repetition.REPEAT;
+      } else {
+        repeat = Repetition.REPEAT_X;
+      }
+    } else if (repeatY) {
+      repeat = Repetition.REPEAT_Y;
+    } else {
+      pattern = null;
+      return;
+    }
+
+    pattern = ctx.createPattern(img.img, repeat);
+    patternRepeatX = repeatX;
+    patternRepeatY = repeatY;
   }
 }
