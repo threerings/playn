@@ -54,7 +54,7 @@ public abstract class GLContext {
    */
   public void processPending() {
     Pender head;
-    synchronized (penders) {
+    synchronized (penderLock) {
       head = penders;
       penders = null;
     }
