@@ -23,23 +23,23 @@ import com.google.gwt.core.client.JsArrayInteger;
  *
  * Taken from the Khronos TypedArrays Draft Spec as of Aug 30, 2010.
  */
-public class Uint8Array extends ArrayBufferView {
+public class Int16Array extends ArrayBufferView {
 
-  public static final int BYTES_PER_ELEMENT = 1;
+  public static final int BYTES_PER_ELEMENT = 2;
 
   /**
    * @see #create(ArrayBuffer, int, int)
    */
-  public static final native Uint8Array create(ArrayBuffer buffer) /*-{
-    return new Uint8Array(buffer);
+  public static final native Int16Array create(ArrayBuffer buffer) /*-{
+    return new Int16Array(buffer);
   }-*/;
 
   /**
    * @see #create(ArrayBuffer, int, int)
    */
-  public static final native Uint8Array create(ArrayBuffer buffer,
+  public static final native Int16Array create(ArrayBuffer buffer,
       int byteOffset) /*-{
-    return new Uint8Array(buffer, byteOffset);
+    return new Int16Array(buffer, byteOffset);
   }-*/;
 
   /**
@@ -62,9 +62,9 @@ public class Uint8Array extends ArrayBufferView {
    * the byteOffset must be a multiple of the element size of the specific type,
    * or an INDEX_SIZE_ERR exception is raised.
    */
-  public static final native Uint8Array create(ArrayBuffer buffer,
+  public static final native Int16Array create(ArrayBuffer buffer,
       int byteOffset, int length) /*-{
-    return new Uint8Array(buffer, byteOffset, length);
+    return new Int16Array(buffer, byteOffset, length);
   }-*/;
 
   /**
@@ -74,7 +74,7 @@ public class Uint8Array extends ArrayBufferView {
    * given typed array or sequence, with each element converted to the
    * appropriate typed array type.
    */
-  public static final Uint8Array create(int[] data) {
+  public static final Int16Array create(int[] data) {
     return create(ArrayUtils.toJsArray(data));
   }
 
@@ -85,16 +85,16 @@ public class Uint8Array extends ArrayBufferView {
    * given typed array or sequence, with each element converted to the
    * appropriate typed array type.
    */
-  public static final native Uint8Array create(Uint8Array array) /*-{
-    return new Uint8Array(array);
+  public static final native Int16Array create(Int16Array array) /*-{
+    return new Int16Array(array);
   }-*/;
 
   /**
    * Create a new ArrayBuffer with enough bytes to hold length elements of this
    * typed array, then creates a typed array view referring to the full buffer.
    */
-  public static final native Uint8Array create(int size) /*-{
-    return new Uint8Array(size);
+  public static final native Int16Array create(int size) /*-{
+    return new Int16Array(size);
   }-*/;
 
   /**
@@ -104,11 +104,11 @@ public class Uint8Array extends ArrayBufferView {
    * given typed array or sequence, with each element converted to the
    * appropriate typed array type.
    */
-  public static final native Uint8Array create(JsArrayInteger data) /*-{
-    return new Uint8Array(data);
+  public static final native Int16Array create(JsArrayInteger data) /*-{
+    return new Int16Array(data);
   }-*/;
 
-  protected Uint8Array() {
+  protected Int16Array() {
   }
 
   /**
@@ -145,10 +145,10 @@ public class Uint8Array extends ArrayBufferView {
   }
 
   /**
-   * @see #set(Uint8Array, int)
+   * @see #set(Int16Array, int)
    * @param array
    */
-  public native final void set(Uint8Array array) /*-{
+  public native final void set(Int16Array array) /*-{
     this.set(array);
   }-*/;
 
@@ -165,7 +165,7 @@ public class Uint8Array extends ArrayBufferView {
    * If the offset plus the length of the given array is out of range for the
    * current TypedArray, an INDEX_SIZE_ERR exception is raised.
    */
-  public native final void set(Uint8Array array, int offset) /*-{
+  public native final void set(Int16Array array, int offset) /*-{
     this.set(array, offset);
   }-*/;
 
@@ -206,7 +206,7 @@ public class Uint8Array extends ArrayBufferView {
    * The returned TypedArray will be of the same type as the array on which this
    * method is invoked.
    */
-  public final native Uint8Array subarray(int offset, int length) /*-{
+  public final native Int16Array subarray(int offset, int length) /*-{
     return this.subarray(offset, length);
   }-*/;
 }

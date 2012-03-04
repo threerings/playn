@@ -359,9 +359,9 @@ public interface GL20 {
   public void glBlendFuncSeparate(int srcRGB, int dstRGB, int srcAlpha, int dstAlpha)
       throws RuntimeException;
 
-  public void glBufferData(int target, long size, Buffer data, int usage);
+  public void glBufferData(int target, int size, Buffer data, int usage);
 
-  public void glBufferSubData(int target, long offset, long size, Buffer data);
+  public void glBufferSubData(int target, int offset, int size, Buffer data);
 
   public int glCheckFramebufferStatus(int target);
 
@@ -383,25 +383,25 @@ public interface GL20 {
       int height, int border, int imageSize, Buffer data);
 
   public void glCompressedTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, long arg7) throws RuntimeException;
+      int arg6, int arg7) throws RuntimeException;
 
   public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
       int arg6, int arg7, Buffer arg8);
 
   public void glCompressedTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, long arg8) throws RuntimeException;
+      int arg6, int arg7, int arg8) throws RuntimeException;
 
   public void glCompressedTexSubImage2D(int target, int level, int xoffset, int yoffset, int width,
       int height, int format, int imageSize, Buffer data);
 
   public void glCompressedTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, long arg8) throws RuntimeException;
+      int arg6, int arg7, int arg8) throws RuntimeException;
 
   public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
       int arg6, int arg7, int arg8, int arg9, Buffer arg10) throws RuntimeException;
 
   public void glCompressedTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-      int arg6, int arg7, int arg8, int arg9, long arg10) throws RuntimeException;
+      int arg6, int arg7, int arg8, int arg9, int arg10) throws RuntimeException;
 
   public void glCopyTexImage2D(int target, int level, int internalformat, int x, int y, int width,
       int height, int border);
@@ -455,8 +455,6 @@ public interface GL20 {
   public void glDrawArrays(int mode, int first, int count);
 
   public void glDrawElements(int mode, int count, int type, Buffer indices);
-
-  public void glDrawElements(int mode, int count, int type, long offset);
 
   public void glDrawElements(int mode, int count, int type, int offset);
 
@@ -650,7 +648,7 @@ public interface GL20 {
   public void glReadPixels(int x, int y, int width, int height, int format, int type, Buffer pixels);
 
   public void glReadPixels(int x, int y, int width, int height, int format, int type,
-      long pixelsBufferOffset) throws RuntimeException;
+      int pixelsBufferOffset) throws RuntimeException;
 
   public void glReleaseShaderCompiler();
 
@@ -687,13 +685,13 @@ public interface GL20 {
       int border, int format, int type, Buffer pixels);
 
   public void glTexImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, long arg8);
+      int arg7, int arg8);
 
   public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
       int arg7, int arg8, Buffer arg9) throws RuntimeException;
 
   public void glTexImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, int arg8, long arg9) throws RuntimeException;
+      int arg7, int arg8, int arg9) throws RuntimeException;
 
   public void glTexParameterf(int target, int pname, float param);
 
@@ -711,13 +709,13 @@ public interface GL20 {
       int height, int format, int type, Buffer pixels);
 
   public void glTexSubImage2D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, long arg8) throws RuntimeException;
+      int arg7, int arg8) throws RuntimeException;
 
   public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
       int arg7, int arg8, int arg9, Buffer arg10) throws RuntimeException;
 
   public void glTexSubImage3D(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6,
-      int arg7, int arg8, int arg9, long arg10) throws RuntimeException;
+      int arg7, int arg8, int arg9, int arg10) throws RuntimeException;
 
   public void glUniform1f(int location, float x);
 
@@ -814,9 +812,6 @@ public interface GL20 {
 
   public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride,
       Buffer ptr);
-
-  public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride,
-      long ptr);
 
   public void glVertexAttribPointer(int indx, int size, int type, boolean normalized, int stride,
       int ptr);

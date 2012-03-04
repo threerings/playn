@@ -15,7 +15,7 @@
  */
 package com.google.gwt.typedarrays.client;
 
-import com.google.gwt.core.client.JsArrayInteger;
+import com.google.gwt.core.client.JsArrayNumber;
 
 /**
  * The typed array view types represent a view of an ArrayBuffer that allows for
@@ -23,23 +23,23 @@ import com.google.gwt.core.client.JsArrayInteger;
  *
  * Taken from the Khronos TypedArrays Draft Spec as of Aug 30, 2010.
  */
-public class Uint8Array extends ArrayBufferView {
+public class Float64Array extends ArrayBufferView {
 
-  public static final int BYTES_PER_ELEMENT = 1;
+  public static final int BYTES_PER_ELEMENT = 4;
 
   /**
    * @see #create(ArrayBuffer, int, int)
    */
-  public static final native Uint8Array create(ArrayBuffer buffer) /*-{
-    return new Uint8Array(buffer);
+  public static final native Float64Array create(ArrayBuffer buffer) /*-{
+    return new Float64Array(buffer);
   }-*/;
 
   /**
    * @see #create(ArrayBuffer, int, int)
    */
-  public static final native Uint8Array create(ArrayBuffer buffer,
+  public static final native Float64Array create(ArrayBuffer buffer,
       int byteOffset) /*-{
-    return new Uint8Array(buffer, byteOffset);
+    return new Float64Array(buffer, byteOffset);
   }-*/;
 
   /**
@@ -62,9 +62,9 @@ public class Uint8Array extends ArrayBufferView {
    * the byteOffset must be a multiple of the element size of the specific type,
    * or an INDEX_SIZE_ERR exception is raised.
    */
-  public static final native Uint8Array create(ArrayBuffer buffer,
+  public static final native Float64Array create(ArrayBuffer buffer,
       int byteOffset, int length) /*-{
-    return new Uint8Array(buffer, byteOffset, length);
+    return new Float64Array(buffer, byteOffset, length);
   }-*/;
 
   /**
@@ -74,7 +74,7 @@ public class Uint8Array extends ArrayBufferView {
    * given typed array or sequence, with each element converted to the
    * appropriate typed array type.
    */
-  public static final Uint8Array create(int[] data) {
+  public static final Float64Array create(double[] data) {
     return create(ArrayUtils.toJsArray(data));
   }
 
@@ -85,16 +85,16 @@ public class Uint8Array extends ArrayBufferView {
    * given typed array or sequence, with each element converted to the
    * appropriate typed array type.
    */
-  public static final native Uint8Array create(Uint8Array array) /*-{
-    return new Uint8Array(array);
+  public static final native Float64Array create(Float64Array array) /*-{
+    return new Float64Array(array);
   }-*/;
 
   /**
    * Create a new ArrayBuffer with enough bytes to hold length elements of this
    * typed array, then creates a typed array view referring to the full buffer.
    */
-  public static final native Uint8Array create(int size) /*-{
-    return new Uint8Array(size);
+  public static final native Float64Array create(int size) /*-{
+    return new Float64Array(size);
   }-*/;
 
   /**
@@ -104,17 +104,17 @@ public class Uint8Array extends ArrayBufferView {
    * given typed array or sequence, with each element converted to the
    * appropriate typed array type.
    */
-  public static final native Uint8Array create(JsArrayInteger data) /*-{
-    return new Uint8Array(data);
+  public static final native Float64Array create(JsArrayNumber data) /*-{
+    return new Float64Array(data);
   }-*/;
 
-  protected Uint8Array() {
+  protected Float64Array() {
   }
 
   /**
    * Returns the element at the given numeric index.
    */
-  public native final int get(int index) /*-{
+  public native final double get(int index) /*-{
     return this[index];
   }-*/;
 
@@ -126,9 +126,9 @@ public class Uint8Array extends ArrayBufferView {
   }-*/;
 
   /**
-   * @see #set(int[], int)
+   * @see #set(double[], int)
    */
-  public final void set(int[] array) {
+  public final void set(double[] array) {
     set(array, 0);
   }
 
@@ -140,15 +140,15 @@ public class Uint8Array extends ArrayBufferView {
    * If the offset plus the length of the given array is out of range for the
    * current TypedArray, an INDEX_SIZE_ERR exception is raised.
    */
-  public final void set(int[] array, int offset) {
+  public final void set(double[] array, int offset) {
     set(ArrayUtils.toJsArray(array), offset);
   }
 
   /**
-   * @see #set(Uint8Array, int)
+   * @see #set(Float64Array, int)
    * @param array
    */
-  public native final void set(Uint8Array array) /*-{
+  public native final void set(Float64Array array) /*-{
     this.set(array);
   }-*/;
 
@@ -165,28 +165,28 @@ public class Uint8Array extends ArrayBufferView {
    * If the offset plus the length of the given array is out of range for the
    * current TypedArray, an INDEX_SIZE_ERR exception is raised.
    */
-  public native final void set(Uint8Array array, int offset) /*-{
+  public native final void set(Float64Array array, int offset) /*-{
     this.set(array, offset);
   }-*/;
 
   /**
    * Sets the element at the given numeric index to the given value.
    */
-  public native final void set(int index, int value) /*-{
+  public native final void set(int index, double value) /*-{
     this[index] = value;
   }-*/;
 
   /**
-   * @see #set(int[], int)
+   * @see #set(double[], int)
    */
-  public native final void set(JsArrayInteger array) /*-{
+  public native final void set(JsArrayNumber array) /*-{
     this.set(array);
   }-*/;
 
   /**
-   * @see #set(int[], int)
+   * @see #set(double[], int)
    */
-  public native final void set(JsArrayInteger array, int offset) /*-{
+  public native final void set(JsArrayNumber array, int offset) /*-{
     this.set(array, offset);
   }-*/;
 
@@ -206,7 +206,7 @@ public class Uint8Array extends ArrayBufferView {
    * The returned TypedArray will be of the same type as the array on which this
    * method is invoked.
    */
-  public final native Uint8Array subarray(int offset, int length) /*-{
+  public final native Float64Array subarray(int offset, int length) /*-{
     return this.subarray(offset, length);
   }-*/;
 }
