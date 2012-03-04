@@ -58,8 +58,6 @@ import com.google.gwt.webgl.client.WebGLUniformLocation;
 /**
  * WebGL implementation of GL20. Maintains a set of VBOs to translate
  * the NIO buffer based version of glVertexAttribPointer to the VBO based version.
- * 
- * @author Stefan Haustein
  */
 @SuppressWarnings("unchecked")
 public final class HtmlGL20 implements playn.core.gl.GL20 {
