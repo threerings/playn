@@ -103,4 +103,9 @@ public class JavaImageRegion extends JavaImage implements Image.Region {
             float x, float y, float w, float h) {
     parent.draw(gfx, dx, dy, dw, dh, sx+x, sy+y, w, h);
   }
+  
+  @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset, int scanSize) {
+    parent.getRgb(startX + (int) sx, startY + (int) sy, width, height, rgbArray, offset, scanSize);
+  }
 }

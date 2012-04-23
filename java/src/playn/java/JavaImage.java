@@ -78,4 +78,10 @@ abstract class JavaImage implements Image {
     gfx.drawImage(img, (int)dx, (int)dy, (int)(dx + dw), (int)(dy + dh),
                   (int)sx, (int)sy, (int)(sx + sw), (int)(sy + sh), null);
   }
+  
+
+  @Override
+  public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset, int scanSize) {
+    img.getRGB(startX, startY, width, height, rgbArray, offset, scanSize);
+  }
 }
