@@ -15,12 +15,13 @@
  */
 package playn.java;
 
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
+
+import pythagoras.f.Point;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
@@ -42,18 +43,11 @@ public class JavaGraphics extends GraphicsGL {
   private final int DEFAULT_HEIGHT = 480;
 
   private final GroupLayerGL rootLayer;
-  private int width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT;
   private final JavaGLContext ctx;
   private JavaGL20 gl;
 
-  JavaGraphics() throws LWJGLException {
-    // set the display mode to the default width/height before creating the display, otherwise
-    // LWJGL will create a full-screen window and then we'll resize it to our small window which
-    // causes annoying flashing
-    Display.setDisplayMode(new DisplayMode(DEFAULT_WIDTH, DEFAULT_HEIGHT));
-    Display.create();
-    ctx = new JavaGLContext(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-
+  public JavaGraphics(float scaleFactor) {
+    this.ctx = new JavaGLContext(scaleFactor, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     this.rootLayer = new GroupLayerGL(ctx);
   }
 
@@ -81,7 +75,7 @@ public class JavaGraphics extends GraphicsGL {
 
   @Override
   public CanvasImage createImage(int w, int h) {
-    return new JavaCanvasImage(w, h);
+    return new JavaCanvasImage(ctx, w, h);
   }
 
   @Override
@@ -131,35 +125,18 @@ public class JavaGraphics extends GraphicsGL {
   }
 
   @Override
-  public int width() {
-    return width;
-  }
-
-  @Override
-  public int height() {
-    return height;
-  }
-
-  @Override
   public void setSize(int width, int height) {
-    try {
-      this.width = width; this.height = height;
-      Display.setDisplayMode(new DisplayMode(width, height));
-      ctx.setSize(width, height);
-    } catch (LWJGLException e) {
-      throw new RuntimeException(e);
-    }
+    ctx.setSize(width, height);
+  }
+
+  @Override
+  public GL20 gl20() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   protected GLContext ctx() {
     return ctx;
-  }
-
-  void paintLayers() {
-    if (gl == null) {
-      ctx.paintLayers(rootLayer);
-    }
   }
 
   @Override
@@ -168,6 +145,29 @@ public class JavaGraphics extends GraphicsGL {
       gl = new JavaGL20();
     }
     return gl;
+  }
+
+  protected JavaImage createStaticImage(BufferedImage source) {
+    return new JavaStaticImage(ctx, source);
+  }
+
+  protected JavaImage createErrorImage(Exception cause) {
+    return new JavaErrorImage(ctx, cause);
+  }
+
+  void init() {
+    ctx.initGL();
+  }
+
+  void transformMouse(Point point) {
+    point.x /= ctx.scaleFactor;
+    point.y /= ctx.scaleFactor;
+  }
+
+  void paintLayers() {
+    if (gl == null) {
+      ctx.paintLayers(rootLayer);
+    }
   }
 
   protected Map<String,java.awt.Font> _fonts = new HashMap<String,java.awt.Font>();
