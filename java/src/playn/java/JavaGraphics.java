@@ -44,6 +44,7 @@ public class JavaGraphics extends GraphicsGL {
   private final GroupLayerGL rootLayer;
   private int width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT;
   private final JavaGLContext ctx;
+  private JavaGL20 gl;
 
   JavaGraphics() throws LWJGLException {
     // set the display mode to the default width/height before creating the display, otherwise
@@ -156,12 +157,17 @@ public class JavaGraphics extends GraphicsGL {
   }
 
   void paintLayers() {
-    ctx.paintLayers(rootLayer);
+    if (gl == null) {
+      ctx.paintLayers(rootLayer);
+    }
   }
 
   @Override
   public GL20 gl20() {
-    throw new UnsupportedOperationException();
+    if (gl == null) {
+      gl = new JavaGL20();
+    }
+    return gl;
   }
 
   protected Map<String,java.awt.Font> _fonts = new HashMap<String,java.awt.Font>();
