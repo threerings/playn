@@ -111,7 +111,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   public float scaleFactor() {
-    return ctx.scaleFactor;
+    return ctx.scale.factor;
   }
 
   @Override
