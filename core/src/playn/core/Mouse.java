@@ -184,6 +184,9 @@ public interface Mouse {
     /**
      * Called when the mouse is moved.
      *
+     * Note: If a mouse button is pressed on a layer, subsequent events will be fired
+     *       on the active layer until the button is released.
+     *
      * @param event provides mouse position and other metadata.
      */
     void onMouseMove(MotionEvent event);
@@ -206,6 +209,20 @@ public interface Mouse {
      * @param event provides wheel velocity and other metadata.
      */
     void onMouseWheelScroll(WheelEvent event);
+
+    /**
+     * Called when the mouse enters a region.
+     *
+     * @param event provides mouse position and other metadata.
+     */
+    void onMouseOver(MotionEvent event);
+
+    /**
+     * Called when the mouse leaves a region.
+     *
+     * @param event provides mouse position and other metadata.
+     */
+    void onMouseOut(MotionEvent event);
   }
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
@@ -218,6 +235,10 @@ public interface Mouse {
     public void onMouseMove(MotionEvent event) { /* NOOP! */ }
     @Override
     public void onMouseWheelScroll(WheelEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseOver(MotionEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseOut(MotionEvent event) { /* NOOP! */ }
   }
 
   /**

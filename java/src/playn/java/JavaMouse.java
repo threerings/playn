@@ -59,6 +59,8 @@ class JavaMouse extends MouseImpl {
         onMouseWheelScroll(new WheelEvent.Impl(time, Mouse.getEventDWheel()));
       } else {
         onMouseMove(new MotionEvent.Impl(time, m.x, m.y, dx, dy));
+        onMouseOver(new MotionEvent.Impl(time, m.x, m.y, dx, dy));
+        onMouseOut(new MotionEvent.Impl(time, m.x, m.y, dx, dy));
         pointer.onMouseMove(time, m.x, m.y);
       }
     }
