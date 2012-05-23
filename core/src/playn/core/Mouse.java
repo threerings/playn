@@ -21,8 +21,6 @@ import pythagoras.f.Point;
  * Input-device interface for mouse events. This interface is for mice and
  * supports buttons and the scroll wheel.
  */
-// TODO(pdr): make the (x,y) coordinates relative to a {@link Layer}, if
-// specified, or the {@link Graphics#rootLayer()} otherwise.
 public interface Mouse {
   /** Used by {@link ButtonEvent} to indicate that the left button is pressed. */
   int BUTTON_LEFT = 0;
@@ -174,14 +172,6 @@ public interface Mouse {
     void onMouseUp(ButtonEvent event);
 
     /**
-     * Called when the mouse is dragged with a button pressed.
-     *
-     * @param event provides mouse position and other metadata.
-     */
-    // Commented out to avoid bloating this API with unused features
-    //void onMouseDrag(MotionEvent event);
-
-    /**
      * Called when the mouse is moved.
      *
      * Note: If a mouse button is pressed on a layer, subsequent events will be fired
@@ -190,14 +180,6 @@ public interface Mouse {
      * @param event provides mouse position and other metadata.
      */
     void onMouseMove(MotionEvent event);
-
-    /**
-     * Called when the mouse is double clicked.
-     *
-     * @param event provides mouse position, button and other metadata.
-     */
-    // Commented out to avoid bloating this API with unused features
-    //void onMouseDoubleClick(ButtonEvent event);
 
     /**
      * Called when mouse wheel scroll occurs.
@@ -209,9 +191,19 @@ public interface Mouse {
      * @param event provides wheel velocity and other metadata.
      */
     void onMouseWheelScroll(WheelEvent event);
+  }
 
+  /**
+   * Listener interface for layer operations:
+   * {@link #onMouseOver(MotionEvent)} and {@link #onMouseOut(MotionEvent)}.
+   */
+  interface LayerListener extends Listener {
     /**
      * Called when the mouse enters a region.
+     *
+     * Note: MotionEvent is first dispatched to {@link #onMouseMove(MotionEvent)},
+     *       then to {@link #onMouseOut(MotionEvent)} and finally to
+     *       {@link #onMouseOver(MotionEvent)}.
      *
      * @param event provides mouse position and other metadata.
      */
@@ -220,6 +212,10 @@ public interface Mouse {
     /**
      * Called when the mouse leaves a region.
      *
+     * Note: MotionEvent is first dispatched to {@link #onMouseMove(MotionEvent)},
+     *       then to {@link #onMouseOut(MotionEvent)} and finally to
+     *       {@link #onMouseOver(MotionEvent)}.
+     *
      * @param event provides mouse position and other metadata.
      */
     void onMouseOut(MotionEvent event);
@@ -227,6 +223,18 @@ public interface Mouse {
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
   class Adapter implements Listener {
+    @Override
+    public void onMouseDown(ButtonEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseUp(ButtonEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseMove(MotionEvent event) { /* NOOP! */ }
+    @Override
+    public void onMouseWheelScroll(WheelEvent event) { /* NOOP! */ }
+  }
+
+  /** A {@link LayerListener} implementation with NOOP stubs provided for each method. */
+  class LayerAdapter implements LayerListener {
     @Override
     public void onMouseDown(ButtonEvent event) { /* NOOP! */ }
     @Override
@@ -252,7 +260,8 @@ public interface Mouse {
    * <code>null</code> will cause mouse events to stop being fired.
    */
   void setListener(Listener listener);
- /**
+
+  /**
    * Lock the mouse, i.e. receive mouse events even when the mouse pointer leaves the window.
    */
   void lock();

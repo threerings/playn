@@ -86,7 +86,8 @@ class HtmlMouse extends MouseImpl {
         }
 
         if (!inDragSequence) {
-          if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY)))
+          MotionEvent.Impl motionEvent = new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY);
+          if (onMouseMove(motionEvent) || onMouseOut(motionEvent) || onMouseOver(motionEvent))
             ev.preventDefault();
         }
         lastX = x;

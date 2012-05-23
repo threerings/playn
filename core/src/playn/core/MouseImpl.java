@@ -143,18 +143,13 @@ public abstract class MouseImpl implements Mouse {
   }
 
   protected boolean onMouseOver(MotionEvent.Impl event) {
-    boolean preventDefault = false;
-    if (listener != null) {
-      event.setPreventDefault(preventDefault);
-      listener.onMouseOver(event);
-      preventDefault = event.getPreventDefault();
-    }
+    boolean preventDefault = event.getPreventDefault();
 
     if (hoverLayer != lastHoverLayer && hoverLayer != null) {
       final MotionEvent.Impl localEvent = event.localize(hoverLayer);
       localEvent.setPreventDefault(preventDefault);
-      hoverLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
-        public void interact(Listener l) {
+      hoverLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
+        public void interact(LayerListener l) {
           l.onMouseOver(localEvent);
         }
       });
@@ -164,18 +159,13 @@ public abstract class MouseImpl implements Mouse {
   }
 
   protected boolean onMouseOut(MotionEvent.Impl event) {
-    boolean preventDefault = false;
-    if (listener != null) {
-      event.setPreventDefault(preventDefault);
-      listener.onMouseOut(event);
-      preventDefault = event.getPreventDefault();
-    }
+    boolean preventDefault = event.getPreventDefault();
 
     if (lastHoverLayer != hoverLayer && lastHoverLayer != null) {
       final MotionEvent.Impl localEvent = event.localize(lastHoverLayer);
       localEvent.setPreventDefault(preventDefault);
-      lastHoverLayer.interact(Listener.class, new AbstractLayer.Interaction<Listener>() {
-        public void interact(Listener l) {
+      lastHoverLayer.interact(LayerListener.class, new AbstractLayer.Interaction<LayerListener>() {
+        public void interact(LayerListener l) {
           l.onMouseOut(localEvent);
         }
       });
