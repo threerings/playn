@@ -51,8 +51,7 @@ class FlashMouse extends MouseImpl {
           lastX = x;
           lastY = y;
         }
-        MotionEvent.Impl motionEvent = new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY);
-        if (onMouseMove(motionEvent) || onMouseOut(motionEvent) || onMouseOver(motionEvent)) {
+        if (onMouseMove(new MotionEvent.Impl(PlayN.currentTime(), x, y, x - lastX, y - lastY))) {
           nativeEvent.preventDefault();
         }
         lastX = x;

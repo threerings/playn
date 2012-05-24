@@ -201,22 +201,24 @@ public interface Mouse {
    */
   interface LayerListener extends Listener {
     /**
-     * Called when the mouse enters a region.
+     * Called when the mouse enters a {@link Layer}.
      *
      * Note: MotionEvent is first dispatched to {@link #onMouseMove(MotionEvent)},
      *       then to {@link #onMouseOut(MotionEvent)} and finally to
-     *       {@link #onMouseOver(MotionEvent)}.
+     *       {@link #onMouseOver(MotionEvent)}. These three events share a single
+     *       preventDefault state.
      *
      * @param event provides mouse position and other metadata.
      */
     void onMouseOver(MotionEvent event);
 
     /**
-     * Called when the mouse leaves a region.
+     * Called when the mouse leaves a {@link Layer}.
      *
      * Note: MotionEvent is first dispatched to {@link #onMouseMove(MotionEvent)},
      *       then to {@link #onMouseOut(MotionEvent)} and finally to
-     *       {@link #onMouseOver(MotionEvent)}.
+     *       {@link #onMouseOver(MotionEvent)}. These three events share a single
+     *       preventDefault state.
      *
      * @param event provides mouse position and other metadata.
      */
@@ -224,19 +226,7 @@ public interface Mouse {
   }
 
   /** A {@link Listener} implementation with NOOP stubs provided for each method. */
-  class Adapter implements Listener {
-    @Override
-    public void onMouseDown(ButtonEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseUp(ButtonEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseMove(MotionEvent event) { /* NOOP! */ }
-    @Override
-    public void onMouseWheelScroll(WheelEvent event) { /* NOOP! */ }
-  }
-
-  /** A {@link LayerListener} implementation with NOOP stubs provided for each method. */
-  class LayerAdapter implements LayerListener {
+  class Adapter implements LayerListener {
     @Override
     public void onMouseDown(ButtonEvent event) { /* NOOP! */ }
     @Override
