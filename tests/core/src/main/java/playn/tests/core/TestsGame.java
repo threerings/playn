@@ -37,6 +37,7 @@ public class TestsGame implements Game {
     new ClearBackgroundTest(),
     new LayerClickTest(),
     new GetTextTest(),
+    new PointerMouseTouchTest(),
     /*new YourTest(),*/
   };
   int currentTest;
