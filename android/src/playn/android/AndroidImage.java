@@ -24,16 +24,16 @@ import playn.core.Pattern;
 import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
+import playn.core.gl.Scale;
 
 class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, AndroidCanvas.Drawable {
 
-  private final AndroidGLContext ctx;
   private final Bitmap bitmap;
 
-  AndroidImage(AndroidGLContext ctx, Bitmap bitmap) {
-    this.ctx = ctx;
+  AndroidImage(GLContext ctx, Bitmap bitmap, Scale scale) {
+    super(ctx, scale);
     this.bitmap = bitmap;
-    ctx.addRefreshable(this);
+    ((AndroidGLContext) ctx).addRefreshable(this);
   }
 
   @Override
@@ -48,22 +48,22 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
 
   @Override
   public void onSurfaceLost() {
-    clearTexture(ctx);
+    clearTexture();
   }
 
   public void destroy() {
-    ctx.removeRefreshable(this);
-    clearTexture(ctx);
+    ((AndroidGLContext) ctx).removeRefreshable(this);
+    clearTexture();
   }
 
   @Override
-  public int height() {
-    return bitmap.getHeight();
+  public float height() {
+    return scale.invScaled(bitmap.getHeight());
   }
 
   @Override
-  public int width() {
-    return bitmap.getWidth();
+  public float width() {
+    return scale.invScaled(bitmap.getWidth());
   }
 
   @Override
@@ -89,7 +89,7 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
 
   @Override
   public Image transform(BitmapTransformer xform) {
-    return new AndroidImage(ctx, ((AndroidBitmapTransformer) xform).transform(bitmap));
+    return new AndroidImage(ctx, ((AndroidBitmapTransformer) xform).transform(bitmap), scale);
   }
 
   @Override
@@ -100,13 +100,19 @@ class AndroidImage extends ImageGL implements AndroidGLContext.Refreshable, Andr
   @Override
   public void prepDraw(Rect rect, RectF rectf, float dx, float dy, float dw, float dh,
                        float sx, float sy, float sw, float sh) {
+    // adjust our source rect to account for the scale factor
+    sx *= scale.factor;
+    sy *= scale.factor;
+    sw *= scale.factor;
+    sh *= scale.factor;
+
     rect.set((int) sx, (int) sy, (int) (sx + sw), (int) (sy + sh));
     rectf.set(dx, dy, dx + dw, dy + dh);
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
-    this.ctx.updateTexture((Integer)tex, bitmap);
+  protected void updateTexture(Object tex) {
+    ((AndroidGLContext) ctx).updateTexture((Integer)tex, bitmap);
   }
 
   @Override

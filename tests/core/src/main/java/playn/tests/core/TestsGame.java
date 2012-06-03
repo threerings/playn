@@ -15,16 +15,17 @@
  */
 package playn.tests.core;
 
-import playn.core.Color;
 import playn.core.Game;
 import playn.core.ImmediateLayer;
 import playn.core.Mouse;
+import playn.core.Keyboard;
 import playn.core.Surface;
 import playn.core.Touch;
 import static playn.core.PlayN.*;
 
 public class TestsGame implements Game {
   Test[] tests = new Test[] {
+    new TextTest(),
     new SubImageTest(),
     new SurfaceTest(),
     new CanvasTest(),
@@ -35,6 +36,7 @@ public class TestsGame implements Game {
     new ClearBackgroundTest(),
     new LayerClickTest(),
     new GetTextTest(),
+    new PointerMouseTouchTest(),
     /*new YourTest(),*/
   };
   int currentTest;
@@ -42,37 +44,38 @@ public class TestsGame implements Game {
   @Override
   public void init() {
     // display basic instructions
-    log().info("Right click or touch with two fingers to go to the next test.");
+    log().info("Right click, touch with two fingers, or type f to go to the next test.");
 
     // add a listener for mouse and touch inputs
-    try {
-      mouse().setListener(new Mouse.Adapter() {
-        @Override
-        public void onMouseDown(Mouse.ButtonEvent event) {
-          if (event.button() == Mouse.BUTTON_RIGHT)
-            advanceTest(1);
-          else if (event.button() == Mouse.BUTTON_MIDDLE)
-            advanceTest(-1);
-        }
-      });
-    } catch (UnsupportedOperationException e) {
-      // no support for mouse; no problem
-    }
-    try {
-      touch().setListener(new Touch.Adapter() {
-        public void onTouchStart(Touch.Event[] touches) {
-          // android doesn't bundle multiple touches into a single event, instead we'll get a
-          // separate event array with a single event with a touch with id > 0
-          if (touches.length > 2 || touches[0].id() > 1)
-            advanceTest(-1);
-          else if (touches.length > 1 || touches[0].id() > 0)
-            advanceTest(1);
-        }
-      });
-    } catch (UnsupportedOperationException e) {
-      // no support for touch; no problem
-    }
-
+    mouse().setListener(new Mouse.Adapter() {
+      @Override
+      public void onMouseDown(Mouse.ButtonEvent event) {
+        if (event.button() == Mouse.BUTTON_RIGHT)
+          advanceTest(1);
+        else if (event.button() == Mouse.BUTTON_MIDDLE)
+          advanceTest(-1);
+      }
+    });
+    touch().setListener(new Touch.Adapter() {
+      @Override
+      public void onTouchStart(Touch.Event[] touches) {
+        // android doesn't bundle multiple touches into a single event, instead we'll get a
+        // separate event array with a single event with a touch with id > 0
+        if (touches.length > 2 || touches[0].id() > 1)
+          advanceTest(-1);
+        else if (touches.length > 1 || touches[0].id() > 0)
+          advanceTest(1);
+      }
+    });
+    keyboard().setListener(new Keyboard.Adapter() {
+      @Override
+      public void onKeyTyped(Keyboard.TypedEvent event) {
+        if (event.typedChar() == 'f')
+          advanceTest(1);
+        else if (event.typedChar() == 'b')
+          advanceTest(-1);
+      }
+    });
     advanceTest(currentTest = 0);
   }
 
@@ -87,8 +90,7 @@ public class TestsGame implements Game {
     graphics().rootLayer().clear();
     ImmediateLayer bg = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
       public void render(Surface surf) {
-        surf.setFillColor(Color.rgb(255, 255, 255));
-        surf.fillRect(0, 0, graphics().width(), graphics().height());
+        surf.setFillColor(0xFFFFFFFF).fillRect(0, 0, graphics().width(), graphics().height());
       }
     });
     bg.setDepth(Float.NEGATIVE_INFINITY); // render behind everything

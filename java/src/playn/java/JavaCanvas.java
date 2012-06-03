@@ -15,6 +15,8 @@
  */
 package playn.java;
 
+import pythagoras.f.MathUtil;
+
 import playn.core.Asserts;
 import playn.core.Canvas;
 import playn.core.Gradient;
@@ -43,7 +45,7 @@ class JavaCanvas implements Canvas {
 
   final Graphics2D gfx;
   private boolean isDirty;
-  private final int width, height;
+  private final float width, height;
   private Deque<JavaCanvasState> stateStack = new LinkedList<JavaCanvasState>();
 
   private Ellipse2D.Float ellipse = new Ellipse2D.Float();
@@ -51,7 +53,7 @@ class JavaCanvas implements Canvas {
   private Rectangle2D.Float rect = new Rectangle2D.Float();
   private RoundRectangle2D.Float roundRect = new RoundRectangle2D.Float();
 
-  JavaCanvas(Graphics2D graphics, int width, int height) {
+  JavaCanvas(Graphics2D graphics, float width, float height) {
     this.gfx = graphics;
     this.width = width;
     this.height = height;
@@ -77,7 +79,7 @@ class JavaCanvas implements Canvas {
 
   @Override
   public Canvas clear() {
-    gfx.clearRect(0, 0, width, height);
+    gfx.clearRect(0, 0, MathUtil.iceil(width), MathUtil.iceil(height));
     isDirty = true;
     return this;
   }
@@ -100,8 +102,7 @@ class JavaCanvas implements Canvas {
 
   @Override
   public Canvas drawImage(Image img, float x, float y) {
-    int w = img.width(), h = img.height();
-    return drawImage(img, x, y, w, h);
+    return drawImage(img, x, y, img.width(), img.height());
   }
 
   @Override
@@ -155,10 +156,10 @@ class JavaCanvas implements Canvas {
     return this;
   }
 
-  @Override
+  @Override @Deprecated
   public Canvas drawText(TextLayout layout, float x, float y) {
     currentState().prepareFill(gfx);
-    ((JavaTextLayout)layout).paint(gfx, x, y);
+    ((JavaTextLayout)layout).draw(gfx, x, y);
     isDirty = true;
     return this;
   }
@@ -201,7 +202,15 @@ class JavaCanvas implements Canvas {
   }
 
   @Override
-  public int height() {
+  public Canvas fillText(TextLayout layout, float x, float y) {
+    currentState().prepareFill(gfx);
+    ((JavaTextLayout)layout).fill(gfx, x, y);
+    isDirty = true;
+    return this;
+  }
+
+  @Override
+  public float height() {
     return height;
   }
 
@@ -346,6 +355,14 @@ class JavaCanvas implements Canvas {
   }
 
   @Override
+  public Canvas strokeText(TextLayout layout, float x, float y) {
+    currentState().prepareStroke(gfx);
+    ((JavaTextLayout)layout).stroke(gfx, x, y);
+    isDirty = true;
+    return this;
+  }
+
+  @Override
   public Canvas transform(float m11, float m12, float m21, float m22, float dx, float dy) {
     gfx.transform(new AffineTransform(m11, m12, m21, m22, dx, dy));
     return this;
@@ -358,7 +375,7 @@ class JavaCanvas implements Canvas {
   }
 
   @Override
-  public int width() {
+  public float width() {
     return width;
   }
 

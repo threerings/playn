@@ -121,7 +121,7 @@ class AndroidCanvas implements Canvas {
     return this;
   }
 
-  @Override
+  @Override @Deprecated
   public Canvas drawText(TextLayout layout, float x, float y) {
     ((AndroidTextLayout)layout).draw(canvas, x, y);
     dirty = true;
@@ -156,14 +156,24 @@ class AndroidCanvas implements Canvas {
 
   @Override
   public Canvas fillRoundRect(float x, float y, float width, float height, float radius) {
-    rectf.set(x, y, width, height);
+    // for some reason setting x, y to non-zero causes the round rect to be distorted
+    canvas.translate(x, y);
+    rectf.set(0, 0, width, height);
     canvas.drawRoundRect(rectf, radius, radius, currentState().prepareFill());
+    canvas.translate(-x, -y);
     dirty = true;
     return this;
   }
 
   @Override
-  public int height() {
+  public Canvas fillText(TextLayout layout, float x, float y) {
+    ((AndroidTextLayout)layout).draw(canvas, x, y, currentState().prepareFill());
+    dirty = true;
+    return this;
+  }
+
+  @Override
+  public float height() {
     return canvas.getHeight();
   }
 
@@ -298,8 +308,18 @@ class AndroidCanvas implements Canvas {
 
   @Override
   public Canvas strokeRoundRect(float x, float y, float width, float height, float radius) {
-    rectf.set(x, y, width, height);
+    // for some reason setting x, y to non-zero causes the round rect to be distorted
+    canvas.translate(x, y);
+    rectf.set(0, 0, width, height);
     canvas.drawRoundRect(rectf, radius, radius, currentState().prepareStroke());
+    canvas.translate(-x, -y);
+    dirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas strokeText(TextLayout layout, float x, float y) {
+    ((AndroidTextLayout)layout).draw(canvas, x, y, currentState().prepareStroke());
     dirty = true;
     return this;
   }
@@ -318,7 +338,7 @@ class AndroidCanvas implements Canvas {
   }
 
   @Override
-  public int width() {
+  public float width() {
     return canvas.getWidth();
   }
 

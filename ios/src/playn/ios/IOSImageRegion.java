@@ -24,8 +24,8 @@ import cli.System.Drawing.RectangleF;
 import playn.core.Pattern;
 import playn.core.gl.ImageRegionGL;
 
-public class IOSImageRegion extends ImageRegionGL implements IOSCanvas.Drawable
-{
+public class IOSImageRegion extends ImageRegionGL implements IOSCanvas.Drawable {
+
   public IOSImageRegion(IOSAbstractImage parent, float x, float y, float width, float height) {
     super(parent, x, y, width, height);
   }
@@ -41,7 +41,7 @@ public class IOSImageRegion extends ImageRegionGL implements IOSCanvas.Drawable
   @Override
   public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
-    throw new UnsupportedOperationException("getRgb() not yet supported on iOS");
+    parent.getRgb(startX + (int)x, startY + (int)y, width, height, rgbArray, offset, scanSize);
   }
 
   @Override

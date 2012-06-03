@@ -20,6 +20,8 @@ import cli.System.Drawing.RectangleF;
 import cli.System.EventArgs;
 
 import cli.OpenTK.FrameEventArgs;
+import cli.OpenTK.Graphics.ES20.All;
+import cli.OpenTK.Graphics.ES20.GL;
 import cli.OpenTK.Platform.iPhoneOS.iPhoneOSGameView;
 
 import cli.MonoTouch.CoreAnimation.CAEAGLLayer;
@@ -45,7 +47,6 @@ public class IOSGameView extends iPhoneOSGameView {
 
     // TODO: I assume we want to manually manage loss of EGL context
     set_LayerRetainsBacking(false);
-    // TODO: figure out twisty maze of Retina scale bullshit
     set_ContentScaleFactor(scale);
     set_MultipleTouchEnabled(true);
     set_AutoResize(false);
@@ -73,7 +74,7 @@ public class IOSGameView extends iPhoneOSGameView {
   protected void CreateFrameBuffer() {
     super.CreateFrameBuffer();
     // now that we're loaded, initialize the GL subsystem
-    platform.graphics().ctx.init();
+    platform.viewDidInit(get_Framebuffer());
   }
 
   @Override
@@ -90,6 +91,14 @@ public class IOSGameView extends iPhoneOSGameView {
   protected void OnLoad(EventArgs e) {
     super.OnLoad(e);
     UIDevice.get_CurrentDevice().BeginGeneratingDeviceOrientationNotifications();
+
+    // run a single frame so that we have something in our framebuffer when iOS stops displaying
+    // our splash screen and starts displaying our app
+    platform.update(0);
+    GL.BindFramebuffer(All.wrap(All.Framebuffer), get_Framebuffer());
+    MakeCurrent();
+    platform.paint();
+    SwapBuffers();
   }
 
   @Override

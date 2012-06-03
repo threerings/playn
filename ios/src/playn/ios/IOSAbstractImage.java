@@ -16,7 +16,10 @@
 package playn.ios;
 
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
+import cli.MonoTouch.CoreGraphics.CGBlendMode;
+import cli.MonoTouch.CoreGraphics.CGColorSpace;
 import cli.MonoTouch.CoreGraphics.CGImage;
+import cli.MonoTouch.CoreGraphics.CGImageAlphaInfo;
 import cli.MonoTouch.UIKit.UIColor;
 import cli.MonoTouch.UIKit.UIImage;
 import cli.System.Drawing.RectangleF;
@@ -24,14 +27,14 @@ import cli.System.Drawing.RectangleF;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.ResourceCallback;
+import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
+import playn.core.gl.Scale;
 
 /**
  * Provides some shared bits for {@link IOSImage} and {@link IOSCanvasImage}.
  */
-public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanvas.Drawable
-{
-  protected final IOSGLContext ctx;
+public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanvas.Drawable {
 
   /**
    * Returns a core graphics image that can be used to paint this image into a canvas.
@@ -62,7 +65,34 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   @Override
   public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
-    throw new UnsupportedOperationException("getRgb() not yet supported on iOS");
+    CGImage image = cgImage();
+    int bytesPerRow = 4 * width;
+    byte[] regionBytes = new byte[bytesPerRow * height];
+    CGBitmapContext context = new CGBitmapContext(regionBytes, width, height, 8, bytesPerRow,
+      // PremultipliedFirst for ARGB, same as BufferedImage in Java.
+      CGColorSpace.CreateDeviceRGB(), CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedFirst));
+    context.SetBlendMode(CGBlendMode.wrap(CGBlendMode.Copy));
+    // UIImage and CGImage use coordinate spaces with relatively inverted Y. Less 1 pixel to adjust
+    // the proper row to the top of the region
+    int invertedY = image.get_Height() - startY - height + 1;
+    context.TranslateCTM(-startX, -invertedY);
+    context.DrawImage(new RectangleF(0, 0, image.get_Width(), image.get_Height()), image);
+
+    int x = 0;
+    int y = 0;
+    for (int px = 0; px < regionBytes.length; px += 4) {
+      int a = (int)regionBytes[px    ] & 0xFF;
+      int r = (int)regionBytes[px + 1] & 0xFF;
+      int g = (int)regionBytes[px + 2] & 0xFF;
+      int b = (int)regionBytes[px + 3] & 0xFF;
+      rgbArray[offset + y * scanSize + x] = a << 24 | r << 16 | g << 8 | b;
+
+      x++;
+      if (x == width) {
+        x = 0;
+        y++;
+      }
+    }
   }
 
   @Override
@@ -82,10 +112,10 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
   public void draw(CGBitmapContext bctx, float dx, float dy, float dw, float dh,
                    float sx, float sy, float sw, float sh) {
     // adjust our source rect to account for the scale factor
-    sx *= ctx.scaleFactor;
-    sy *= ctx.scaleFactor;
-    sw *= ctx.scaleFactor;
-    sh *= ctx.scaleFactor;
+    sx *= scale.factor;
+    sy *= scale.factor;
+    sw *= scale.factor;
+    sh *= scale.factor;
 
     CGImage cgImage = cgImage();
     float iw = cgImage.get_Width(), ih = cgImage.get_Height();
@@ -103,7 +133,8 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
 
   @Override
   public Image transform(BitmapTransformer xform) {
-    return new IOSImage(ctx, new UIImage(((IOSBitmapTransformer) xform).transform(cgImage())));
+    UIImage ximage = new UIImage(((IOSBitmapTransformer) xform).transform(cgImage()));
+    return new IOSImage(ctx, ximage, scale);
   }
 
   @Override
@@ -114,7 +145,7 @@ public abstract class IOSAbstractImage extends ImageGL implements Image, IOSCanv
       ctx.queueDeleteFramebuffer(reptex);
   }
 
-  protected IOSAbstractImage(IOSGLContext ctx) {
-    this.ctx = ctx;
+  protected IOSAbstractImage(GLContext ctx, Scale scale) {
+    super(ctx, scale);
   }
 }

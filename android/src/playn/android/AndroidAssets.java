@@ -15,9 +15,10 @@
  */
 package playn.android;
 
-import static playn.core.PlayN.log;
-
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,24 +28,28 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 
-import playn.core.AbstractAssets;
-import playn.core.Image;
-import playn.core.ResourceCallback;
-import playn.core.Sound;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import pythagoras.f.MathUtil;
+
+import playn.core.AbstractAssets;
+import playn.core.Image;
+import playn.core.ResourceCallback;
+import playn.core.Sound;
+import playn.core.gl.Scale;
+import static playn.core.PlayN.log;
+
 public class AndroidAssets extends AbstractAssets {
 
-  private final AndroidGraphics graphics;
-  private final AndroidAudio audio;
+  private final AndroidPlatform platform;
   private String pathPrefix = null;
+  private Scale assetScale = null;
 
-  AndroidAssets(AndroidGraphics graphics, AndroidAudio audio) {
-    this.graphics = graphics;
-    this.audio = audio;
+  AndroidAssets(AndroidPlatform platform) {
+    this.platform = platform;
   }
 
   public void setPathPrefix(String prefix) {
@@ -55,58 +60,107 @@ public class AndroidAssets extends AbstractAssets {
   }
 
   /**
-   * Attempts to open the asset with the given name, throwing an
-   * {@link IOException} in case of failure.
+   * Configures the default scale to use for assets. This allows one to use higher resolution
+   * imagery than the device might normally. For example, one can supply scale 2 here, and
+   * configure the graphics scale to 1.25 in order to use iOS Retina graphics (640x960) on a WXGA
+   * (480x800) device.
    */
-  private InputStream openAsset(String path) throws IOException {
-    InputStream is = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
-    if (is == null)
-      throw new IOException("Unable to load resource: " + pathPrefix + path);
-    return is;
+  public void setAssetScale(float scaleFactor) {
+    this.assetScale = new Scale(scaleFactor);
   }
 
   @Override
   protected Image doGetImage(String path) {
-    return createImage(graphics.ctx, doGetBitmap(path));
-  }
-
-  protected AndroidImage createImage(AndroidGLContext ctx, Bitmap bitmap) {
-    return new AndroidImage(ctx, bitmap);
+    Exception error = null;
+    for (Scale.ScaledResource rsrc : assetScale().getScaledResources(path)) {
+      try {
+        InputStream is = openAsset(rsrc.path);
+        try {
+          Bitmap bitmap = decodeBitmap(is);
+          // if this image is at a higher scale factor than the view, scale the bitmap down to the
+          // view display factor (because otherwise the GPU will end up doing that every time the
+          // bitmap is drawn, and it will do a crappy job of it)
+          Scale viewScale = platform.graphics().ctx.scale, imageScale = rsrc.scale;
+          float viewImageRatio = viewScale.factor / imageScale.factor ;
+          if (viewImageRatio < 1) {
+            int swidth = MathUtil.iceil(viewImageRatio * bitmap.getWidth());
+            int sheight = MathUtil.iceil(viewImageRatio * bitmap.getHeight());
+            bitmap = Bitmap.createScaledBitmap(bitmap, swidth, sheight, true);
+            imageScale = viewScale;
+          }
+          return new AndroidImage(platform.graphics().ctx, bitmap, imageScale);
+        } finally {
+          is.close();
+        }
+      } catch (FileNotFoundException fnfe) {
+        error = fnfe; // keep going, checking for lower resolution images
+      } catch (Exception e) {
+        error = e;
+        break; // the image was broken not missing, stop here
+      }
+    }
+    platform.log().warn("Could not load image: " + pathPrefix + path, error);
+    // TODO: create error image which reports failure to callbacks
+    // error != null ? error : new FileNotFoundException(path);
+    return new AndroidImage(platform.graphics().ctx, createErrorBitmap(), Scale.ONE);
   }
 
   /**
-   * Decodes a resource to a bitmap. Always succeeds, returning an error
-   * placeholder if something goes wrong.
+   * Copies a resource from our APK into a temporary file and returns a handle on that file.
+   *
+   * @param path the path to the to-be-cached asset.
+   * @param cacheName the name to use for the cache file.
    */
-  Bitmap doGetBitmap(String path) {
+  File cacheAsset(String path, String cacheName) throws IOException {
+    InputStream in = openAsset(path);
+    File cachedFile = new File(platform.activity.getCacheDir(), cacheName);
     try {
-      InputStream is = openAsset(path);
+      FileOutputStream out = new FileOutputStream(cachedFile);
       try {
-        Bitmap bitmap = decodeBitmap(is);
-        return bitmap;
+        byte[] buffer = new byte[16 * 1024];
+        while (true) {
+          int r = in.read(buffer);
+          if (r < 0)
+            break;
+          out.write(buffer, 0, r);
+        }
       } finally {
-        is.close();
+        out.close();
       }
-    } catch (IOException e) {
-      return createErrorBitmap(e);
+    } finally {
+      in.close();
     }
+    return cachedFile;
+  }
+
+  private Scale assetScale () {
+    return (assetScale != null) ? assetScale : platform.graphics().ctx.scale;
+  }
+
+  /**
+   * Attempts to open the asset with the given name, throwing an {@link IOException} in case of
+   * failure.
+   */
+  private InputStream openAsset(String path) throws IOException {
+    InputStream is = getClass().getClassLoader().getResourceAsStream(pathPrefix + path);
+    if (is == null)
+      throw new FileNotFoundException("Missing resource: " + pathPrefix + path);
+    return is;
   }
 
   private Bitmap decodeBitmap(InputStream is) {
     BitmapFactory.Options options = new BitmapFactory.Options();
     options.inDither = true;
     // Prefer the bitmap config we computed from the window parameter
-    options.inPreferredConfig = graphics.preferredBitmapConfig;
+    options.inPreferredConfig = platform.graphics().preferredBitmapConfig;
     // Never scale bitmaps based on device parameters
     options.inScaled = false;
     return BitmapFactory.decodeStream(is, null, options);
   }
 
-  private Bitmap createErrorBitmap(Exception e) {
+  private Bitmap createErrorBitmap() {
     int height = 100, width = 100;
-
     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
-
     android.graphics.Canvas c = new android.graphics.Canvas(bitmap);
     android.graphics.Paint p = new android.graphics.Paint();
     p.setColor(android.graphics.Color.RED);
@@ -115,56 +169,16 @@ public class AndroidAssets extends AbstractAssets {
         c.drawText("ERROR", xx * 45, yy * 15, p);
       }
     }
-
     return bitmap;
-  }
-
-  private class ErrorSound implements Sound {
-    private final String path;
-    private final IOException exception;
-
-    public ErrorSound(String path, IOException exception) {
-      this.path = path;
-      this.exception = exception;
-    }
-
-    @Override
-    public boolean play() {
-      log().error("Attempted to play sound that was unable to load: " + path);
-      return false;
-    }
-
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void setLooping(boolean looping) {
-    }
-
-    @Override
-    public void setVolume(float volume) {
-    }
-
-    @Override
-    public boolean isPlaying() {
-      return false;
-    }
-
-    @Override
-    public void addCallback(ResourceCallback<? super Sound> callback) {
-      callback.error(exception);
-    }
   }
 
   @Override
   protected Sound doGetSound(String path) {
     try {
-      InputStream in = openAsset(path + ".mp3");
-      return audio.createSound(path + ".mp3", in);
+      return platform.audio().createSound(path + ".mp3");
     } catch (IOException e) {
       log().error("Unable to load sound: " + path, e);
-      return new ErrorSound(path, e);
+      return platform.audio().createErrorSound(path, e);
     }
   }
 

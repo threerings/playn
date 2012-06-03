@@ -60,7 +60,7 @@ public abstract class GameActivity extends Activity {
 
     // Build the AndroidPlatform and register this activity.
     AndroidGL20 gl20;
-    if (isHoneycombOrLater()) {
+    if (isHoneycombOrLater() || !AndroidGL20Native.available) {
       gl20 = new AndroidGL20();
     } else {
       // Provide our own native bindings for some missing methods.
@@ -118,6 +118,10 @@ public abstract class GameActivity extends Activity {
     return false;
   }
 
+  protected float scaleFactor() {
+    return 1; // TODO: determine scale factor automatically?
+  }
+
   public LinearLayout viewLayout() {
     return viewLayout;
   }
@@ -140,9 +144,7 @@ public abstract class GameActivity extends Activity {
 
   @Override
   protected void onDestroy() {
-    File cacheDir = getCacheDir();
-    File[] tempFiles = cacheDir.listFiles();
-    for (File file : tempFiles) {
+    for (File file : getCacheDir().listFiles()) {
       file.delete();
     }
     platform().audio().onDestroy();

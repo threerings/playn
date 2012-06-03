@@ -19,9 +19,7 @@ import cli.System.Console;
 
 import playn.core.Log;
 
-public class IOSLog implements Log
-{
-  // TODO: stack traces
+public class IOSLog implements Log {
 
   @Override
   public void debug(String msg) {
@@ -32,7 +30,7 @@ public class IOSLog implements Log
   public void debug(String msg, Throwable e) {
     debug(msg);
     if (e != null)
-      e.printStackTrace();
+      Console.WriteLine(e);
   }
 
   @Override
@@ -44,7 +42,7 @@ public class IOSLog implements Log
   public void info(String msg, Throwable e) {
     info(msg);
     if (e != null)
-      e.printStackTrace();
+      Console.WriteLine(e);
   }
 
   @Override
@@ -56,7 +54,7 @@ public class IOSLog implements Log
   public void warn(String msg, Throwable e) {
     warn(msg);
     if (e != null)
-      e.printStackTrace();
+      Console.WriteLine(e);
   }
 
   @Override
@@ -68,6 +66,6 @@ public class IOSLog implements Log
   public void error(String msg, Throwable e) {
     error(msg);
     if (e != null)
-      e.printStackTrace();
+      Console.WriteLine(e);
   }
 }

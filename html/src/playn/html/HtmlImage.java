@@ -32,6 +32,7 @@ import playn.core.Pattern;
 import playn.core.ResourceCallback;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
+import playn.core.gl.Scale;
 
 class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
 
@@ -46,23 +47,25 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
   ImageElement img;
   CanvasElement canvas; // Used internally for getRGB
 
-  HtmlImage(CanvasElement img) {
+  HtmlImage(GLContext ctx, CanvasElement img) {
+    super(ctx, Scale.ONE);
     this.canvas = img;
     fakeComplete(img);
     this.img = img.cast();
   }
 
-  HtmlImage(ImageElement img) {
+  HtmlImage(GLContext ctx, ImageElement img) {
+    super(ctx, Scale.ONE);
     this.img = img;
   }
 
   @Override
-  public int height() {
+  public float height() {
     return img == null ? 0 : img.getHeight();
   }
 
   @Override
-  public int width() {
+  public float width() {
     return img == null ? 0 : img.getWidth();
   }
 
@@ -145,12 +148,19 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
 
   @Override
   public Image transform(BitmapTransformer xform) {
-    return new HtmlImage(((HtmlBitmapTransformer) xform).transform(img));
+    return new HtmlImage(ctx, ((HtmlBitmapTransformer) xform).transform(img));
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
-    ((HtmlGLContext)ctx).updateTexture((WebGLTexture)tex, img);
+  public void clearTexture() {
+    // we may be in use on a non-WebGL platform, in which case we should NOOP
+    if (ctx != null)
+      super.clearTexture();
+  }
+
+  @Override
+  protected void updateTexture(Object tex) {
+    ((HtmlGLContext) ctx).updateTexture((WebGLTexture)tex, img);
   }
 
   ImageElement subImageElement(float x, float y, float width, float height) {

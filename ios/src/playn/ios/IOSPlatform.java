@@ -15,6 +15,9 @@
  */
 package playn.ios;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +57,7 @@ public class IOSPlatform implements Platform {
     },
 
     /** Supports landscape left and right orients. */
-    LANDSCAPES(UIDeviceOrientation.LandscapeLeft) {
+    LANDSCAPES(UIDeviceOrientation.LandscapeRight) {
       @Override
       public boolean isSupported(UIDeviceOrientation orient) {
         return ((orient.Value == UIDeviceOrientation.LandscapeLeft) ||
@@ -82,14 +85,50 @@ public class IOSPlatform implements Platform {
     }
   };
 
+  /**
+   * Registers your application. Defaults to supporting {@link SupportedOrients#PORTRAITS} and
+   * native iPad resolution.
+   */
   public static IOSPlatform register(UIApplication app) {
     return register(app, SupportedOrients.PORTRAITS);
   }
 
+  /**
+   * Registers your application with the specified supported orientations and native iPad
+   * resolution.
+   */
   public static IOSPlatform register(UIApplication app, SupportedOrients orients) {
-    IOSPlatform platform = new IOSPlatform(app, orients);
+    return register(app, orients, false);
+  }
+
+  /**
+   * Registers your application with the specified supported orientations.
+   *
+   * @param iPadLikePhone if true, an iPad will be treated like a 2x Retina device with resolution
+   * 384x512 and which will use @2x images. A Retina iPad will also have resolution 384x512 and
+   * will use @4x images if they exist, then fall back to @2x (and default (1x) if necessary). If
+   * false, iPad will be treated as a non-Retina device with resolution 768x1024 and will use
+   * default (1x) images, and a Retina iPad will be treated as a Retina device with resolution
+   * 768x1024 and will use @2x images.
+   */
+  public static IOSPlatform register(UIApplication app, SupportedOrients orients,
+                                     boolean iPadLikePhone) {
+    IOSPlatform platform = new IOSPlatform(app, orients, iPadLikePhone);
     PlayN.setPlatform(platform);
     return platform;
+  }
+
+  static {
+    // disable output to System.out/err as that will result in a crash due to iOS disallowing
+    // writes to stdout/stderr
+    OutputStream noop = new OutputStream() {
+      @Override
+      public void write(int b) throws IOException {} // noop!
+      @Override
+      public void write(byte b[], int off, int len) throws IOException {} // noop!
+    };
+    System.setOut(new PrintStream(noop));
+    System.setErr(new PrintStream(noop));
   }
 
   private final IOSAudio audio;
@@ -113,18 +152,25 @@ public class IOSPlatform implements Platform {
   private final UIWindow mainWindow;
   private final IOSGameView gameView;
 
-  protected IOSPlatform(UIApplication app, SupportedOrients orients) {
+  protected IOSPlatform(UIApplication app, SupportedOrients orients, boolean iPadLikePhone) {
     this.app = app;
     this.orients = orients;
 
+    float deviceScale = UIScreen.get_MainScreen().get_Scale();
     RectangleF bounds = UIScreen.get_MainScreen().get_Bounds();
-    float scale = UIScreen.get_MainScreen().get_Scale();
+    int screenWidth = (int)bounds.get_Width(), screenHeight = (int)bounds.get_Height();
+    boolean useHalfSize = (screenWidth >= 768) && iPadLikePhone;
+    float viewScale = (useHalfSize ? 2 : 1) * deviceScale;
+    if (useHalfSize) {
+      screenWidth /= 2;
+      screenHeight /= 2;
+    }
 
     // create log first so that other services can use it during initialization
     log = new IOSLog();
 
     audio = new IOSAudio();
-    graphics = new IOSGraphics(this, bounds, scale);
+    graphics = new IOSGraphics(this, screenWidth, screenHeight, viewScale, deviceScale);
     json = new JsonImpl();
     keyboard = new IOSKeyboard();
     net = new IOSNet(this);
@@ -136,11 +182,7 @@ public class IOSPlatform implements Platform {
     runQueue = new RunQueue(log);
 
     mainWindow = new UIWindow(bounds);
-    mainWindow.Add(gameView = new IOSGameView(this, bounds, scale));
-
-    // configure our orientation to a supported default, a notification will come in later that
-    // will adjust us to the devices current orientation
-    onOrientationChange(orients.defaultOrient);
+    mainWindow.Add(gameView = new IOSGameView(this, bounds, deviceScale));
   }
 
   @Override
@@ -238,19 +280,29 @@ public class IOSPlatform implements Platform {
   @Override
   public void run(Game game) {
     this.game = game;
+    // initialize the game and start things off
+    game.init();
     // start the main game loop (TODO: support 0 update rate)
     gameView.Run(1000d / game.updateRate());
     // make our main window visible
     mainWindow.MakeKeyAndVisible();
-    // initialize the game and start things off
-    game.init();
+  }
+
+  void viewDidInit(int defaultFrameBuffer) {
+    graphics.ctx.viewDidInit(defaultFrameBuffer);
+    // configure our orientation to a supported default, a notification will come in later that
+    // will adjust us to the device's current orientation
+    onOrientationChange(orients.defaultOrient);
   }
 
   void onOrientationChange(UIDeviceOrientation orientation) {
     if (!orients.isSupported(orientation))
       return; // ignore unsupported (or Unknown) orientations
     graphics.setOrientation(orientation);
-    app.SetStatusBarOrientation(ORIENT_MAP.get(orientation), true);
+    UIInterfaceOrientation sorient = ORIENT_MAP.get(orientation);
+    if (!sorient.equals(app.get_StatusBarOrientation())) {
+      app.SetStatusBarOrientation(sorient, !app.get_StatusBarHidden());
+    }
     // TODO: notify the game of the orientation change
   }
 

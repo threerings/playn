@@ -62,11 +62,11 @@
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
-    <Reference Include="${artifactId}">
-      <HintPath>bin\\${artifactId}.dll</HintPath>
+    <Reference Include="${artifactId}-ios">
+      <HintPath>bin\\${artifactId}-ios.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>..\..\..\ikvm-monotouch\bin\IKVM.OpenJDK.Core.dll</HintPath>
+      <HintPath>bin\IKVM.OpenJDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="System.Data" />
@@ -79,9 +79,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Content Include="resources\images\bg.png">
-      <Link>images\bg.png</Link>
-    </Content>
+    <Content Include="assets\images\bg.png" />
     <Content Include="touch-icon-57x57.png" />
   </ItemGroup>
 </Project>

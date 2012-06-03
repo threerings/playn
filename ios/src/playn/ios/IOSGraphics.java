@@ -15,7 +15,6 @@
  */
 package playn.ios;
 
-import cli.System.Drawing.RectangleF;
 import cli.System.Runtime.InteropServices.Marshal;
 
 import cli.MonoTouch.CoreGraphics.CGBitmapContext;
@@ -55,6 +54,7 @@ public class IOSGraphics extends GraphicsGL {
 
   private final GroupLayerGL rootLayer;
   private final int screenWidth, screenHeight;
+  private final float touchScale;
   private final Point touchTemp = new Point();
   private InternalTransform rootTransform;
   private boolean invertSizes;
@@ -67,17 +67,19 @@ public class IOSGraphics extends GraphicsGL {
 
   final IOSGLContext ctx;
 
-  public IOSGraphics(IOSPlatform platform, RectangleF bounds, float scale) {
-    screenWidth = (int)bounds.get_Width();
-    screenHeight = (int)bounds.get_Height();
-    ctx = new IOSGLContext(platform, scale, screenWidth, screenHeight);
+  public IOSGraphics(IOSPlatform platform, int screenWidth, int screenHeight,
+                     float viewScale, float touchScale) {
+    this.screenWidth = screenWidth;
+    this.screenHeight = screenHeight;
+    this.touchScale = touchScale;
+    ctx = new IOSGLContext(platform, viewScale, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
     rootTransform = new StockInternalTransform();
-    rootTransform.uniformScale(ctx.scaleFactor);
+    rootTransform.uniformScale(ctx.scale.factor);
   }
 
   @Override
-  public CanvasImage createImage(int width, int height) {
+  public CanvasImage createImage(float width, float height) {
     return new IOSCanvasImage(ctx, width, height);
   }
 
@@ -109,7 +111,7 @@ public class IOSGraphics extends GraphicsGL {
 
   @Override
   public TextLayout layoutText(String text, TextFormat format) {
-    return IOSTextLayout.create(this, text, format);
+    return new IOSTextLayout(this, text, format);
   }
 
   @Override
@@ -143,11 +145,6 @@ public class IOSGraphics extends GraphicsGL {
   }
 
   @Override
-  public float scaleFactor() {
-    return ctx.scaleFactor;
-  }
-
-  @Override
   public GL20 gl20() {
     throw new UnsupportedOperationException();
   }
@@ -160,7 +157,7 @@ public class IOSGraphics extends GraphicsGL {
   void setOrientation(UIDeviceOrientation orientation) {
     ctx.orient = orientation.Value;
     rootTransform = new StockInternalTransform();
-    rootTransform.uniformScale(ctx.scaleFactor);
+    rootTransform.uniformScale(ctx.scale.factor);
     switch (orientation.Value) {
     case UIDeviceOrientation.Portrait:
       invertSizes = false;
@@ -184,8 +181,7 @@ public class IOSGraphics extends GraphicsGL {
   }
 
   IPoint transformTouch(float x, float y) {
-    return rootTransform.inverseTransform(
-      touchTemp.set(x*ctx.scaleFactor, y*ctx.scaleFactor), touchTemp);
+    return rootTransform.inverseTransform(touchTemp.set(x*touchScale, y*touchScale), touchTemp);
   }
 
   void paint(Game game, float alpha) {

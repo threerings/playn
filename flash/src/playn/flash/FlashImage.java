@@ -26,7 +26,9 @@ import flash.display.BitmapData;
 
 import playn.core.Pattern;
 
-@FlashImport({"flash.display.Loader", "flash.events.Event", "flash.net.URLRequest"})
+@FlashImport({
+  "flash.display.Loader", "flash.events.Event", "flash.net.URLRequest", "flash.system.LoaderContext"
+})
 class FlashImage implements Image {
 
   private List<ResourceCallback<? super Image>> callbacks =
@@ -43,25 +45,26 @@ class FlashImage implements Image {
   }
 
   private native void scheduleLoad(String url) /*-{
-     var loader = new Loader();
-     var self = this;
-     loader.contentLoaderInfo.addEventListener(flash.events.Event.COMPLETE,
-        function(event) {
-          self.@playn.flash.FlashImage::imageData = event.target.content.bitmapData;
-          self.@playn.flash.FlashImage::runCallbacks(Z)(true);
-        });
-      loader.addEventListener(flash.events.IOErrorEvent.IO_ERROR,  function() {} );
-      loader.contentLoaderInfo.addEventListener(flash.events.IOErrorEvent.IO_ERROR,  function() {} );
-     loader.load(new URLRequest(url));
+    var loader = new Loader();
+    var self = this;
+    var context = new flash.system.LoaderContext();
+    context.checkPolicyFile = true;
+    loader.contentLoaderInfo.addEventListener(flash.events.Event.COMPLETE, function(event) {
+      self.@playn.flash.FlashImage::imageData = event.target.content.bitmapData;
+      self.@playn.flash.FlashImage::runCallbacks(Z)(true);
+    });
+    loader.addEventListener(flash.events.IOErrorEvent.IO_ERROR, function() {} );
+    loader.contentLoaderInfo.addEventListener(flash.events.IOErrorEvent.IO_ERROR, function() {} );
+    loader.load(new URLRequest(url), context);
   }-*/;
 
   @Override
-  public int width() {
+  public float width() {
     return imageData == null ? 0 : imageData.getWidth();
   }
 
   @Override
-  public int height() {
+  public float height() {
     return imageData == null ? 0 : imageData.getHeight();
   }
 
@@ -102,6 +105,11 @@ class FlashImage implements Image {
   @Override
   public Image transform(BitmapTransformer xform) {
     return new FlashImage(((FlashBitmapTransformer) xform).transform(imageData));
+  }
+
+  @Override
+  public void clearTexture() {
+    // noop
   }
 
   BitmapData bitmapData() {

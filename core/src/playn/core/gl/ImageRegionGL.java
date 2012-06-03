@@ -25,6 +25,7 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   protected float width, height;
 
   public ImageRegionGL(ImageGL parent, float x, float y, float width, float height) {
+    super(parent.ctx, parent.scale);
     this.parent = parent;
     this.x = x;
     this.y = y;
@@ -33,30 +34,30 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   }
 
   @Override
-  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  public Object ensureTexture(boolean repeatX, boolean repeatY) {
     if (!isReady()) {
       return null;
     } else if (repeatX || repeatY) {
-      scaleTexture(ctx, repeatX, repeatY);
+      scaleTexture(repeatX, repeatY);
       return reptex;
     } else {
-      return parent.ensureTexture(ctx, repeatX, repeatY);
+      return parent.ensureTexture(repeatX, repeatY);
     }
   }
 
   @Override
-  public void clearTexture(GLContext ctx) {
-    parent.clearTexture(ctx);
+  public void clearTexture() {
+    parent.clearTexture();
   }
 
   @Override
-  public void reference(GLContext ctx) {
-    parent.reference(ctx);
+  public void reference() {
+    parent.reference();
   }
 
   @Override
-  public void release(GLContext ctx) {
-    parent.release(ctx);
+  public void release() {
+    parent.release();
   }
 
   @Override
@@ -70,13 +71,13 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   }
 
   @Override
-  public int width() {
-    return (int) width;
+  public float width() {
+    return width;
   }
 
   @Override
-  public int height() {
-    return (int) height;
+  public float height() {
+    return height;
   }
 
   @Override
@@ -132,16 +133,16 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
+  protected void updateTexture(Object tex) {
     throw new AssertionError("Region.updateTexture should never be called.");
   }
 
-  private void scaleTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  private void scaleTexture(boolean repeatX, boolean repeatY) {
     if (reptex != null)
       return;
 
-    int scaledWidth = ctx.scaledCeil(this.width);
-    int scaledHeight = ctx.scaledCeil(this.height);
+    int scaledWidth = scale.scaledCeil(this.width);
+    int scaledHeight = scale.scaledCeil(this.height);
 
     // GL requires pow2 on axes that repeat
     int width = GLUtil.nextPowerOfTwo(scaledWidth), height = GLUtil.nextPowerOfTwo(scaledHeight);
@@ -153,7 +154,7 @@ public abstract class ImageRegionGL extends ImageGL implements Image.Region {
       height = scaledHeight;
 
     // our source image is our parent's texture
-    Object tex = parent.ensureTexture(ctx, false, false);
+    Object tex = parent.ensureTexture(false, false);
 
     // create our texture and point a new framebuffer at it
     reptex = ctx.createTexture(width, height, repeatX, repeatY);

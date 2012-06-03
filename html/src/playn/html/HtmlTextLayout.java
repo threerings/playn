@@ -25,6 +25,8 @@ import java.util.List;
 
 import static playn.core.PlayN.graphics;
 
+// TODO: remove this annotation once we've nixed deprecated TextFormat bits
+@SuppressWarnings("deprecation")
 class HtmlTextLayout implements TextLayout {
 
   private TextFormat format;
@@ -95,8 +97,27 @@ class HtmlTextLayout implements TextLayout {
     return format;
   }
 
+  void stroke(Context2d ctx, float x, float y) {
+    configContext(ctx);
+    float ypos = 0;
+    for (Line line : lines) {
+      ctx.strokeText(line.text, x + format.align.getX(line.width, width), y + ypos);
+      ypos += metrics.height;
+    }
+  }
+
+  void fill(Context2d ctx, float x, float y) {
+    configContext(ctx);
+    float ypos = 0;
+    for (Line line : lines) {
+      ctx.fillText(line.text, x + format.align.getX(line.width, width), y + ypos);
+      ypos += metrics.height;
+    }
+  }
+
   void draw(Context2d ctx, float x, float y) {
     configContext(ctx);
+    ctx.setFillStyle(HtmlGraphics.cssColorString(format.textColor));
 
     if (format.effect instanceof TextFormat.Effect.Shadow) {
       TextFormat.Effect.Shadow seffect = (TextFormat.Effect.Shadow)format.effect;
@@ -105,10 +126,9 @@ class HtmlTextLayout implements TextLayout {
       ctx.setShadowOffsetY(seffect.shadowOffsetY);
       drawText(ctx, x, y);
 
-    } else if (format.effect instanceof TextFormat.Effect.Outline) {
-      TextFormat.Effect.Outline oeffect = (TextFormat.Effect.Outline)format.effect;
+    } else if (format.effect instanceof TextFormat.Effect.PixelOutline) {
       ctx.save();
-      ctx.setFillStyle(HtmlGraphics.cssColorString(oeffect.outlineColor));
+      ctx.setFillStyle(HtmlGraphics.cssColorString(format.effect.getAltColor()));
 
       drawText(ctx, x + 0, y + 0);
       drawText(ctx, x + 0, y + 1);
@@ -144,7 +164,6 @@ class HtmlTextLayout implements TextLayout {
     case BOLD_ITALIC: style = "bold italic"; break;
     }
 
-    ctx.setFillStyle(HtmlGraphics.cssColorString(format.textColor));
     ctx.setFont(style + " " + font.size() + "px " + font.name());
     ctx.setTextBaseline(Context2d.TextBaseline.TOP);
   }

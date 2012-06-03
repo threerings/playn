@@ -27,6 +27,8 @@ import playn.core.Path;
 import playn.core.Pattern;
 import playn.core.TextLayout;
 
+import pythagoras.f.MathUtil;
+
 class HtmlCanvas implements Canvas {
 
   interface Drawable {
@@ -37,24 +39,24 @@ class HtmlCanvas implements Canvas {
 
   private final CanvasElement canvas;
   private final Context2d ctx;
-  private final int width, height;
+  private final float width, height;
   private boolean dirty = true;
 
-  HtmlCanvas(int width, int height) {
-    this(Document.get().createElement("canvas").<CanvasElement>cast(), width, height);
+  HtmlCanvas(float width, float height) {
+    this(Document.get().createCanvasElement(), width, height);
   }
 
-  HtmlCanvas(CanvasElement canvas, int width, int height) {
+  HtmlCanvas(CanvasElement canvas, float width, float height) {
     this(canvas, canvas.getContext2d(), width, height);
-    canvas.setWidth(width);
-    canvas.setHeight(height);
+    canvas.setWidth(MathUtil.iceil(width));
+    canvas.setHeight(MathUtil.iceil(height));
   }
 
-  HtmlCanvas(Context2d ctx, int width, int height) {
+  HtmlCanvas(Context2d ctx, float width, float height) {
     this(null, ctx, width, height);
   }
 
-  private HtmlCanvas(CanvasElement canvas, Context2d ctx, int width, int height) {
+  private HtmlCanvas(CanvasElement canvas, Context2d ctx, float width, float height) {
     this.canvas = canvas;
     this.width = width;
     this.height = height;
@@ -137,7 +139,7 @@ class HtmlCanvas implements Canvas {
     return this;
   }
 
-  @Override
+  @Override @Deprecated
   public Canvas drawText(TextLayout layout, float x, float y) {
     ((HtmlTextLayout)layout).draw(ctx, x, y);
     dirty = true;
@@ -171,14 +173,21 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public Canvas fillRoundRect(float x, float y, float w, float h, float radius) {
-    addRoundRectPath(x, y, width, height, radius);
+    addRoundRectPath(x, y, w, h, radius);
     ctx.fill();
     dirty = true;
     return this;
   }
 
   @Override
-  public final int height() {
+  public Canvas fillText(TextLayout layout, float x, float y) {
+    ((HtmlTextLayout)layout).fill(ctx, x, y);
+    dirty = true;
+    return this;
+  }
+
+  @Override
+  public final float height() {
     return height;
   }
 
@@ -220,7 +229,7 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public Canvas setFillColor(int color) {
-    ctx.setFillStyle(HtmlGraphics.cssColor(color));
+    ctx.setFillStyle(HtmlGraphics.cssColorString(color));
     return this;
   }
 
@@ -258,7 +267,7 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public Canvas setStrokeColor(int color) {
-    ctx.setStrokeStyle(HtmlGraphics.cssColor(color));
+    ctx.setStrokeStyle(HtmlGraphics.cssColorString(color));
     return this;
   }
 
@@ -301,8 +310,15 @@ class HtmlCanvas implements Canvas {
 
   @Override
   public Canvas strokeRoundRect(float x, float y, float w, float h, float radius) {
-    addRoundRectPath(x, y, width, height, radius);
+    addRoundRectPath(x, y, w, h, radius);
     ctx.stroke();
+    dirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas strokeText(TextLayout layout, float x, float y) {
+    ((HtmlTextLayout)layout).stroke(ctx, x, y);
     dirty = true;
     return this;
   }
@@ -321,7 +337,7 @@ class HtmlCanvas implements Canvas {
   }
 
   @Override
-  public final int width() {
+  public final float width() {
     return width;
   }
 

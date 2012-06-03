@@ -71,7 +71,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
-  public SurfaceLayer createSurfaceLayer(int width, int height) {
+  public SurfaceLayer createSurfaceLayer(float width, float height) {
     return new SurfaceLayerGL(ctx, width, height);
   }
 
@@ -111,7 +111,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   public float scaleFactor() {
-    return ctx.scaleFactor;
+    return ctx.scale.factor;
   }
 
   @Override
@@ -120,6 +120,11 @@ class HtmlGraphicsGL extends HtmlGraphics {
       gl20 = new HtmlGL20(ctx.gl);
     }
     return gl20;
+  }
+
+  @Override
+  HtmlGLContext ctx() {
+    return ctx;
   }
 
   @Override

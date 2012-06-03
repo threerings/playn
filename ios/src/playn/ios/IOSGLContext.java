@@ -38,6 +38,7 @@ public class IOSGLContext extends GLContext {
   public static final boolean CHECK_ERRORS = false;
 
   int orient;
+  private Integer defaultFrameBuffer; // configured in init()
 
   private GLShader.Texture texShader;
   private GLShader.Color colorShader;
@@ -47,8 +48,14 @@ public class IOSGLContext extends GLContext {
     setSize(screenWidth, screenHeight);
   }
 
-  public void init() {
-    reinitGL();
+  void viewDidInit(int defaultFrameBuffer) {
+    this.defaultFrameBuffer = defaultFrameBuffer;
+    GL.Disable(All.wrap(All.CullFace));
+    GL.Enable(All.wrap(All.Blend));
+    GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
+    GL.ClearColor(0, 0, 0, 1);
+    texShader = new IOSGLShader.Texture(this);
+    colorShader = new IOSGLShader.Color(this);
   }
 
   @Override
@@ -130,7 +137,7 @@ public class IOSGLContext extends GLContext {
 
   @Override
   protected Object defaultFrameBuffer() {
-    return 0;
+    return defaultFrameBuffer;
   }
 
   @Override
@@ -147,7 +154,10 @@ public class IOSGLContext extends GLContext {
 
   @Override
   protected void bindFramebufferImpl(Object frameBuffer, int width, int height) {
-    GL.BindFramebuffer(All.wrap(All.Framebuffer), (Integer) frameBuffer);
+    // this is called during early initialization before we know our default frame buffer id, but
+    // we can just skip binding in that case because our default frame buffer is already bound
+    if (frameBuffer != null)
+      GL.BindFramebuffer(All.wrap(All.Framebuffer), (Integer) frameBuffer);
     GL.Viewport(0, 0, width, height);
   }
 
@@ -209,14 +219,5 @@ public class IOSGLContext extends GLContext {
     rootLayer.paint(rootTransform, 1); // paint all the layers
     checkGLError("updateLayers end");
     useShader(null); // guarantee a flush
-  }
-
-  private void reinitGL() {
-    GL.Disable(All.wrap(All.CullFace));
-    GL.Enable(All.wrap(All.Blend));
-    GL.BlendFunc(All.wrap(All.One), All.wrap(All.OneMinusSrcAlpha));
-    GL.ClearColor(0, 0, 0, 1);
-    texShader = new IOSGLShader.Texture(this);
-    colorShader = new IOSGLShader.Color(this);
   }
 }

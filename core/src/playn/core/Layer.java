@@ -62,7 +62,8 @@ public interface Layer {
   GroupLayer parent();
 
   /**
-   * Returns the layer's transformation matrix.
+   * Returns the layer's transformation matrix. This provides access to the layer's current
+   * translation, scale and rotation.
    */
   Transform transform();
 
@@ -152,10 +153,10 @@ public interface Layer {
   void setDepth(float depth);
 
   /**
-   * Sets the translation of the layer.
-   * <p>
-   * This sets the translation of the layer's transformation matrix so coordinates in the layer will
-   * be translated by this amount.
+   * Sets the translation of the layer. The current translation can be read via {@link #transform}.
+   *
+   * <p> This sets the translation of the layer's transformation matrix so coordinates in the layer
+   * will be translated by this amount. </p>
    *
    * @param x translation on x axis
    * @param y translation on y axis
@@ -163,24 +164,24 @@ public interface Layer {
   void setTranslation(float x, float y);
 
   /**
-   * Sets the scale of the layer.
-   * <p>
-   * This sets the scale of the layer's transformation matrix so coordinates in the layer will be
-   * multiplied by this scale.
-   * <p>
-   * Note that a scale of {@code 1} is equivalent to no scale.
+   * Sets the scale of the layer. The current scale can be read via {@link #transform}.
+   *
+   * <p> This sets the scale of the layer's transformation matrix so coordinates in the layer will
+   * be multiplied by this scale. </p>
+   *
+   * <p> Note that a scale of {@code 1} is equivalent to no scale. </p>
    *
    * @param x non-zero scale value
    */
   void setScale(float x);
 
   /**
-   * Sets the scale of the layer.
-   * <p>
-   * This sets the scale of the layer's transformation matrix so coordinates in the layer will be
-   * multiplied by this scale.
-   * <p>
-   * Note that a scale of {@code 1} is equivalent to no scale.
+   * Sets the scale of the layer. The current scale can be read via {@link #transform}.
+   *
+   * <p> This sets the scale of the layer's transformation matrix so coordinates in the layer will
+   * be multiplied by this scale. </p>
+   *
+   * <p> Note that a scale of {@code 1} is equivalent to no scale. </p>
    *
    * @param x non-zero scale value on the x axis
    * @param y non-zero scale value on the y axis
@@ -188,11 +189,10 @@ public interface Layer {
   void setScale(float x, float y);
 
   /**
-   * Sets the rotation of the layer.
-   * <p>
-   * This sets the rotation of the layer's transformation matrix so coordinates in the layer will be
-   * rotated by this angle.
-   * <p>
+   * Sets the rotation of the layer. The current rotation can be read via {@link #transform}.
+   *
+   * <p> This sets the rotation of the layer's transformation matrix so coordinates in the layer
+   * will be rotated by this angle. </p>
    *
    * @param angle angle to rotate, in radians
    */
@@ -240,7 +240,7 @@ public interface Layer {
    * dispatched to layers "below" it, you must register a NOOP listener on the layer, or manually
    * call {@link #setInteractive} after removing the last listener.</p>
    */
-  Connection addListener(Pointer.Listener listener);
+  Connection addListener(Pointer.Listener pointerListener);
 
   /**
    * Registers a listener with this layer that will be notified if a mouse event happens within its
@@ -262,7 +262,24 @@ public interface Layer {
    * to layers "below" it, you must register a NOOP listener on the layer, or manually call {@link
    * #setInteractive} after removing the last listener.</p>
    */
-  Connection addListener(Mouse.Listener listener);
+  Connection addListener(Mouse.LayerListener mouseListener);
+
+  /**
+   * Registers a listener with this layer that will be notified if a touch event happens within its
+   * bounds. Events dispatched to this listener will have their {@link Event#localX} and {@link
+   * Event#localY} values set to the coordinates of the touch as transformed into this layer's
+   * coordinate system. {@link Event#x} and {@link Event#y} will always contain the screen (global)
+   * coordinates of the touch.
+   *
+   * <p>When a listener is added, the layer and all of its parents are marked as interactive.
+   * Interactive layers intercept touches/clicks. When all listeners are disconnected (including
+   * Mouse and Touch listeners), the layer will be marked non-interactive. Its parents are lazily
+   * marked non-interactive as it is discovered that they have no interactive children. Thus if you
+   * require that a layer continue to intercept click/touch events to prevent them from being
+   * dispatched to layers "below" it, you must register a NOOP listener on the layer, or manually
+   * call {@link #setInteractive} after removing the last listener.</p>
+   */
+  Connection addListener(Touch.LayerListener touchListener);
 
   /**
    * Interface for {@link Layer}s containing explicit sizes.

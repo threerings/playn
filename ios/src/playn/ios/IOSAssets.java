@@ -33,9 +33,10 @@ import playn.core.Image;
 import playn.core.PlayN;
 import playn.core.ResourceCallback;
 import playn.core.Sound;
+import playn.core.gl.Scale;
 
-public class IOSAssets implements Assets
-{
+public class IOSAssets implements Assets {
+
   private String pathPrefix = "";
   private final IOSGraphics graphics;
   private final IOSAudio audio;
@@ -62,20 +63,25 @@ public class IOSAssets implements Assets
   @Override
   public Image getImage(String path) {
     String fullPath = Path.Combine(pathPrefix, path);
-    String scaledPath = graphics.adjustImagePath(fullPath);
-    if (File.Exists(scaledPath))
-      fullPath = scaledPath;
-    PlayN.log().debug("Loading image: " + fullPath);
-    try {
-      Stream stream = new FileStream(fullPath, FileMode.wrap(FileMode.Open),
-                                     FileAccess.wrap(FileAccess.Read),
-                                     FileShare.wrap(FileShare.Read));
-      NSData data = NSData.FromStream(stream);
-      return createImage(graphics.ctx, UIImage.LoadFromData(data));
-    } catch (Throwable t) {
-      PlayN.log().warn("Failed to load image: " + fullPath, t);
-      return createImage(graphics.ctx, new UIImage());
+    Throwable error = null;
+    for (Scale.ScaledResource rsrc : graphics.ctx().scale.getScaledResources(fullPath)) {
+      if (!File.Exists(rsrc.path)) continue;
+      PlayN.log().debug("Loading image: " + rsrc.path);
+      try {
+        Stream stream = new FileStream(rsrc.path, FileMode.wrap(FileMode.Open),
+                                       FileAccess.wrap(FileAccess.Read),
+                                       FileShare.wrap(FileShare.Read));
+        NSData data = NSData.FromStream(stream);
+        return new IOSImage(graphics.ctx, UIImage.LoadFromData(data), rsrc.scale);
+      } catch (Throwable t) {
+        PlayN.log().warn("Failed to load image: " + rsrc.path, t);
+        error = t; // note this error if this is the lowest resolution image, but fall back to
+                   // lower resolution images if not; in the Java backend we'd fail here, but this
+                   // is a production backend, so we want to try to make things work
+      }
     }
+    // TODO: return an error image
+    return new IOSImage(graphics.ctx, new UIImage(), Scale.ONE);
   }
 
   @Override
@@ -111,9 +117,5 @@ public class IOSAssets implements Assets
   @Override
   public int getPendingRequestCount() {
     return 0; // nothing is async
-  }
-
-  protected IOSAbstractImage createImage(IOSGLContext ctx, UIImage image) {
-    return new IOSImage(ctx, image);
   }
 }

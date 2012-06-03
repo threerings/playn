@@ -15,17 +15,21 @@
  */
 package playn.android;
 
+import android.graphics.Bitmap;
+
 import playn.core.Canvas;
 import playn.core.CanvasImage;
-import playn.core.gl.GLContext;
 
 class AndroidCanvasImage extends AndroidImage implements CanvasImage {
 
   private final AndroidCanvas canvas;
 
-  AndroidCanvasImage(AndroidGraphics graphics, int width, int height, boolean alpha) {
-    super(graphics.ctx, graphics.createBitmap(width, height, alpha));
+  AndroidCanvasImage(AndroidGraphics gfx, float width, float height) {
+    super(gfx.ctx, Bitmap.createBitmap(gfx.ctx.scale.scaledCeil(width),
+                                       gfx.ctx.scale.scaledCeil(height),
+                                       gfx.preferredBitmapConfig), gfx.ctx.scale);
     this.canvas = new AndroidCanvas(bitmap());
+    this.canvas.scale(gfx.ctx.scale.factor, gfx.ctx.scale.factor);
   }
 
   @Override
@@ -34,13 +38,13 @@ class AndroidCanvasImage extends AndroidImage implements CanvasImage {
   }
 
   @Override
-  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  public Object ensureTexture(boolean repeatX, boolean repeatY) {
     // if we have a canvas, and it's dirty, force the recreation of our texture which will obtain
     // the latest canvas data
     if (canvas.dirty()) {
       canvas.clearDirty();
-      clearTexture(ctx);
+      clearTexture();
     }
-    return super.ensureTexture(ctx, repeatX, repeatY);
+    return super.ensureTexture(repeatX, repeatY);
   }
 }

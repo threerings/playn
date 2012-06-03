@@ -212,14 +212,14 @@ public interface Canvas {
   Canvas drawPoint(float x, float y);
 
   /**
-   * Draws text at the specified location.
+   * Draws text at the specified location. The text will be drawn in the current fill color.
    */
   Canvas drawText(String text, float x, float y);
 
   /**
-   * Draws the supplied text layout at the specified location. The text will be drawn in the
-   * current fill color.
+   * @deprecated Use {@link #strokeText} or {@link #fillText}.
    */
+  @Deprecated
   Canvas drawText(TextLayout layout, float x, float y);
 
   /**
@@ -249,9 +249,14 @@ public interface Canvas {
   Canvas fillRoundRect(float x, float y, float width, float height, float radius);
 
   /**
+   * Fills the text at the specified location. The text will use the current fill color.
+   */
+  Canvas fillText(TextLayout text, float x, float y);
+
+  /**
    * The height of this canvas.
    */
-  int height();
+  float height();
 
   /**
    * Restores the canvas's previous state.
@@ -378,6 +383,12 @@ public interface Canvas {
   Canvas strokeRoundRect(float x, float y, float width, float height, float radius);
 
   /**
+   * Strokes the text at the specified location. The text will use the current stroke configuration
+   * (color, width, etc.).
+   */
+  Canvas strokeText(TextLayout text, float x, float y);
+
+  /**
    * Multiplies the current transformation matrix by the given matrix.
    */
   Canvas transform(float m11, float m12, float m21, float m22, float dx, float dy);
@@ -390,5 +401,5 @@ public interface Canvas {
   /**
    * The width of this canvas.
    */
-  int width();
+  float width();
 }

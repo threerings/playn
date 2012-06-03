@@ -19,17 +19,16 @@ import cli.MonoTouch.CoreGraphics.CGImage;
 
 import playn.core.Canvas;
 import playn.core.CanvasImage;
-import playn.core.gl.GLContext;
 
 /**
  * Provides {@link Canvas} rendering into an image.
  */
-public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
-{
+public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage {
+
   private final IOSCanvas canvas;
 
-  public IOSCanvasImage(IOSGLContext ctx, int width, int height) {
-    super(ctx);
+  public IOSCanvasImage(IOSGLContext ctx, float width, float height) {
+    super(ctx, ctx.scale);
     canvas = new IOSCanvas(ctx, width, height);
   }
 
@@ -39,24 +38,24 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
   }
 
   @Override
-  public int width() {
+  public float width() {
     return canvas.width();
   }
 
   @Override
-  public int height() {
+  public float height() {
     return canvas.height();
   }
 
   @Override
-  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  public Object ensureTexture(boolean repeatX, boolean repeatY) {
     // if we have a canvas, and it's dirty, force the recreation of our texture which will obtain
     // the latest canvas data
     if (canvas.dirty()) {
       canvas.clearDirty();
-      clearTexture(ctx);
+      clearTexture();
     }
-    return super.ensureTexture(ctx, repeatX, repeatY);
+    return super.ensureTexture(repeatX, repeatY);
   }
 
   @Override
@@ -65,7 +64,8 @@ public class IOSCanvasImage extends IOSAbstractImage implements CanvasImage
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
-    this.ctx.updateTexture((Integer)tex, canvas.texWidth(), canvas.texHeight(), canvas.data());
+  protected void updateTexture(Object tex) {
+    ((IOSGLContext) ctx).updateTexture((Integer)tex, canvas.texWidth(), canvas.texHeight(),
+                                       canvas.data());
   }
 }

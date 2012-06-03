@@ -213,8 +213,13 @@ public abstract class AbstractLayer implements Layer {
   }
 
   @Override
-  public Connection addListener(Mouse.Listener listener) {
-    return addInteractor(Mouse.Listener.class, listener);
+  public Connection addListener(Mouse.LayerListener listener) {
+    return addInteractor(Mouse.LayerListener.class, listener);
+  }
+
+  @Override
+  public Connection addListener(Touch.LayerListener listener) {
+    return addInteractor(Touch.LayerListener.class, listener);
   }
 
   // width() and height() exist so that we can share hitTest among all layer implementations;

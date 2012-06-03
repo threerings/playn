@@ -18,7 +18,6 @@ import java.util.HashMap;
 
 import com.google.gwt.canvas.dom.client.CanvasGradient;
 import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -39,10 +38,6 @@ import playn.core.TextLayout;
 import playn.core.gl.GL20;
 
 public abstract class HtmlGraphics implements Graphics {
-
-  static CssColor cssColor(int color) {
-    return CssColor.make(cssColorString(color));
-  }
 
   static String cssColorString(int color) {
     double a = ((color >> 24) & 0xff) / 255.0;
@@ -97,8 +92,8 @@ public abstract class HtmlGraphics implements Graphics {
   }
 
   @Override
-  public CanvasImage createImage(int w, int h) {
-    return new HtmlCanvasImage(new HtmlCanvas(w, h));
+  public CanvasImage createImage(float width, float height) {
+    return new HtmlCanvasImage(ctx(), new HtmlCanvas(width, height));
   }
 
   @Override
@@ -169,6 +164,10 @@ public abstract class HtmlGraphics implements Graphics {
   @Override
   public GL20 gl20() {
     throw new UnsupportedOperationException();
+  }
+
+  HtmlGLContext ctx() {
+    return null;
   }
 
   HtmlFontMetrics getFontMetrics(Font font) {

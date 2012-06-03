@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-tests</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>playn-tests-core</artifactId>
@@ -19,8 +19,6 @@
   </dependencies>
 
   <build>
-    <sourceDirectory>src</sourceDirectory>
-
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -30,7 +28,7 @@
 
     <resources>
       <resource>
-        <directory>${basedir}/src</directory>
+        <directory>${project.build.sourceDirectory}</directory>
       </resource>
     </resources>
   </build>

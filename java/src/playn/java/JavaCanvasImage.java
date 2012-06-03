@@ -23,18 +23,17 @@ import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.Image;
 import playn.core.ResourceCallback;
-import playn.core.gl.GLContext;
 
 class JavaCanvasImage extends JavaImage implements CanvasImage {
 
   private final JavaCanvas canvas;
 
-  JavaCanvasImage(JavaGLContext ctx, int width, int height) {
-    super(ctx, new BufferedImage(ctx.scaledCeil(width), ctx.scaledCeil(height),
-                                 BufferedImage.TYPE_INT_ARGB));
+  JavaCanvasImage(JavaGLContext ctx, float width, float height) {
+    super(ctx, new BufferedImage(ctx.scale.scaledCeil(width), ctx.scale.scaledCeil(height),
+                                 BufferedImage.TYPE_INT_ARGB), ctx.scale);
     Graphics2D gfx = img.createGraphics();
     gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    gfx.scale(ctx.scaleFactor, ctx.scaleFactor);
+    gfx.scale(ctx.scale.factor, ctx.scale.factor);
     canvas = new JavaCanvas(gfx, width(), height());
   }
 
@@ -49,13 +48,13 @@ class JavaCanvasImage extends JavaImage implements CanvasImage {
   }
 
   @Override
-  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  public Object ensureTexture(boolean repeatX, boolean repeatY) {
     // if we have a canvas, and it's dirty, force the recreation of our texture which will obtain
     // the latest canvas data
     if (canvas.dirty()) {
       canvas.clearDirty();
-      clearTexture(ctx);
+      clearTexture();
     }
-    return super.ensureTexture(ctx, repeatX, repeatY);
+    return super.ensureTexture(repeatX, repeatY);
   }
 }

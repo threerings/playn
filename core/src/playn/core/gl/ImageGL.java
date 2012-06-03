@@ -22,6 +22,11 @@ import playn.core.Pattern;
 
 public abstract class ImageGL implements Image {
 
+  protected final GLContext ctx;
+
+  /** This image's scale factor. */
+  protected final Scale scale;
+
   /** The current count of references to this image. */
   protected int refs;
 
@@ -32,14 +37,14 @@ public abstract class ImageGL implements Image {
    * Creates a texture for this image (if one does not already exist) and returns it. May return
    * null if the underlying image data is not yet ready.
    */
-  public Object ensureTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  public Object ensureTexture(boolean repeatX, boolean repeatY) {
     if (!isReady()) {
       return null;
     } else if (repeatX || repeatY) {
-      scaleTexture(ctx, repeatX, repeatY);
+      scaleTexture(repeatX, repeatY);
       return reptex;
     } else {
-      loadTexture(ctx);
+      loadTexture();
       return tex;
     }
   }
@@ -47,7 +52,7 @@ public abstract class ImageGL implements Image {
   /**
    * Releases this image's texture memory.
    */
-  public void clearTexture(GLContext ctx) {
+  public void clearTexture() {
     if (tex != null) {
       ctx.destroyTexture(tex);
       tex = null;
@@ -65,7 +70,7 @@ public abstract class ImageGL implements Image {
    * which does not support reference counting, thus images must also provide some fallback
    * mechanism for releasing their texture when no longer needed (like in their finalizer).
    */
-  public void reference(GLContext ctx) {
+  public void reference() {
     refs++; // we still create our texture on demand
   }
 
@@ -73,19 +78,19 @@ public abstract class ImageGL implements Image {
    * Decrements this image's reference count. Called by {@link ImageLayerGL} to let the image know
    * that may no longer be part of the scene graph.
    */
-  public void release(GLContext ctx) {
+  public void release() {
     Asserts.checkState(refs > 0, "Released an image with no references!");
     if (--refs == 0) {
-      clearTexture(ctx);
+      clearTexture();
     }
   }
 
   /**
    * Draws this image with the supplied transform in the specified target dimensions.
    */
-  void draw(GLContext ctx, InternalTransform xform, float dx, float dy, float dw, float dh,
+  void draw(InternalTransform xform, float dx, float dy, float dw, float dh,
             boolean repeatX, boolean repeatY, float alpha) {
-    Object tex = ensureTexture(ctx, repeatX, repeatY);
+    Object tex = ensureTexture(repeatX, repeatY);
     if (tex != null) {
       float sw = repeatX ? dw : width(), sh = repeatY ? dh : height();
       ctx.drawTexture(tex, texWidth(repeatX), texHeight(repeatY), xform,
@@ -96,13 +101,18 @@ public abstract class ImageGL implements Image {
   /**
    * Draws this image with the supplied transform, and source and target dimensions.
    */
-  void draw(GLContext ctx, InternalTransform xform, float dx, float dy, float dw, float dh,
+  void draw(InternalTransform xform, float dx, float dy, float dw, float dh,
             float sx, float sy, float sw, float sh, float alpha) {
-    Object tex = ensureTexture(ctx, false, false);
+    Object tex = ensureTexture(false, false);
     if (tex != null) {
       ctx.drawTexture(tex, texWidth(false), texHeight(false), xform,
                       dx, dy, dw, dh, x()+sx, y()+sy, sw, sh, alpha);
     }
+  }
+
+  protected ImageGL(GLContext ctx, Scale scale) {
+    this.ctx = ctx;
+    this.scale = scale;
   }
 
   /**
@@ -136,21 +146,21 @@ public abstract class ImageGL implements Image {
   /**
    * Copies our current image data into the supplied texture.
    */
-  protected abstract void updateTexture(GLContext ctx, Object tex);
+  protected abstract void updateTexture(Object tex);
 
-  private void loadTexture(GLContext ctx) {
+  private void loadTexture() {
     if (tex != null)
       return;
     tex = ctx.createTexture(false, false);
-    updateTexture(ctx, tex);
+    updateTexture(tex);
   }
 
-  private void scaleTexture(GLContext ctx, boolean repeatX, boolean repeatY) {
+  private void scaleTexture(boolean repeatX, boolean repeatY) {
     if (reptex != null)
       return;
 
-    int scaledWidth = ctx.scaledCeil(width());
-    int scaledHeight = ctx.scaledCeil(height());
+    int scaledWidth = scale.scaledCeil(width());
+    int scaledHeight = scale.scaledCeil(height());
 
     // GL requires pow2 on axes that repeat
     int width = GLUtil.nextPowerOfTwo(scaledWidth), height = GLUtil.nextPowerOfTwo(scaledHeight);
@@ -161,12 +171,12 @@ public abstract class ImageGL implements Image {
     // no need to scale if our source data is already a power of two
     if ((width == 0) && (height == 0)) {
       reptex = ctx.createTexture(scaledWidth, scaledHeight, repeatX, repeatY);
-      updateTexture(ctx, reptex);
+      updateTexture(reptex);
       return;
     }
 
     // otherwise we need to scale our non-repeated texture, so load that normally
-    loadTexture(ctx);
+    loadTexture();
 
     // width/height == 0 => already a power of two.
     if (width == 0)

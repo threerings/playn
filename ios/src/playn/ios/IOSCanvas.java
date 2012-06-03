@@ -43,23 +43,25 @@ public class IOSCanvas implements Canvas {
               float dx, float dy, float dw, float dh);
   }
 
-  private final int width, height;
+  private final float width, height;
   private final int texWidth, texHeight;
 
+  private float strokeWidth = 1;
+  private int strokeColor = 0xFF000000;
   private boolean isDirty;
   private IntPtr data;
   private CGBitmapContext bctx;
 
   private LinkedList<IOSCanvasState> states = new LinkedList<IOSCanvasState>();
 
-  public IOSCanvas(IOSGLContext ctx, int width, int height) {
+  public IOSCanvas(IOSGLContext ctx, float width, float height) {
     this.width = width;
     this.height = height;
     states.addFirst(new IOSCanvasState());
 
     // create our raw image data
-    texWidth = ctx.scaledCeil(width);
-    texHeight = ctx.scaledCeil(height);
+    texWidth = ctx.scale.scaledCeil(width);
+    texHeight = ctx.scale.scaledCeil(height);
     data = Marshal.AllocHGlobal(texWidth * texHeight * 4);
 
     // create the bitmap context via which we'll render into it
@@ -68,8 +70,8 @@ public class IOSCanvas implements Canvas {
       CGImageAlphaInfo.wrap(CGImageAlphaInfo.PremultipliedLast));
 
     // CG coordinate system is OpenGL-style (0,0 in lower left); so we flip it
-    bctx.TranslateCTM(0, ctx.scaled(height));
-    bctx.ScaleCTM(ctx.scaleFactor, -ctx.scaleFactor);
+    bctx.TranslateCTM(0, ctx.scale.scaled(height));
+    bctx.ScaleCTM(ctx.scale.factor, -ctx.scale.factor);
 
     // clear the canvas to start
     clear();
@@ -109,18 +111,18 @@ public class IOSCanvas implements Canvas {
   }
 
   @Override
-  public int width() {
+  public float width() {
     return width;
   }
 
   @Override
-  public int height() {
+  public float height() {
     return height;
   }
 
   @Override
   public Canvas clear() {
-    bctx.ClearRect(new RectangleF(0, 0, width, height));
+    bctx.ClearRect(new RectangleF(0, 0, texWidth, texHeight));
     isDirty = true;
     return this;
   }
@@ -190,7 +192,7 @@ public class IOSCanvas implements Canvas {
     return this;
   }
 
-  @Override
+  @Override @Deprecated
   public Canvas drawText(TextLayout layout, float x, float y) {
     ((IOSTextLayout) layout).draw(bctx, x, y);
     isDirty = true;
@@ -249,6 +251,13 @@ public class IOSCanvas implements Canvas {
       bctx.Clip();
       gradient.fill(bctx);
     }
+    isDirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas fillText(TextLayout layout, float x, float y) {
+    ((IOSTextLayout) layout).fill(bctx, x, y);
     isDirty = true;
     return this;
   }
@@ -332,12 +341,14 @@ public class IOSCanvas implements Canvas {
 
   @Override
   public Canvas setStrokeColor(int color) {
+    this.strokeColor = color;
     bctx.SetStrokeColor(toCGColor(color));
     return this;
   }
 
   @Override
   public Canvas setStrokeWidth(float strokeWidth) {
+    this.strokeWidth = strokeWidth;
     bctx.SetLineWidth(strokeWidth);
     return this;
   }
@@ -374,6 +385,13 @@ public class IOSCanvas implements Canvas {
   public Canvas strokeRoundRect(float x, float y, float width, float height, float radius) {
     addRoundRectPath(x, y, width, height, radius);
     bctx.StrokePath();
+    isDirty = true;
+    return this;
+  }
+
+  @Override
+  public Canvas strokeText(TextLayout layout, float x, float y) {
+    ((IOSTextLayout) layout).stroke(bctx, x, y, strokeWidth, strokeColor);
     isDirty = true;
     return this;
   }

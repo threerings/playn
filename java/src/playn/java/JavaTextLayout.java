@@ -28,26 +28,56 @@ import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
 
+import playn.core.AbstractTextLayout;
 import playn.core.TextFormat;
 
-class JavaTextLayout implements playn.core.TextLayout {
+// TODO: remove this annotation once we've nixed deprecated TextFormat bits
+@SuppressWarnings("deprecation")
+class JavaTextLayout extends AbstractTextLayout {
 
   private static FontRenderContext dummyFontContext = createDummyFRC();
 
-  private float width, height;
-  private TextFormat format;
   private List<TextLayout> layouts = new ArrayList<TextLayout>();
-  private Color textColor, altColor;
+  private final JavaTextStamp stamp, altStamp;
 
-  public JavaTextLayout(String text, TextFormat format) {
-    this.format = format;
+  private class JavaTextStamp implements Stamp<Graphics2D> {
+    private final Color color;
 
-    // convert our colors to Java-land
-    textColor = JavaCanvasState.convertColor(format.textColor);
-    Integer altARGB = format.effect.getAltColor();
-    if (altARGB != null) {
-      altColor = JavaCanvasState.convertColor(altARGB);
+    public JavaTextStamp(int color) {
+      this.color = JavaCanvasState.convertColor(color);
     }
+
+    @Override
+    public void draw(Graphics2D gfx, float x, float y) {
+      gfx.setColor(color);
+      paint(gfx, x, y, false);
+    }
+
+    public void paint(Graphics2D gfx, float x, float y, boolean stroke) {
+      float yoff = y;
+      for (TextLayout layout : layouts) {
+        Rectangle2D bounds = layout.getBounds();
+        // some fonts starting rendering inset to the right, and others start rendering at a negative
+        // inset, blowing outside their bounding box (naughty!); for the former, we trim off that
+        // inset and for the latter we shift everything to the right to ensure that we don't paint
+        // outside our reported bounding box (so that someone can create a single canvas of bounding
+        // box size and render this text layout into it at (0,0) and nothing will get cut off)
+        float sx = x + (float)-bounds.getX() + format.align.getX(getWidth(bounds), width);
+        yoff += layout.getAscent();
+        if (stroke) {
+          gfx.translate(sx, yoff);
+          gfx.draw(layout.getOutline(null));
+          gfx.translate(-sx, -yoff);
+        } else {
+          layout.draw(gfx, sx, yoff);
+        }
+        yoff += layout.getDescent() + layout.getLeading();
+      }
+    }
+  }
+
+  public JavaTextLayout(JavaGraphics gfx, String text, TextFormat format) {
+    super(gfx, format);
 
     // normalize newlines in the text (Windows: CRLF -> LF, Mac OS pre-X: CR -> LF)
     text = text.replace("\r\n", "\n").replace('\r', '\n');
@@ -83,21 +113,16 @@ class JavaTextLayout implements playn.core.TextLayout {
       }
       theight += (layout.getAscent() + layout.getDescent());
     }
-    width = format.effect.adjustWidth(twidth);
-    height = format.effect.adjustHeight(theight);
-  }
+    width = twidth;
+    height = theight;
 
-  @Override
-  public float width() {
-    // reserve a pixel on the left and right to make antialiasing work better
-    return width + 2*PAD;
-  }
-
-  @Override
-  public float height() {
-    // reserve a pixel only on the top to make antialising work better; nearly no fonts jam up
-    // against the bottom, so reserving a pixel down there just makes things look misaligned
-    return height + PAD;
+    // create our stamps
+    stamp = new JavaTextStamp(format.textColor);
+    if (format.effect.getAltColor() != null) {
+      altStamp = new JavaTextStamp(format.effect.getAltColor());
+    } else {
+      altStamp = null;
+    }
   }
 
   @Override
@@ -105,82 +130,21 @@ class JavaTextLayout implements playn.core.TextLayout {
     return layouts.size();
   }
 
-  @Override
-  public TextFormat format() {
-    return format;
+  void stroke(Graphics2D gfx, float x, float y) {
+    stamp.paint(gfx, x, y, true);
   }
 
-  void paint(Graphics2D gfx, float x, float y) {
+  void draw(Graphics2D gfx, float x, float y) {
     Color ocolor = gfx.getColor();
-
-    if (format.effect instanceof TextFormat.Effect.Shadow) {
-      TextFormat.Effect.Shadow seffect = (TextFormat.Effect.Shadow)format.effect;
-      // if the shadow is negative, we need to move the real text down/right to keep everything
-      // within our bounds
-      float tx, sx, ty, sy;
-      if (seffect.shadowOffsetX > 0) {
-        tx = 0;
-        sx = seffect.shadowOffsetX;
-      } else {
-        tx = -seffect.shadowOffsetX;
-        sx = 0;
-      }
-      if (seffect.shadowOffsetY > 0) {
-        ty = 0;
-        sy = seffect.shadowOffsetY;
-      } else {
-        ty = -seffect.shadowOffsetY;
-        sy = 0;
-      }
-      gfx.setColor(altColor);
-      paintOnce(gfx, x + sx, y + sy);
-      gfx.setColor(textColor);
-      paintOnce(gfx, x + tx, y + ty);
-
-    } else if (format.effect instanceof TextFormat.Effect.Outline) {
-      // you might think that we could render TextLayout.getOutline() but the results are hideous;
-      // this expensive but functional approach is way better looking
-      gfx.setColor(altColor);
-      paintOnce(gfx, x+0, y+0);
-      paintOnce(gfx, x+0, y+1);
-      paintOnce(gfx, x+0, y+2);
-      paintOnce(gfx, x+1, y+0);
-      paintOnce(gfx, x+1, y+2);
-      paintOnce(gfx, x+2, y+0);
-      paintOnce(gfx, x+2, y+1);
-      paintOnce(gfx, x+2, y+2);
-
-      gfx.setColor(textColor);
-      paintOnce(gfx, x+1, y+1);
-
-    } else {
-      gfx.setColor(textColor);
-      paintOnce(gfx, x, y);
-    }
-
+    draw(gfx, stamp, altStamp, x, y);
     gfx.setColor(ocolor);
   }
 
-  void paintOnce(Graphics2D gfx, float x, float y) {
-    float yoff = 0;
-    for (TextLayout layout : layouts) {
-      Rectangle2D bounds = layout.getBounds();
-      // some fonts starting rendering inset to the right, and others start rendering at a negative
-      // inset, blowing outside their bounding box (naughty!); for the former, we trim off that
-      // inset and for the latter we shift everything to the right to ensure that we don't paint
-      // outside our reported bounding box (so that someone can create a single canvas of bounding
-      // box size and render this text layout into it at (0,0) and nothing will get cut off)
-      float rx = (float)-bounds.getX() + format.align.getX(getWidth(bounds), width);
-      yoff += layout.getAscent();
-      layout.draw(gfx, x + rx + PAD, y + yoff + PAD);
-      if (layout != layouts.get(0)) {
-        yoff += layout.getLeading(); // add interline spacing
-      }
-      yoff += layout.getDescent();
-    }
+  void fill(Graphics2D gfx, float x, float y) {
+    stamp.paint(gfx, x, y, false);
   }
 
-  float getWidth(Rectangle2D bounds) {
+  private static float getWidth(Rectangle2D bounds) {
     // if our text includes a negative inset, that needs to be tacked onto the width
     return (float)(Math.max(-bounds.getX(), 0) + bounds.getWidth());
   }
@@ -190,8 +154,4 @@ class JavaTextLayout implements playn.core.TextLayout {
     gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     return gfx.getFontRenderContext();
   }
-
-  // this is used to reserve one pixel of padding around the top and sides of our rendered text
-  // which makes antialising work much more nicely
-  private final float PAD = 1;
 }

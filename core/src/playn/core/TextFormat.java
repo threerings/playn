@@ -47,9 +47,11 @@ public class TextFormat {
     public abstract float getX(float textWidth, float lineWidth);
   };
 
-  /** Used to model the different text effects: shadow and outline. */
+  /** @deprecated Use stroke and fill to create your own effects. */
+  @Deprecated
   public static abstract class Effect {
-    /** Indicates that no text effect should be used. */
+    /** @deprecated Use stroke and fill to create your own effects. */
+    @Deprecated
     public static final Effect NONE = new Effect() {
       @Override
       public String toString() {
@@ -57,17 +59,20 @@ public class TextFormat {
       }
     };
 
-    /** Creates a shadow effect as specified. */
+    /** @deprecated Use stroke and fill to create your own effects. */
+    @Deprecated
     public static Effect shadow (int shadowColor, float shadowOffsetX, float shadowOffsetY) {
       return new Shadow(shadowColor, shadowOffsetX, shadowOffsetY);
     }
 
-    /** Creates an outline effect as specified. */
+    /** @deprecated Use stroke and fill to create your own effects. */
+    @Deprecated
     public static Effect outline (int outlineColor) {
-      return new Outline(outlineColor);
+      return new PixelOutline(outlineColor);
     }
 
-    /** Contains metadata for the shadow effect. */
+    /** @deprecated Use stroke and fill to create your own effects. */
+    @Deprecated
     public static final class Shadow extends Effect {
       /** The color of the shadow (as {@code 0xAARRGGBB}). */
       public final int shadowColor;
@@ -106,22 +111,23 @@ public class TextFormat {
       }
     }
 
-    /** Contains metadata for the outline effect. */
-    public static final class Outline extends Effect {
+    /** @deprecated Use stroke and fill to create your own effects. */
+    @Deprecated
+    public static final class PixelOutline extends Effect {
       /** The color of the outline (as {@code 0xAARRGGBB}). */
       public final int outlineColor;
 
-      public Outline (int outlineColor) {
+      public PixelOutline (int outlineColor) {
         this.outlineColor = outlineColor;
       }
 
       @Override
       public float adjustWidth (float width) {
-        return width + 4;
+        return width + 2;
       }
       @Override
       public float adjustHeight (float height) {
-        return height + 4;
+        return height + 2;
       }
       @Override
       public Integer getAltColor () {
@@ -130,7 +136,7 @@ public class TextFormat {
 
       @Override
       public String toString() {
-        return "outline [color=" + Integer.toHexString(outlineColor) + "]";
+        return "poutline [color=" + Integer.toHexString(outlineColor) + "]";
       }
     }
 
@@ -163,10 +169,12 @@ public class TextFormat {
   /** The alignment to use for multiline text. */
   public final Alignment align;
 
-  /** The fill color to be used for the text (as {@code 0xAARRGGBB}). */
+  /** @deprecated Use set the stroke or fill color on the canvas instead. */
+  @Deprecated
   public final int textColor;
 
-  /** The effect to apply to the text when rendering, or {@link Effect#NONE}. */
+  /** @deprecated Use stroke and fill to create your own effects. */
+  @Deprecated
   public final Effect effect;
 
   /** Creates a default text format instance. */
@@ -174,13 +182,23 @@ public class TextFormat {
     this(null, Float.MAX_VALUE, Alignment.LEFT, 0xFF000000, Effect.NONE);
   }
 
-  /** Creates a configured text format instance. */
+  /** @deprecated Use stroke and fill to create your own effects. */
+  @Deprecated
   public TextFormat(Font font, float wrapWidth, Alignment align, int textColor, Effect effect) {
     this.font = font;
     this.wrapWidth = wrapWidth;
     this.align = align;
     this.textColor = textColor;
     this.effect = effect;
+  }
+
+  /** Creates a configured text format instance. */
+  public TextFormat(Font font, float wrapWidth, Alignment align) {
+    this.font = font;
+    this.wrapWidth = wrapWidth;
+    this.align = align;
+    this.textColor = 0xFF000000;
+    this.effect = Effect.NONE;
   }
 
   /** Returns true if line wrapping is desired. */
@@ -209,12 +227,14 @@ public class TextFormat {
     return new TextFormat(this.font, this.wrapWidth, align, this.textColor, this.effect);
   }
 
-  /** Returns a clone of this text format with the text color configured as specified. */
+  /** @deprecated Use set the stroke or fill color on the canvas instead. */
+  @Deprecated
   public TextFormat withTextColor(int textColor) {
     return new TextFormat(this.font, this.wrapWidth, this.align, textColor, this.effect);
   }
 
-  /** Returns a clone of this text format with the effect configured as specified. */
+  /** @deprecated Use stroke and fill to create your own effects. */
+  @Deprecated
   public TextFormat withEffect(Effect effect) {
     return new TextFormat(this.font, this.wrapWidth, this.align, this.textColor, effect);
   }
@@ -222,7 +242,6 @@ public class TextFormat {
   @Override
   public String toString() {
     String wrapStr = shouldWrap() ? ""+wrapWidth : "n/a";
-    return "[font=" + font + ", wrapWidth=" + wrapStr + ", align=" + align +
-      ", textColor=" + Integer.toHexString(textColor) + ", effect=" + effect + "]";
+    return "[font=" + font + ", wrapWidth=" + wrapStr + ", align=" + align + "]";
   }
 }

@@ -15,6 +15,9 @@
  */
 package playn.android;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,15 +25,23 @@ import android.graphics.LinearGradient;
 import android.graphics.PixelFormat;
 import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
+import android.graphics.Typeface;
 import android.view.View;
+import android.util.Pair;
+
+import pythagoras.f.IPoint;
+import pythagoras.f.MathUtil;
+import pythagoras.f.Point;
 
 import playn.core.CanvasImage;
 import playn.core.Font;
 import playn.core.Gradient;
 import playn.core.GroupLayer;
 import playn.core.Image;
+import playn.core.InternalTransform;
 import playn.core.Path;
 import playn.core.Pattern;
+import playn.core.StockInternalTransform;
 import playn.core.TextFormat;
 import playn.core.TextLayout;
 import playn.core.gl.GL20;
@@ -39,40 +50,60 @@ import playn.core.gl.GraphicsGL;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.SurfaceGL;
 
-class AndroidGraphics extends GraphicsGL {
+public class AndroidGraphics extends GraphicsGL {
 
-  private static int startingScreenWidth;
-  private static int startingScreenHeight;
+  private static int startingScreenWidth, startingScreenHeight;
 
   public final AndroidGLContext ctx;
   public final Bitmap.Config preferredBitmapConfig;
 
   final GroupLayerGL rootLayer;
-  private final GameActivity activity;
-  private final GameViewGL gameView;
-  private final AndroidTouchEventHandler touchHandler;
+  private final InternalTransform rootTransform = new StockInternalTransform();
+  private final AndroidPlatform platform;
+  private final Point touchTemp = new Point();
 
   private int screenWidth, screenHeight;
   private boolean sizeSetManually = false;
+  private Map<Pair<String,Font.Style>,Typeface> fonts =
+    new HashMap<Pair<String,Font.Style>,Typeface>();
 
-  public AndroidGraphics(AndroidPlatform platform, GameActivity activity, AndroidGL20 gfx,
-                         AndroidTouchEventHandler touchHandler) {
-    this.activity = activity;
-    this.touchHandler = touchHandler;
+  public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx, float scaleFactor) {
+    this.platform = platform;
     this.preferredBitmapConfig = mapDisplayPixelFormat();
     if (startingScreenWidth != 0)
-      screenWidth = startingScreenWidth;
+      screenWidth = MathUtil.iceil(startingScreenWidth / scaleFactor);
     if (startingScreenHeight != 0)
-      screenHeight = startingScreenHeight;
-    // TODO: determine scale factor automatically?
-    ctx = new AndroidGLContext(platform, 1, gfx, screenWidth, screenHeight);
-    gameView = activity.gameView();
+      screenHeight = MathUtil.iceil(startingScreenHeight / scaleFactor);
+    ctx = new AndroidGLContext(platform, scaleFactor, gfx, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
+    rootTransform.uniformScale(scaleFactor);
+  }
+
+  /**
+   * Registers a font with the graphics system.
+   *
+   * @param path the path to the font resource (relative to the asset manager's path prefix).
+   * @param name the name under which to register the font.
+   * @param style the style variant of the specified name provided by the font file. For example
+   * one might {@code registerFont("myfont.ttf", "My Font", Font.Style.PLAIN)} and
+   * {@code registerFont("myfontb.ttf", "My Font", Font.Style.BOLD)} to provide both the plain and
+   * bold variants of a particular font.
+   */
+  public void registerFont(String path, String name, Font.Style style) {
+    try {
+      // Android has no way to load a font from an input stream so we have to first copy the data
+      // into a file and then load from there; awesome!
+      Typeface face = Typeface.createFromFile(
+        platform.assets().cacheAsset(path, name + path.substring(path.lastIndexOf('.'))));
+      fonts.put(Pair.create(name, style), face);
+    } catch (Exception e) {
+        platform.log().warn("Failed to load font [name=" + name + ", path=" + path + "]", e);
+    }
   }
 
   @Override
-  public CanvasImage createImage(int w, int h) {
-    return new AndroidCanvasImage(this, w, h, true);
+  public CanvasImage createImage(float width, float height) {
+    return new AndroidCanvasImage(this, width, height);
   }
 
   @Override
@@ -104,7 +135,9 @@ class AndroidGraphics extends GraphicsGL {
    */
   @Override
   public Font createFont(String name, Font.Style style, float size) {
-    return new AndroidFont(name, style, size);
+    Typeface face = fonts.get(Pair.create(name, style));
+    return (face == null) ? new AndroidFont(name, style, size) :
+      new AndroidFont(name, style, size, face);
   }
 
   @Override
@@ -146,12 +179,11 @@ class AndroidGraphics extends GraphicsGL {
   }
 
   void refreshScreenSize(boolean resize) {
-    View viewLayout = activity.viewLayout();
+    View viewLayout = platform.activity.viewLayout();
     int oldWidth = screenWidth;
     int oldHeight = screenHeight;
     screenWidth = viewLayout.getWidth();
     screenHeight = viewLayout.getHeight();
-    touchHandler.calculateOffsets(this);
     // Change game size to fill the screen if it has never been set manually.
     if (resize && !sizeSetManually && (screenWidth != oldWidth || screenHeight != oldHeight))
       setSize(screenWidth, screenHeight, false);
@@ -168,18 +200,13 @@ class AndroidGraphics extends GraphicsGL {
   }
 
   @Override
-  public float scaleFactor() {
-    return ctx.scaleFactor;
-  }
-
-  @Override
   public GL20 gl20() {
     return ctx.gl20;
   }
 
   @Override
-  protected SurfaceGL createSurface(int width, int height) {
-    return new AndroidSurfaceGL(activity.getCacheDir(), ctx, width, height);
+  protected SurfaceGL createSurface(float width, float height) {
+    return new AndroidSurfaceGL(platform.activity.getCacheDir(), ctx, width, height);
   }
 
   @Override
@@ -187,31 +214,30 @@ class AndroidGraphics extends GraphicsGL {
     return ctx;
   }
 
-  /** Used to create bitmaps for canvas images. */
-  Bitmap createBitmap(int width, int height, boolean alpha) {
-    // TODO: Why not always use the preferredBitmapConfig?  (Preserved from pre-GL code)
-    return Bitmap.createBitmap(
-      width, height, alpha ? preferredBitmapConfig : Bitmap.Config.ARGB_8888);
-  }
-
   void preparePaint() {
     ctx.preparePaint();
   }
 
   void paintLayers() {
-    ctx.paintLayers(rootLayer);
+    ctx.paintLayers(rootLayer, rootTransform);
+  }
+
+  IPoint transformTouch(float x, float y) {
+    // TODO: nix these adjustments when we nix support for setting screen size
+    x -= (screenWidth() - width()) / 2;
+    y -= (screenHeight() - height()) / 2;
+    return rootTransform.inverseTransform(touchTemp.set(x, y), touchTemp);
   }
 
   private void setSize(int width, int height, boolean manual) {
     if (manual)
       sizeSetManually = true;
-    gameView.gameSizeSet();
-    touchHandler.calculateOffsets(this);
+    platform.activity.gameView().gameSizeSet();
     // Layout the views again to change the surface size
-    activity.runOnUiThread(new Runnable() {
+    platform.activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        View viewLayout = activity.viewLayout();
+        View viewLayout = platform.activity.viewLayout();
         viewLayout.measure(viewLayout.getMeasuredWidth(), viewLayout.getMeasuredHeight());
         viewLayout.requestLayout();
       }
@@ -224,16 +250,16 @@ class AndroidGraphics extends GraphicsGL {
    */
   private Bitmap.Config mapDisplayPixelFormat() {
     // TODO:  This method will require testing over a variety of devices.
-    int format = activity.getWindowManager().getDefaultDisplay().getPixelFormat();
+    int format = platform.activity.getWindowManager().getDefaultDisplay().getPixelFormat();
     ActivityManager activityManager = (ActivityManager)
-      activity.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
+      platform.activity.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
     int memoryClass = activityManager.getMemoryClass();
 
     // For low memory devices (like the HTC Magic), prefer 16-bit bitmaps
-    // FIXME: The memoryClass check is from the Canvas-only implementation and may function incorrectly with OpenGL
-    if (format == PixelFormat.RGBA_4444 ||  memoryClass <= 16)
-      return Bitmap.Config.ARGB_4444;
-    else return Bitmap.Config.ARGB_8888;
+    // FIXME: The memoryClass check is from the Canvas-only implementation and may function
+    // incorrectly with OpenGL
+    return (format == PixelFormat.RGBA_4444 || memoryClass <= 16) ?
+      Bitmap.Config.ARGB_4444 : Bitmap.Config.ARGB_8888;
   }
 
   /**

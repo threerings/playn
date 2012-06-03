@@ -26,25 +26,25 @@ import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
+import playn.core.gl.Scale;
 
 abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
 
-  protected final JavaGLContext ctx;
   protected BufferedImage img;
 
-  JavaImage(JavaGLContext ctx, BufferedImage img) {
-    this.ctx = ctx;
+  JavaImage(GLContext ctx, BufferedImage img, Scale scale) {
+    super(ctx, scale);
     this.img = img;
   }
 
   @Override
-  public int width() {
-    return ctx.invScaledCeil(img.getWidth());
+  public float width() {
+    return scale.invScaled(img.getWidth());
   }
 
   @Override
-  public int height() {
-    return ctx.invScaledCeil(img.getHeight());
+  public float height() {
+    return scale.invScaled(img.getHeight());
   }
 
   @Override
@@ -76,12 +76,12 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
 
   @Override
   public Image transform(BitmapTransformer xform) {
-    return new JavaStaticImage(ctx, ((JavaBitmapTransformer) xform).transform(img));
+    return new JavaStaticImage(ctx, ((JavaBitmapTransformer) xform).transform(img), scale);
   }
 
   @Override
   public void draw(Graphics2D gfx, float x, float y, float w, float h) {
-    // using img.getWidth/Height here accounts for ctx.scaleFactor
+    // using img.getWidth/Height here accounts for ctx.scale.factor
     AffineTransform tx = new AffineTransform(w / img.getWidth(), 0f, 0f,
                                              h / img.getHeight(), x, y);
     gfx.drawImage(img, tx, null);
@@ -91,20 +91,21 @@ abstract class JavaImage extends ImageGL implements JavaCanvas.Drawable {
   public void draw(Graphics2D gfx, float dx, float dy, float dw, float dh,
                    float sx, float sy, float sw, float sh) {
     // adjust our source rect to account for the scale factor
-    sx *= ctx.scaleFactor;
-    sy *= ctx.scaleFactor;
-    sw *= ctx.scaleFactor;
-    sh *= ctx.scaleFactor;
+    sx *= scale.factor;
+    sy *= scale.factor;
+    sw *= scale.factor;
+    sh *= scale.factor;
     // now render the image through a clip and with a scaling transform, so that only the desired
     // source rect is rendered, and is rendered into the desired target region
     float scaleX = dw/sw, scaleY = dh/sh;
     gfx.setClip(new Rectangle2D.Float(dx, dy, dw, dh));
-    gfx.drawImage(img, new AffineTransform(scaleX, 0f, 0f, scaleY, dx-sx*scaleX, dy-sy*scaleY), null);
+    gfx.drawImage(img, new AffineTransform(scaleX, 0f, 0f, scaleY,
+                                           dx-sx*scaleX, dy-sy*scaleY), null);
     gfx.setClip(null);
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
+  protected void updateTexture(Object tex) {
     Asserts.checkState(img != null);
     ((JavaGLContext) ctx).updateTexture((Integer) tex, img);
   }

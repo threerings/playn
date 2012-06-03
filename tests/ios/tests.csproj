@@ -66,7 +66,7 @@
       <HintPath>bin\playn-tests-ios.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>..\..\..\ikvm-monotouch\bin\IKVM.OpenJDK.Core.dll</HintPath>
+      <HintPath>bin\IKVM.OpenJDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="System.Data" />
@@ -80,16 +80,17 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Content Include="images\alphalayertest.png" />
-    <Content Include="images\alphalayertest@2x.png" />
     <Content Include="images\alphalayertest_expected.png" />
-    <Content Include="images\alphalayertest_expected@2x.png" />
     <Content Include="images\imagetypetest.png" />
-    <Content Include="images\imagetypetest@2x.png" />
     <Content Include="images\imagetypetest_expected.png" />
-    <Content Include="images\imagetypetest_expected@2x.png" />
     <Content Include="images\orange.png" />
-    <Content Include="images\orange@2x.png" />
     <Content Include="images\tile.png" />
     <Content Include="touch-icon-57x57.png" />
+    <Content Include="images\alphalayertest%402x.png" />
+    <Content Include="images\alphalayertest_expected%402x.png" />
+    <Content Include="images\imagetypetest%402x.png" />
+    <Content Include="images\imagetypetest_expected%402x.png" />
+    <Content Include="images\orange%402x.png" />
+    <Content Include="Default%402x.png" />
   </ItemGroup>
 </Project>

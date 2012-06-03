@@ -26,7 +26,6 @@ import playn.core.Analytics;
 import playn.core.Audio;
 import playn.core.PlayN;
 import playn.core.Game;
-import playn.core.Graphics;
 import playn.core.Json;
 import playn.core.Keyboard;
 import playn.core.Log;
@@ -144,7 +143,7 @@ public class HtmlPlatform implements Platform {
   // initialization, before we have called PlayN.setPlatform
   static final HtmlLog log = GWT.create(HtmlLog.class);
 
-  private final HtmlAssets assets = new HtmlAssets();
+  private final HtmlAssets assets = new HtmlAssets(this);
   private final HtmlAudio audio = new HtmlAudio();
   private final HtmlRegularExpression regularExpression = new HtmlRegularExpression();
   private final HtmlGraphics graphics;
@@ -207,7 +206,7 @@ public class HtmlPlatform implements Platform {
   }
 
   @Override
-  public Graphics graphics() {
+  public HtmlGraphics graphics() {
     return graphics;
   }
 

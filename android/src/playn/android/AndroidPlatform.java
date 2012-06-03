@@ -24,6 +24,7 @@ import playn.core.Mouse;
 import playn.core.MouseStub;
 import playn.core.Platform;
 import playn.core.PlayN;
+import playn.core.TouchImpl;
 import playn.core.json.JsonImpl;
 import playn.core.util.RunQueue;
 
@@ -40,35 +41,35 @@ public class AndroidPlatform implements Platform {
   Game game;
   GameActivity activity;
 
+  private final AndroidAnalytics analytics;
+  private final AndroidAssets assets;
   private final AndroidAudio audio;
   private final AndroidGraphics graphics;
-  private final Json json;
   private final AndroidKeyboard keyboard;
   private final AndroidLog log;
   private final AndroidNet net;
   private final AndroidPointer pointer;
   private final AndroidStorage storage;
-  private final AndroidTouch touch;
+  private final TouchImpl touch;
   private final AndroidTouchEventHandler touchHandler;
-  private final AndroidAssets assets;
-  private final AndroidAnalytics analytics;
+  private final Json json;
   private final RunQueue runQueue;
 
   protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
     this.activity = activity;
 
-    audio = new AndroidAudio(activity);
-    touchHandler = new AndroidTouchEventHandler(activity.gameView());
-    graphics = new AndroidGraphics(this, activity, gl20, touchHandler);
-    json = new JsonImpl();
-    keyboard = new AndroidKeyboard();
     log = new AndroidLog();
-    net = new AndroidNet();
-    pointer = new AndroidPointer();
-    touch = new AndroidTouch();
-    assets = new AndroidAssets(graphics, audio);
+    audio = new AndroidAudio(this);
+    graphics = new AndroidGraphics(this, gl20, activity.scaleFactor());
     analytics = new AndroidAnalytics();
+    assets = new AndroidAssets(this);
+    json = new JsonImpl();
+    keyboard = new AndroidKeyboard(this);
+    net = new AndroidNet(this);
+    pointer = new AndroidPointer();
     storage = new AndroidStorage(activity);
+    touch = new TouchImpl();
+    touchHandler = new AndroidTouchEventHandler(graphics, activity.gameView());
     runQueue = new RunQueue(log);
   }
 
@@ -129,7 +130,7 @@ public class AndroidPlatform implements Platform {
   }
 
   @Override
-  public AndroidTouch touch() {
+  public TouchImpl touch() {
     return touch;
   }
 

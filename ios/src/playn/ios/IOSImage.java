@@ -19,27 +19,28 @@ import cli.MonoTouch.CoreGraphics.CGImage;
 import cli.MonoTouch.UIKit.UIImage;
 
 import playn.core.gl.GLContext;
+import playn.core.gl.Scale;
 
 /**
  * Implements {@link Image} based on a static bitmap.
  */
-public class IOSImage extends IOSAbstractImage
-{
+public class IOSImage extends IOSAbstractImage {
+
   private final UIImage image;
 
-  public IOSImage (IOSGLContext ctx, UIImage image) {
-    super(ctx);
+  public IOSImage (GLContext ctx, UIImage image, Scale scale) {
+    super(ctx, scale);
     this.image = image;
   }
 
   @Override
-  public int width() {
-    return ctx.invScaledCeil(image.get_CGImage().get_Width());
+  public float width() {
+    return scale.invScaled(image.get_CGImage().get_Width());
   }
 
   @Override
-  public int height() {
-    return ctx.invScaledCeil(image.get_CGImage().get_Height());
+  public float height() {
+    return scale.invScaled(image.get_CGImage().get_Height());
   }
 
   @Override
@@ -53,7 +54,7 @@ public class IOSImage extends IOSAbstractImage
   }
 
   @Override
-  protected void updateTexture(GLContext ctx, Object tex) {
-    this.ctx.updateTexture((Integer)tex, image);
+  protected void updateTexture(Object tex) {
+    ((IOSGLContext) ctx).updateTexture((Integer)tex, image);
   }
 }
