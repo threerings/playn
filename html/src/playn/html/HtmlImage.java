@@ -29,6 +29,7 @@ import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.Pattern;
 import playn.core.ResourceCallback;
+import playn.core.gl.GL20;
 import playn.core.gl.GLContext;
 import playn.core.gl.ImageGL;
 import playn.core.gl.Scale;
@@ -168,5 +169,15 @@ class HtmlImage extends ImageGL implements HtmlCanvas.Drawable {
     canvas.setHeight(MathUtil.iceil(height));
     canvas.getContext2d().drawImage(img, x, y, width, height, 0, 0, width, height);
     return canvas.cast();
+  }
+  
+  @Override
+  public void glTexImage2D(GL20 gl, int target, int level, int internalformat, int format, int type) {
+    ((HtmlGL20) gl).gl.texImage2D(target, level, internalformat, format, type, img);
+  }
+  
+  @Override
+  public void glTexSubImage2D(GL20 gl, int target, int level, int xOffset, int yOffset, int format, int type) {
+    ((HtmlGL20) gl).gl.texSubImage2D(target, level, xOffset, yOffset, format, type, img);
   }
 }

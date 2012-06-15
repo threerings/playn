@@ -20,6 +20,7 @@ import flash.gwt.FlashImport;
 import java.util.ArrayList;
 import java.util.List;
 
+import playn.core.AbstractImage;
 import playn.core.Image;
 import playn.core.ResourceCallback;
 import flash.display.BitmapData;
@@ -29,7 +30,7 @@ import playn.core.Pattern;
 @FlashImport({
   "flash.display.Loader", "flash.events.Event", "flash.net.URLRequest", "flash.system.LoaderContext"
 })
-class FlashImage implements Image {
+class FlashImage extends AbstractImage implements Image {
 
   private List<ResourceCallback<? super Image>> callbacks =
     new ArrayList<ResourceCallback<? super Image>>();

@@ -15,12 +15,13 @@
  */
 package playn.core.gl;
 
+import playn.core.AbstractImage;
 import playn.core.Asserts;
 import playn.core.Image;
 import playn.core.InternalTransform;
 import playn.core.Pattern;
 
-public abstract class ImageGL implements Image {
+public abstract class ImageGL extends AbstractImage implements Image {
 
   protected final GLContext ctx;
 
