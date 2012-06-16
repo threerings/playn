@@ -32,7 +32,8 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   private final CanvasElement canvas;
   private final Context2d ctx;
 
-  public HtmlGraphicsCanvas() {
+  public HtmlGraphicsCanvas(HtmlPlatform.Configuration configuration) {
+    super(configuration);
     canvas = Document.get().createCanvasElement();
     rootElement.appendChild(canvas);
     ctx = canvas.getContext2d();

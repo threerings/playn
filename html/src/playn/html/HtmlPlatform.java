@@ -44,6 +44,8 @@ public class HtmlPlatform implements Platform {
     public Mode mode = Mode.AUTODETECT;
     public boolean transparentCanvas = false;
     public boolean antiAliasing = true;
+    // Scale up the canvas on fullscreen. Highly experimental.
+    public boolean experimentalFullscreen = false;
   }
   
   /** Used by {@link #register(Mode)}. */
@@ -356,14 +358,14 @@ public class HtmlPlatform implements Platform {
     try {
       switch (configuration.mode != null ? configuration.mode : Renderer.requestedMode()) {
       case CANVAS:
-        return new HtmlGraphicsCanvas();
+        return new HtmlGraphicsCanvas(configuration);
       case DOM:
-        return new HtmlGraphicsDom();
+        return new HtmlGraphicsDom(configuration);
       case WEBGL:
         return new HtmlGraphicsGL(this, configuration);
       default:
       case AUTODETECT:
-        return hasGLSupport() ? new HtmlGraphicsGL(this, configuration) : new HtmlGraphicsCanvas();
+        return hasGLSupport() ? new HtmlGraphicsGL(this, configuration) : new HtmlGraphicsCanvas(configuration);
       }
 
     // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.
@@ -373,7 +375,7 @@ public class HtmlPlatform implements Platform {
       log().info("GL context creation failed with an unknown error." + t);
     }
 
-    return new HtmlGraphicsCanvas();
+    return new HtmlGraphicsCanvas(configuration);
   }
 
   private native JavaScriptObject getWindow() /*-{

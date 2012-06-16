@@ -37,10 +37,10 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   private final CanvasElement canvas;
   private final HtmlGLContext ctx;
-  private HtmlGL20 gl20;
   private final GroupLayerGL rootLayer;
 
   HtmlGraphicsGL(HtmlPlatform platform, HtmlPlatform.Configuration configuration) throws RuntimeException {
+    super(configuration);
     canvas = Document.get().createCanvasElement();
     rootElement.appendChild(canvas);
     try {
@@ -148,9 +148,13 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   void paint(Game game, float paintAlpha) {
-    ctx.preparePaint(rootLayer);
-    game.paint(paintAlpha);
-    ctx.paintLayers(rootLayer);
+    if (rootLayer.size() > 0) {
+      ctx.preparePaint(rootLayer);
+      game.paint(paintAlpha);
+      ctx.paintLayers(rootLayer);
+    } else {
+      game.paint(paintAlpha);
+    }
   }
 
   @Override

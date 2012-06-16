@@ -30,7 +30,8 @@ class HtmlGraphicsDom extends HtmlGraphics {
 
   private final HtmlGroupLayerDom rootLayer;
 
-  public HtmlGraphicsDom() {
+  public HtmlGraphicsDom(HtmlPlatform.Configuration configuration) {
+    super(configuration);
     Element div = Document.get().createDivElement();
     div.getStyle().setOverflow(Overflow.HIDDEN);
     rootElement.appendChild(div);
