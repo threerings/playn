@@ -57,6 +57,7 @@ class AndroidGLContext extends GL20Context {
     for (Refreshable ref : refreshables.keySet()) {
       ref.onSurfaceLost();
     }
+    cleanup(); // release our shaders and buffers
   }
 
   void updateTexture(int texture, Bitmap image) {
