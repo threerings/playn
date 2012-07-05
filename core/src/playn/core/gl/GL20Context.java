@@ -61,6 +61,17 @@ public class GL20Context extends GLContext {
     checkGLError("initGL");
   }
 
+  public void cleanup() {
+    if (quadShader != null) {
+      quadShader.clearProgram();
+      quadShader = null;
+    }
+    if (trisShader != null) {
+      trisShader.clearProgram();
+      trisShader = null;
+    }
+  }
+
   public void preparePaint(GroupLayerGL rootLayer) {
     checkGLError("preparePaint");
     if (rootLayer.size() > 0) {
