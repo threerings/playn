@@ -21,11 +21,11 @@ import android.widget.LinearLayout;
 
 public class AndroidLayoutView extends LinearLayout {
 
-  private GameActivity activity;
+  private AndroidPlatform platform;
 
-  public AndroidLayoutView(GameActivity activity) {
-    super(activity);
-    this.activity = activity;
+  public AndroidLayoutView(AndroidPlatform platform) {
+    super(platform.activity);
+    this.platform = platform;
     setBackgroundColor(0xFF000000);
     setGravity(Gravity.CENTER);
   }
@@ -34,16 +34,10 @@ public class AndroidLayoutView extends LinearLayout {
   public void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
     Log.i("playn", "Screen sized changed to ( " + w + " , " + h + ")");
-    AndroidPlatform platform = activity.platform();
-    if (platform != null) {
-      platform.graphics().refreshScreenSize();
-    } else {
-      AndroidGraphics.setStartingScreenSize(w, h);
-    }
-  }
-
-  @Override
-  public void onLayout(boolean changed, int l, int t, int r, int b) {
-    super.onLayout(changed, l, t, r, b);
+    // if (platform != null) {
+    //   platform.graphics().ctx.setSize(w, h);
+    // } else {
+    //   AndroidGraphics.setStartingScreenSize(w, h);
+    // }
   }
 }

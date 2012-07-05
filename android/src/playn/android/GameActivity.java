@@ -27,7 +27,7 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,12 +39,14 @@ import android.widget.LinearLayout;
  * TODO: save/restore state
  */
 public abstract class GameActivity extends Activity {
-  private final int REQUIRED_CONFIG_CHANGES = ActivityInfo.CONFIG_ORIENTATION
-      | ActivityInfo.CONFIG_KEYBOARD_HIDDEN;
 
-  private GameViewGL gameView;
-  private AndroidLayoutView viewLayout;
+  private final int REQUIRED_CONFIG_CHANGES =
+    ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_KEYBOARD_HIDDEN;
+
   private Context context;
+  private AndroidPlatform platform;
+  private AndroidTouchEventHandler touchHandler;
+  private GameViewGL gameView;
 
   /**
    * The entry-point into a PlayN game. Developers should implement main() to call
@@ -55,36 +57,28 @@ public abstract class GameActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    context = getApplicationContext();
+    this.context = getApplicationContext();
 
     // Build the AndroidPlatform and register this activity.
-    AndroidGL20 gl20;
-    if (isHoneycombOrLater() || !AndroidGL20Native.available) {
-      gl20 = new AndroidGL20();
-    } else {
-      // Provide our own native bindings for some missing methods.
-      gl20 = new AndroidGL20Native();
-    }
+    AndroidGL20 gl20 = (isHoneycombOrLater() || !AndroidGL20Native.available) ?
+      new AndroidGL20() : // uses platform methods for everything
+      new AndroidGL20Native(); // uses our own native bindings for some missing methods
+    this.platform = AndroidPlatform.register(gl20, this);
 
-    // Build a View to hold the surface view and report changes to the screen
-    // size.
-    viewLayout = new AndroidLayoutView(this);
-    gameView = new GameViewGL(gl20, this, context);
-    viewLayout.addView(gameView);
+    // Build a View to hold the surface view and report changes to the screen size.
+    this.touchHandler = new AndroidTouchEventHandler(platform);
+    this.gameView = new GameViewGL(context, this);
 
     // Build the Window and View
+    int windowFlags = WindowManager.LayoutParams.FLAG_FULLSCREEN;
     if (isHoneycombOrLater()) {
-      // Use the raw constant rather than the flag to avoid blowing up on
-      // earlier Android
-      int flagHardwareAccelerated = 0x1000000;
-      getWindow().setFlags(flagHardwareAccelerated, flagHardwareAccelerated);
+      // Use the raw constant rather than the flag to avoid blowing up on earlier Android
+      windowFlags |= 0x1000000;
     }
+    getWindow().setFlags(windowFlags, windowFlags);
 
-    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-    getWindow().setContentView(viewLayout, params);
+    // Create our layout and configure the window.
+    setContentView(gameView);
 
     // Default to landscape orientation.
     if (usePortraitOrientation()) {
@@ -104,8 +98,11 @@ public abstract class GameActivity extends Activity {
                 + "      android:configChanges=\"keyboardHidden|orientation\"").show();
       }
     } catch (NameNotFoundException e) {
-      Log.w("playn", "Cannot access game AndroidManifest.xml file.");
+      platform.log().warn("Cannot access game AndroidManifest.xml file.");
     }
+
+    // call our main method to set up the game then start the game loop
+    main();
   }
 
   /**
@@ -122,24 +119,29 @@ public abstract class GameActivity extends Activity {
     return 1; // TODO: determine scale factor automatically?
   }
 
-  public LinearLayout viewLayout() {
-    return viewLayout;
-  }
-
   public GameViewGL gameView() {
     return gameView;
   }
 
+  boolean isHoneycombOrLater() {
+    return android.os.Build.VERSION.SDK_INT >= 11;
+  }
+
   protected AndroidPlatform platform() {
-    return gameView.platform;
+    return platform;
   }
 
   protected Context context() {
     return context;
   }
 
-  boolean isHoneycombOrLater() {
-    return android.os.Build.VERSION.SDK_INT >= 11;
+  protected void setContentView(GameViewGL view) {
+    LinearLayout layout = new LinearLayout(this);
+    layout.setBackgroundColor(0xFF000000);
+    layout.setGravity(Gravity.CENTER);
+    layout.addView(gameView);
+    LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+    getWindow().setContentView(layout, params);
   }
 
   @Override
@@ -147,32 +149,41 @@ public abstract class GameActivity extends Activity {
     for (File file : getCacheDir().listFiles()) {
       file.delete();
     }
-    platform().audio().onDestroy();
+    platform.audio().onDestroy();
+    platform.onExit();
     super.onDestroy();
   }
 
   @Override
   protected void onPause() {
-    if (AndroidPlatform.DEBUG_LOGS) Log.d("playn", "onPause");
-    gameView.notifyVisibilityChanged(View.INVISIBLE);
-    if (platform() != null)
-      platform().audio().onPause();
+    if (AndroidPlatform.DEBUG_LOGS) platform.log().debug("onPause");
+    gameView.onPause();
+    platform.invokeLater(new Runnable() {
+      public void run() {
+        platform.audio().onPause();
+        platform.onPause();
+      }
+    });
     super.onPause();
   }
 
   @Override
   protected void onResume() {
-    if (AndroidPlatform.DEBUG_LOGS) Log.d("playn", "onResume");
-    gameView.notifyVisibilityChanged(View.VISIBLE);
-    if (platform() != null)
-      platform().audio().onResume();
+    if (AndroidPlatform.DEBUG_LOGS) platform.log().debug("onResume");
+    platform.invokeLater(new Runnable() {
+      public void run() {
+        platform.audio().onResume();
+        platform.onResume();
+      }
+    });
+    gameView.onResume();
     super.onResume();
   }
 
   /**
-   * Called automatically to handle keyboard events. Automatically passes through
-   * the parsed keyboard event to {@GameViewGL} for processing in the {@Keyboard}
-   * Listener instance on the render thread.
+   * Called automatically to handle keyboard events. Automatically passes through the parsed
+   * keyboard event to {@GameViewGL} for processing in the {@Keyboard} Listener instance on the
+   * render thread.
    */
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent nativeEvent) {
@@ -200,13 +211,13 @@ public abstract class GameActivity extends Activity {
   }
 
   /**
-   * Called automatically to handle touch events. Automatically passes through
-   * the parsed MotionEvent to {@GameViewGL} for processing in the {@Touch}
-   * and {@Pointer} Listener instances on the render thread.
+   * Called automatically to handle touch events. Queues the touch events to be processed on the
+   * game thread.
    */
   @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    return platform().touchEventHandler().onMotionEvent(event);
+  public boolean onTouchEvent(final MotionEvent event) {
+    touchHandler.onMotionEvent(event);
+    return false;
   }
 
   // TODO: uncomment the remaining key codes when we upgrade to latest Android jars

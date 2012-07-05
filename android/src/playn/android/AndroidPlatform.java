@@ -49,7 +49,6 @@ public class AndroidPlatform extends AbstractPlatform {
   private final AndroidPointer pointer;
   private final AndroidStorage storage;
   private final TouchImpl touch;
-  private final AndroidTouchEventHandler touchHandler;
   private final Json json;
 
   protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
@@ -57,7 +56,7 @@ public class AndroidPlatform extends AbstractPlatform {
     this.activity = activity;
 
     audio = new AndroidAudio(this);
-    graphics = new AndroidGraphics(this, gl20, activity.scaleFactor());
+    graphics = new AndroidGraphics(this, gl20, activity);
     analytics = new AndroidAnalytics();
     assets = new AndroidAssets(this);
     json = new JsonImpl();
@@ -66,7 +65,6 @@ public class AndroidPlatform extends AbstractPlatform {
     pointer = new AndroidPointer();
     storage = new AndroidStorage(activity);
     touch = new TouchImpl();
-    touchHandler = new AndroidTouchEventHandler(graphics, activity.gameView());
   }
 
   @Override
@@ -120,10 +118,6 @@ public class AndroidPlatform extends AbstractPlatform {
     return touch;
   }
 
-  public AndroidTouchEventHandler touchEventHandler() {
-    return touchHandler;
-  }
-
   @Override
   public AndroidPointer pointer() {
     return pointer;
@@ -160,12 +154,15 @@ public class AndroidPlatform extends AbstractPlatform {
     return Type.ANDROID;
   }
 
-  // allow these to be called by GameViewGL
+  // allow these to be called by GameActivity
   protected void onPause() {
     super.onPause();
   }
   protected void onResume() {
     super.onResume();
+  }
+  protected void onExit() {
+    super.onExit();
   }
 
   void update(float delta) {

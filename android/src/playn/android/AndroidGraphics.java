@@ -27,6 +27,7 @@ import android.graphics.RadialGradient;
 import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
 import android.util.Pair;
+import android.view.Display;
 import android.view.View;
 
 import pythagoras.f.IPoint;
@@ -51,27 +52,29 @@ import playn.core.gl.SurfaceGL;
 
 public class AndroidGraphics extends GraphicsGL {
 
-  private static int startingScreenWidth, startingScreenHeight;
-
   public final AndroidGLContext ctx;
   public final Bitmap.Config preferredBitmapConfig;
 
   final GroupLayerGL rootLayer;
   private final AndroidPlatform platform;
+  private final GameActivity activity;
   private final Point touchTemp = new Point();
 
   private int screenWidth, screenHeight;
-  private boolean sizeSetManually = false;
   private Map<Pair<String,Font.Style>,Typeface> fonts =
     new HashMap<Pair<String,Font.Style>,Typeface>();
 
-  public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx, float scaleFactor) {
+  public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx, GameActivity activity) {
     this.platform = platform;
+    this.activity = activity;
     this.preferredBitmapConfig = mapDisplayPixelFormat();
-    if (startingScreenWidth != 0)
-      screenWidth = MathUtil.iceil(startingScreenWidth / scaleFactor);
-    if (startingScreenHeight != 0)
-      screenHeight = MathUtil.iceil(startingScreenHeight / scaleFactor);
+
+    float scaleFactor = activity.scaleFactor();
+    Display display = activity.getWindowManager().getDefaultDisplay();
+    screenWidth = MathUtil.iceil(display.getWidth() / scaleFactor);
+    screenHeight = MathUtil.iceil(display.getHeight() / scaleFactor);
+    platform.log().info("Screen size " + screenWidth + "x" + screenHeight);
+
     ctx = new AndroidGLContext(platform, gfx, scaleFactor, screenWidth, screenHeight);
     rootLayer = new GroupLayerGL(ctx);
   }
@@ -134,16 +137,12 @@ public class AndroidGraphics extends GraphicsGL {
    */
   @Override
   public int screenHeight() {
-    return screenHeight;
+    return activity.usePortraitOrientation() ? screenWidth : screenHeight;
   }
 
-  /**
-   * @return The width of the AndroidLayoutView containing the GameView (generally the
-   *         entire display width) in pixels.
-   */
   @Override
   public int screenWidth() {
-    return screenWidth;
+    return activity.usePortraitOrientation() ? screenHeight : screenWidth;
   }
 
   @Override
@@ -161,29 +160,9 @@ public class AndroidGraphics extends GraphicsGL {
     return rootLayer;
   }
 
-  public void refreshScreenSize() {
-    refreshScreenSize(true);
-  }
-
-  void refreshScreenSize(boolean resize) {
-    View viewLayout = platform.activity.viewLayout();
-    int oldWidth = screenWidth;
-    int oldHeight = screenHeight;
-    screenWidth = viewLayout.getWidth();
-    screenHeight = viewLayout.getHeight();
-    // Change game size to fill the screen if it has never been set manually.
-    if (resize && !sizeSetManually && (screenWidth != oldWidth || screenHeight != oldHeight))
-      setSize(screenWidth, screenHeight, false);
-  }
-
-  /*
-   * Public manual setSize function. Once this is called, automatic calls to
-   * refreshScreenSize() when something changes the size of the gameView will
-   * not force a call to setSize.
-   */
-  @Override
+  @Deprecated @Override
   public void setSize(int width, int height) {
-    setSize(width, height, true);
+    // no longer supported
   }
 
   @Override
@@ -208,26 +187,7 @@ public class AndroidGraphics extends GraphicsGL {
   }
 
   IPoint transformTouch(float x, float y) {
-    // TODO: nix these adjustments when we nix support for setting screen size
-    x -= (screenWidth() - width()) / 2;
-    y -= (screenHeight() - height()) / 2;
     return ctx.rootTransform().inverseTransform(touchTemp.set(x, y), touchTemp);
-  }
-
-  private void setSize(int width, int height, boolean manual) {
-    if (manual)
-      sizeSetManually = true;
-    platform.activity.gameView().gameSizeSet();
-    // Layout the views again to change the surface size
-    platform.activity.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        View viewLayout = platform.activity.viewLayout();
-        viewLayout.measure(viewLayout.getMeasuredWidth(), viewLayout.getMeasuredHeight());
-        viewLayout.requestLayout();
-      }
-    });
-    ctx.setSize(width, height);
   }
 
   /**
@@ -245,17 +205,5 @@ public class AndroidGraphics extends GraphicsGL {
     // incorrectly with OpenGL
     return (format == PixelFormat.RGBA_4444 || memoryClass <= 16) ?
       Bitmap.Config.ARGB_4444 : Bitmap.Config.ARGB_8888;
-  }
-
-  /**
-   * Called by AndroidViewLayout to make sure that AndroidGraphics is
-   * initialized with non-zero screen dimensions.
-   *
-   * @param width
-   * @param height
-   */
-  static void setStartingScreenSize(int width, int height) {
-    startingScreenWidth = width;
-    startingScreenHeight = height;
   }
 }

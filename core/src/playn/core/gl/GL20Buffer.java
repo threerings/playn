@@ -175,6 +175,7 @@ public abstract class GL20Buffer implements GLBuffer {
 
   @Override
   public void destroy() {
+    playn.core.PlayN.log().info("Destroing buffer " + bufferId);
     gl.glDeleteBuffers(1, new int[] { bufferId }, 0);
   }
 
@@ -188,6 +189,7 @@ public abstract class GL20Buffer implements GLBuffer {
   private static int genBufferId(GL20 gl) {
     int[] ids = new int[1];
     gl.glGenBuffers(1, ids, 0);
+    playn.core.PlayN.log().info("Created buffer " + ids[0]);
     return ids[0];
   }
 }

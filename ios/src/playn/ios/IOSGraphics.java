@@ -125,9 +125,9 @@ public class IOSGraphics extends GraphicsGL {
     return rootLayer;
   }
 
-  @Override
+  @Deprecated @Override
   public void setSize(int width, int height) {
-    ctx.setSize(width, height);
+    throw new UnsupportedOperationException();
   }
 
   @Override

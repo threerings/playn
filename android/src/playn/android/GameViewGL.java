@@ -20,60 +20,23 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.View;
 
 import playn.core.Keyboard;
 import playn.core.Pointer;
 import playn.core.Touch;
 
-public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback {
+public class GameViewGL extends GLSurfaceView {
 
-  private static volatile int contextId = 1;
+  private final GameLoop loop;
+  private final AndroidPlatform platform;
 
-  private final AndroidGL20 gl20;
-  private final AndroidRendererGL renderer;
-  private final GameActivity activity;
-  private GameLoop loop;
-  private boolean gameSizeSet = false; // Set by AndroidGraphics
-  AndroidPlatform platform;
-
-  private class AndroidRendererGL implements Renderer {
-    @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-      contextId++;
-      // EGLContext lost, so surfaces need to be rebuilt and redrawn.
-      if (platform != null) {
-        platform.graphics().ctx.onSurfaceCreated();
-      }
-    }
-
-    @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-      gl20.glViewport(0, 0, width, height);
-      if (AndroidPlatform.DEBUG_LOGS)
-        Log.d("playn", "Surface dimensions changed to ( " + width + " , " + height + ")");
-    }
-
-    @Override
-    public void onDrawFrame(GL10 gl) {
-      // Wait until onDrawFrame to make sure all the metrics are in place at this point.
-      if (platform == null) {
-        platform = AndroidPlatform.register(gl20, activity);
-        activity.main();
-        loop = new GameLoop(platform);
-        loop.start();
-      }
-      // Handle updating, clearing the screen, and drawing
-      if (loop.running())
-        loop.run();
-    }
-  }
-
-  public GameViewGL(AndroidGL20 _gl20, GameActivity activity, Context context) {
+  public GameViewGL(Context context, GameActivity activity) {
     super(context);
-    this.gl20 = _gl20;
-    this.activity = activity;
+    this.platform = activity.platform();
+    this.loop = new GameLoop(platform);
+
     getHolder().addCallback(this);
     setFocusable(true);
     setEGLContextClientVersion(2);
@@ -81,83 +44,50 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
       // FIXME: Need to use android3.0 as a Maven artifact for this to work
       // setPreserveEGLContextOnPause(true);
     }
-    this.setRenderer(renderer = new AndroidRendererGL());
+    setRenderer(new Renderer() {
+      @Override
+      public void onSurfaceCreated(GL10 gl, EGLConfig config) {} // nada
+      @Override
+      public void onSurfaceChanged(GL10 gl, int width, int height) {} // nada
+      @Override
+      public void onDrawFrame(GL10 gl) {
+        loop.run(); // handles updating and painting
+      }
+    });
     setRenderMode(RENDERMODE_CONTINUOUSLY);
   }
 
   @Override
-  public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    // Default to filling all the available space when the game is first loads
-    if (platform != null && gameSizeSet) {
-      int width = platform.graphics().width();
-      int height = platform.graphics().height();
-      if (width == 0 || height == 0) {
-        Log.e("playn", "Invalid game size set: (" + width + " , " + height + ")");
-      } else {
-        int minWidth = getSuggestedMinimumWidth();
-        int minHeight = getSuggestedMinimumHeight();
-        width = width > minWidth ? width : minWidth;
-        height = height > minHeight ? height : minHeight;
-        setMeasuredDimension(width, height);
-        if (AndroidPlatform.DEBUG_LOGS)
-          Log.d("playn", "Using game-specified sizing. (" + width + " , " + height + ")");
-        return;
-      }
-    }
-
-    if (AndroidPlatform.DEBUG_LOGS) Log.d("playn", "Using default sizing.");
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-  }
-
-  void gameSizeSet() {
-    gameSizeSet = true;
-  }
-
-  static int contextId() {
-    return contextId;
-  }
-
-  /*
-   * Input and lifecycle functions called by the UI thread.
-   */
-  public void notifyVisibilityChanged(int visibility) {
-    Log.i("playn", "notifyVisibilityChanged: " + visibility);
-    if (visibility == INVISIBLE) {
-      if (loop != null)
-        loop.pause();
-      onPause();
-    } else {
-      if (loop != null)
-        loop.start();
-      onResume();
-    }
-  }
-
-  @Override
   public void onPause() {
-    if (platform != null) {
-      queueEvent(new Runnable() {
-        @Override
-        public void run() {
-          platform.graphics().ctx.onSurfaceLost();
-          platform.onPause();
-        }
-      });
-    }
     super.onPause();
+    loop.pause();
   }
 
   @Override
   public void onResume() {
     super.onResume();
-    if (platform != null) {
-      queueEvent(new Runnable() {
-        @Override
-        public void run() {
-          platform.onResume();
-        }
-      });
-    }
+    loop.start();
+  }
+
+  @Override
+  public void surfaceCreated(SurfaceHolder holder) {
+    super.surfaceCreated(holder);
+    platform.log().debug("Surface created");
+    platform.graphics().ctx.onSurfaceCreated();
+  }
+
+  @Override
+  public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    super.surfaceChanged(holder, format, width, height);
+    platform.log().debug("Surface changed " + width + "x" + height);
+    platform.graphics().ctx.setSize(width, height);
+  }
+
+  @Override
+  public void surfaceDestroyed(SurfaceHolder holder) {
+    super.surfaceDestroyed(holder);
+    platform.log().debug("Surface destroyed");
+    platform.graphics().ctx.onSurfaceLost();
   }
 
   void onKeyDown(final Keyboard.Event event) {
@@ -183,60 +113,6 @@ public class GameViewGL extends GLSurfaceView implements SurfaceHolder.Callback 
       @Override
       public void run() {
         platform.keyboard().onKeyUp(event);
-      }
-    });
-  }
-
-  void onPointerStart(final Pointer.Event.Impl event) {
-    queueEvent(new Runnable() {
-      @Override
-      public void run() {
-        platform.pointer().onPointerStart(event);
-      }
-    });
-  }
-
-  void onPointerDrag(final Pointer.Event.Impl event) {
-    queueEvent(new Runnable() {
-      @Override
-      public void run() {
-        platform.pointer().onPointerDrag(event);
-      }
-    });
-  }
-
-  void onPointerEnd(final Pointer.Event.Impl event) {
-    queueEvent(new Runnable() {
-      @Override
-      public void run() {
-        platform.pointer().onPointerEnd(event);
-      }
-    });
-  }
-
-  void onTouchStart(final Touch.Event.Impl[] touches) {
-    queueEvent(new Runnable() {
-      @Override
-      public void run() {
-        platform.touch().onTouchStart(touches);
-      }
-    });
-  }
-
-  void onTouchMove(final Touch.Event.Impl[] touches) {
-    queueEvent(new Runnable() {
-      @Override
-      public void run() {
-        platform.touch().onTouchMove(touches);
-      }
-    });
-  }
-
-  void onTouchEnd(final Touch.Event.Impl[] touches) {
-    queueEvent(new Runnable() {
-      @Override
-      public void run() {
-        platform.touch().onTouchEnd(touches);
       }
     });
   }

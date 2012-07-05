@@ -43,11 +43,11 @@ class AndroidGLContext extends GL20Context {
   AndroidGLContext(AndroidPlatform platform, AndroidGL20 gfx, float scaleFactor,
                    int screenWidth, int screenHeight) {
     super(platform, gfx, scaleFactor, screenWidth, screenHeight, CHECK_ERRORS);
-    init();
+    // init will be called later when our GL surface is available
   }
 
   void onSurfaceCreated() {
-    init(); // reinitialize GL
+    init(); // (re)initialize GL
     for (Refreshable ref : refreshables.keySet()) {
       ref.onSurfaceCreated();
     }

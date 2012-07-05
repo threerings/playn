@@ -46,6 +46,7 @@ public class GL20Context extends GLContext {
   }
 
   public void init() {
+    platform.log().info("GL20Context.init");
     gl.glDisable(GL_CULL_FACE);
     gl.glEnable(GL_BLEND);
     gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -62,6 +63,7 @@ public class GL20Context extends GLContext {
   }
 
   public void cleanup() {
+    platform.log().info("GL20Context.cleanup");
     if (quadShader != null) {
       quadShader.clearProgram();
       quadShader = null;
@@ -217,6 +219,7 @@ public class GL20Context extends GLContext {
   protected void bindFramebufferImpl(int fbuf, int width, int height) {
     gl.glBindFramebuffer(GL_FRAMEBUFFER, fbuf);
     gl.glViewport(0, 0, width, height);
+    platform.log().info("Viewport " + width + "x" + height);
   }
 
   @Override
