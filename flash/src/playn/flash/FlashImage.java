@@ -36,12 +36,15 @@ class FlashImage extends AbstractImage implements Image {
     new ArrayList<ResourceCallback<? super Image>>();
 
   protected BitmapData imageData = null;
+  private final String url;
 
   FlashImage(String url) {
+    this.url = url;
     scheduleLoad(url);
   }
 
   FlashImage(BitmapData data) {
+    this.url = "<from bitmap>";
     this.imageData = data;
   }
 
@@ -54,8 +57,10 @@ class FlashImage extends AbstractImage implements Image {
       self.@playn.flash.FlashImage::imageData = event.target.content.bitmapData;
       self.@playn.flash.FlashImage::runCallbacks(Z)(true);
     });
-    loader.addEventListener(flash.events.IOErrorEvent.IO_ERROR, function() {} );
-    loader.contentLoaderInfo.addEventListener(flash.events.IOErrorEvent.IO_ERROR, function() {} );
+    loader.contentLoaderInfo.addEventListener(flash.events.IOErrorEvent.IO_ERROR, function() {
+        self.@playn.flash.FlashImage::imageData = new flash.display.BitmapData(1, 1, true, 0xFF000000);
+        self.@playn.flash.FlashImage::runCallbacks(Z)(false);
+    });
     loader.load(new URLRequest(url), context);
   }-*/;
 
@@ -127,7 +132,7 @@ class FlashImage extends AbstractImage implements Image {
       if (success) {
         cb.done(this);
       } else {
-        cb.error(new Exception("Error loading image"));
+        cb.error(new Exception("Error loading image: " + url));
       }
     }
     callbacks.clear();
