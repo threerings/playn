@@ -340,6 +340,13 @@ public class HtmlPlatform extends AbstractPlatform {
   }
 
   @Override
+  public void setPropagateEvents(boolean propagate) {
+    mouse.setPropagateEvents(propagate);
+    touch.setPropagateEvents(propagate);
+    pointer.setPropagateEvents(propagate);
+  }
+
+  @Override
   public Type type() {
     return Type.HTML;
   }
