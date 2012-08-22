@@ -15,25 +15,25 @@
  */
 package playn.flash;
 
-import flash.gwt.FlashImport;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import playn.core.AbstractImage;
 import playn.core.Image;
-import playn.core.ResourceCallback;
 import flash.display.BitmapData;
+import flash.gwt.FlashImport;
 
+import playn.core.Image;
 import playn.core.Pattern;
+import playn.core.util.Callback;
 
 @FlashImport({
   "flash.display.Loader", "flash.events.Event", "flash.net.URLRequest", "flash.system.LoaderContext"
 })
 class FlashImage extends AbstractImage implements Image {
 
-  private List<ResourceCallback<? super Image>> callbacks =
-    new ArrayList<ResourceCallback<? super Image>>();
+  private List<Callback<? super Image>> callbacks =
+    new ArrayList<Callback<? super Image>>();
 
   protected BitmapData imageData = null;
   private final String url;
@@ -80,7 +80,7 @@ class FlashImage extends AbstractImage implements Image {
   }
 
   @Override
-  public void addCallback(ResourceCallback<? super Image> callback) {
+  public void addCallback(Callback<? super Image> callback) {
     callbacks.add(callback);
     if (isReady()) {
       runCallbacks(true);
@@ -128,11 +128,11 @@ class FlashImage extends AbstractImage implements Image {
   }
 
   private void runCallbacks(boolean success) {
-    for (ResourceCallback<? super Image> cb : callbacks) {
+    for (Callback<? super Image> cb : callbacks) {
       if (success) {
-        cb.done(this);
+        cb.onSuccess(this);
       } else {
-        cb.error(new Exception("Error loading image: " + url));
+        cb.onFailure(new Exception("Error loading image: " + url));
       }
     }
     callbacks.clear();

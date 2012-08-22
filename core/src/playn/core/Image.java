@@ -16,6 +16,7 @@
 package playn.core;
 
 import playn.core.gl.GL20;
+import playn.core.util.Callback;
 
 /**
  * An image.
@@ -46,7 +47,7 @@ public interface Image {
    * already loaded, the callback will be notified immediately. The callback is
    * discarded once the image is loaded.
    */
-  void addCallback(ResourceCallback<? super Image> callback);
+  void addCallback(Callback<? super Image> callback);
 
   /**
    * A subregion of an image. See {@link Image#subImage}.
