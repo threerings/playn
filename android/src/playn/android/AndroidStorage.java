@@ -16,40 +16,49 @@
 package playn.android;
 
 import java.util.ArrayList;
+
 import playn.core.Storage;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
 public class AndroidStorage implements Storage {
   private static final String PREFS_NAME = "playn";
+  private final Activity activity;
   private SharedPreferences settings;
 
   public AndroidStorage(Activity activity) {
-    settings = activity.getSharedPreferences(PREFS_NAME, 0);
+    this.activity = activity;
   }
 
   @Override
   public void setItem(String key, String data) throws RuntimeException {
-    settings.edit().putString(key, data).commit();
+    getSettings().edit().putString(key, data).commit();
   }
 
   @Override
   public void removeItem(String key) {
-    settings.edit().remove(key).commit();
+    getSettings().edit().remove(key).commit();
   }
 
   @Override
   public String getItem(String key) {
-    return settings.getString(key, null);
+    return getSettings().getString(key, null);
   }
 
   @Override
   public Iterable<String> keys() {
-    return new ArrayList<String>(settings.getAll().keySet());
+    return new ArrayList<String>(getSettings().getAll().keySet());
   }
 
   @Override
   public boolean isPersisted() {
     return true;
+  }
+
+  private SharedPreferences getSettings() {
+    if (settings == null) {
+      settings = activity.getSharedPreferences(PREFS_NAME, 0);
+    }
+    return settings;
   }
 }
