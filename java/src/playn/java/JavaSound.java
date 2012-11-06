@@ -16,9 +16,9 @@ package playn.java;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
-import pythagoras.f.FloatMath;
-
 import playn.core.AbstractSound;
+import pythagoras.f.FloatMath;
+import pythagoras.f.MathUtil;
 
 class JavaSound extends AbstractSound<Clip> {
 
@@ -73,6 +73,6 @@ class JavaSound extends AbstractSound<Clip> {
   // }
 
   protected static float toGain (float volume) {
-    return 20 * FloatMath.log10(volume);
+		return MathUtil.clamp(20 * FloatMath.log10(volume), -80, 0);
   }
 }
