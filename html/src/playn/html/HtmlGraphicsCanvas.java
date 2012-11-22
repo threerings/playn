@@ -34,6 +34,8 @@ class HtmlGraphicsCanvas extends HtmlGraphics {
   public HtmlGraphicsCanvas(HtmlPlatform.Configuration configuration) {
     super(configuration);
     canvas = Document.get().createCanvasElement();
+    canvas.setWidth(rootElement.getOffsetWidth());
+    canvas.setHeight(rootElement.getOffsetHeight());
     rootElement.appendChild(canvas);
     ctx = canvas.getContext2d();
     rootLayer = new HtmlGroupLayerCanvas();
