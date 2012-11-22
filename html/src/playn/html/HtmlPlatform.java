@@ -39,7 +39,7 @@ import playn.html.HtmlUrlParameters.Renderer;
 public class HtmlPlatform extends AbstractPlatform {
 
   public static class Configuration {
-    public Mode mode = Mode.AUTODETECT;
+    public Mode mode = Renderer.requestedMode();
     public boolean transparentCanvas = false;
     public boolean antiAliasing = true;
     // Scale up the canvas on fullscreen. Highly experimental.
@@ -348,7 +348,7 @@ public class HtmlPlatform extends AbstractPlatform {
 
   private HtmlGraphics createGraphics(Configuration configuration) {
     try {
-      switch (configuration.mode != null ? configuration.mode : Renderer.requestedMode()) {
+      switch (configuration.mode) {
       case CANVAS:
         return new HtmlGraphicsCanvas(configuration);
       case DOM:
