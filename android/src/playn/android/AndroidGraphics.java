@@ -132,10 +132,6 @@ public class AndroidGraphics extends GraphicsGL {
     return new AndroidGradient(gradient);
   }
 
-  /**
-   * @return The height of the AndroidLayoutView containing the GameView (generally the
-   *         entire display height) in pixels.
-   */
   @Override
   public Font createFont(String name, Font.Style style, float size) {
     Pair<String,Font.Style> key = Pair.create(name, style);
