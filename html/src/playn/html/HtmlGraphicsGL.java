@@ -68,8 +68,8 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
-  public void setRootSize(int width, int height) {
-    super.setRootSize(width, height);
+  public void setSize(int width, int height) {
+    super.setSize(width, height);
     canvas.setWidth(width);
     canvas.setHeight(height);
     ctx.setSize(width, height);
