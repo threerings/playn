@@ -42,6 +42,7 @@ public class HtmlPlatform extends AbstractPlatform {
     public Mode mode = Renderer.requestedMode();
     public boolean transparentCanvas = false;
     public boolean antiAliasing = true;
+    public float scaleFactor = 1;
     // Scale up the canvas on fullscreen. Highly experimental.
     public boolean experimentalFullscreen = false;
   }
@@ -196,9 +197,9 @@ public class HtmlPlatform extends AbstractPlatform {
      */
     try {
       graphics = createGraphics(configuration);
-      pointer = new HtmlPointer(graphics.rootElement());
-      mouse = new HtmlMouse(graphics.rootElement());
-      touch = new HtmlTouch(graphics.rootElement());
+      pointer = new HtmlPointer(this, graphics.rootElement());
+      mouse = new HtmlMouse(this, graphics.rootElement());
+      touch = new HtmlTouch(this, graphics.rootElement());
 
     } catch (Throwable e) {
       log.error("init()", e);
