@@ -26,16 +26,20 @@ public class QuadShader extends GLShader {
   /** The GLSL code for quad-specific vertex shader. */
   public static final String VERTEX_SHADER =
     "uniform vec2 u_ScreenSize;\n" +
-    "uniform vec4 u_Data[3*_MAX_QUADS_];\n" +
+    "uniform vec4 u_Data[4*_MAX_QUADS_];\n" +
+
     "attribute vec3 a_Vertex;\n" +
+
     "varying vec2 v_TexCoord;\n" +
+    "varying float v_Alpha;\n" +
 
     "void main(void) {\n" +
     // Extract the transform &c data for this quad.
-    "int index = 3*int(a_Vertex.z);\n" +
+    "int index = 4*int(a_Vertex.z);\n" +
     "vec4 mat = u_Data[index+0];\n" +
     "vec4 txc = u_Data[index+1];\n" +
     "vec4 tcs = u_Data[index+2];\n" +
+    "v_Alpha = u_Data[index+3].a;\n" + // TODO(bruno): Use the entire vec4 for tinting
 
     // Transform the vertex.
     "mat3 transform = mat3(\n" +
@@ -58,7 +62,7 @@ public class QuadShader extends GLShader {
   private static final int VERTICES_PER_QUAD = 4;
   private static final int ELEMENTS_PER_QUAD = 6;
   private static final int VERTEX_SIZE = 3; // 3 floats per vertex
-  private static final int VEC4S_PER_QUAD = 3; // 3 vec4s per matrix
+  private static final int VEC4S_PER_QUAD = 4; // 4 vec4s per matrix
 
   private final int maxQuads;
 
@@ -119,7 +123,9 @@ public class QuadShader extends GLShader {
     private final Attrib aVertices;
     private final GLBuffer.Float verts, data;
     private final GLBuffer.Short elems;
+
     private int quadCounter;
+    private float alpha;
 
     public QuadCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
@@ -152,12 +158,17 @@ public class QuadShader extends GLShader {
     }
 
     @Override
-    public void prepare(int fbufWidth, int fbufHeight) {
+    public void activate(int fbufWidth, int fbufHeight) {
       prog.bind();
       uScreenSize.bind(fbufWidth/2f, fbufHeight/2f);
       verts.bind(GL_ARRAY_BUFFER);
       aVertices.bind(0, 0);
       elems.bind(GL_ELEMENT_ARRAY_BUFFER);
+    }
+
+    @Override
+    public void prepare(float alpha, boolean justActivated) {
+      this.alpha = alpha;
     }
 
     @Override
@@ -188,6 +199,8 @@ public class QuadShader extends GLShader {
       data.add(sx1, sy1);
       data.add(sx2 - sx1, sy3 - sy1);
       data.skip(2);
+      data.skip(3); // TODO(bruno): Stick RGB in here
+      data.add(alpha);
       quadCounter++;
 
       if (quadCounter >= maxQuads)

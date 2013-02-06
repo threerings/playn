@@ -23,11 +23,15 @@ public class IndexedTrisShader extends GLShader {
   /** The GLSL code for our vertex shader. */
   public static final String VERTEX_SHADER =
     "uniform vec2 u_ScreenSize;\n" +
+
     "attribute vec4 a_Matrix;\n" +
     "attribute vec2 a_Translation;\n" +
     "attribute vec2 a_Position;\n" +
     "attribute vec2 a_TexCoord;\n" +
+    "attribute float a_Alpha;\n" +
+
     "varying vec2 v_TexCoord;\n" +
+    "varying float v_Alpha;\n" +
 
     "void main(void) {\n" +
     // Transform the vertex.
@@ -43,9 +47,10 @@ public class IndexedTrisShader extends GLShader {
     "  gl_Position.y = 1.0 - gl_Position.y;\n" +
 
     "  v_TexCoord = a_TexCoord;\n" +
+    "  v_Alpha = a_Alpha;\n" +
     "}";
 
-  private static final int VERTEX_SIZE = 10; // 10 floats per vertex
+  private static final int VERTEX_SIZE = 11; // 11 floats per vertex
   private static final int START_VERTS = 16*4;
   private static final int EXPAND_VERTS = 16*4;
   private static final int START_ELEMS = 6*START_VERTS/4;
@@ -83,10 +88,12 @@ public class IndexedTrisShader extends GLShader {
 
   protected class ITCore extends Core {
     private final Uniform2f uScreenSize;
-    private final Attrib aMatrix, aTranslation, aPosition, aTexCoord;
+    private final Attrib aMatrix, aTranslation, aPosition, aTexCoord, aAlpha;
 
     private final GLBuffer.Float vertices;
     private final GLBuffer.Short elements;
+
+    private float alpha;
 
     public ITCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
@@ -97,6 +104,7 @@ public class IndexedTrisShader extends GLShader {
       aTranslation = prog.getAttrib("a_Translation", 2, GL20.GL_FLOAT);
       aPosition = prog.getAttrib("a_Position", 2, GL20.GL_FLOAT);
       aTexCoord = prog.getAttrib("a_TexCoord", 2, GL20.GL_FLOAT);
+      aAlpha = prog.getAttrib("a_Alpha", 1, GL20.GL_FLOAT);
 
       // create our vertex and index buffers
       vertices = ctx.createFloatBuffer(START_VERTS*VERTEX_SIZE);
@@ -104,7 +112,7 @@ public class IndexedTrisShader extends GLShader {
     }
 
     @Override
-    public void prepare(int fbufWidth, int fbufHeight) {
+    public void activate(int fbufWidth, int fbufHeight) {
       prog.bind();
       uScreenSize.bind(fbufWidth, fbufHeight);
 
@@ -114,9 +122,15 @@ public class IndexedTrisShader extends GLShader {
       aPosition.bind(VERTEX_STRIDE, 24);
       if (aTexCoord != null)
         aTexCoord.bind(VERTEX_STRIDE, 32);
+      aAlpha.bind(VERTEX_STRIDE, 40);
 
       elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
       ctx.checkGLError("Shader.prepare bind");
+    }
+
+    @Override
+    public void prepare(float alpha, boolean justActivated) {
+      this.alpha = alpha;
     }
 
     @Override
@@ -147,10 +161,10 @@ public class IndexedTrisShader extends GLShader {
                         float x3, float y3, float sx3, float sy3,
                         float x4, float y4, float sx4, float sy4) {
       int vertIdx = beginPrimitive(4, 6);
-      vertices.add(m00, m01, m10, m11, tx, ty).add(x1, y1).add(sx1, sy1);
-      vertices.add(m00, m01, m10, m11, tx, ty).add(x2, y2).add(sx2, sy2);
-      vertices.add(m00, m01, m10, m11, tx, ty).add(x3, y3).add(sx3, sy3);
-      vertices.add(m00, m01, m10, m11, tx, ty).add(x4, y4).add(sx4, sy4);
+      addVertex(m00, m01, m10, m11, tx, ty, x1, y1, sx1, sy1);
+      addVertex(m00, m01, m10, m11, tx, ty, x2, y2, sx2, sy2);
+      addVertex(m00, m01, m10, m11, tx, ty, x3, y3, sx3, sy3);
+      addVertex(m00, m01, m10, m11, tx, ty, x4, y4, sx4, sy4);
 
       elements.add(vertIdx+0);
       elements.add(vertIdx+1);
@@ -166,7 +180,7 @@ public class IndexedTrisShader extends GLShader {
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
         float x = xys[ii], y = xys[ii+1];
-        vertices.add(m00, m01, m10, m11, tx, ty).add(x, y).add(x/tw, y/th);
+        addVertex(m00, m01, m10, m11, tx, ty, x, y, x/tw, y/th);
       }
       for (int ii = 0, ll = indices.length; ii < ll; ii++)
         elements.add(vertIdx+indices[ii]);
@@ -177,7 +191,7 @@ public class IndexedTrisShader extends GLShader {
                              float[] xys, float[] sxys, int[] indices) {
       int vertIdx = beginPrimitive(xys.length/2, indices.length);
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2)
-        vertices.add(m00, m01, m10, m11, tx, ty).add(xys[ii], xys[ii+1]).add(sxys[ii], sxys[ii+1]);
+        addVertex(m00, m01, m10, m11, tx, ty, xys[ii], xys[ii+1], sxys[ii], sxys[ii+1]);
       for (int ii = 0, ll = indices.length; ii < ll; ii++)
         elements.add(vertIdx+indices[ii]);
     }
@@ -185,6 +199,12 @@ public class IndexedTrisShader extends GLShader {
     @Override
     public String toString() {
       return "cq=" + (elements.capacity()/6);
+    }
+
+    protected void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
+                             float x, float y, float sx, float sy) {
+      vertices.add(m00, m01, m10, m11, tx, ty).add(x, y).add(sx, sy);
+      vertices.add(alpha);
     }
 
     protected int beginPrimitive(int vertexCount, int elemCount) {

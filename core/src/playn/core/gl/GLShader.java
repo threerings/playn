@@ -121,10 +121,11 @@ public abstract class GLShader {
     if (justActivated) {
       curCore = texCore;
       curExtras = texExtras;
-      texCore.prepare(ctx.curFbufWidth, ctx.curFbufHeight);
+      texCore.activate(ctx.curFbufWidth, ctx.curFbufHeight);
       if (GLContext.STATS_ENABLED) ctx.stats.shaderBinds++;
     }
-    texExtras.prepare(tex, alpha, justActivated);
+    texCore.prepare(alpha, justActivated);
+    texExtras.prepare(tex, justActivated);
     return this;
   }
 
@@ -147,10 +148,11 @@ public abstract class GLShader {
     if (justActivated) {
       curCore = colorCore;
       curExtras = colorExtras;
-      colorCore.prepare(ctx.curFbufWidth, ctx.curFbufHeight);
+      colorCore.activate(ctx.curFbufWidth, ctx.curFbufHeight);
       if (GLContext.STATS_ENABLED) ctx.stats.shaderBinds++;
     }
-    colorExtras.prepare(color, alpha, justActivated);
+    colorCore.prepare(alpha, justActivated);
+    colorExtras.prepare(color, justActivated);
     return this;
   }
 
@@ -300,12 +302,13 @@ public abstract class GLShader {
       "#endif\n" +
 
       "uniform sampler2D u_Texture;\n" +
+
       "varying vec2 v_TexCoord;\n" +
-      "uniform float u_Alpha;\n" +
+      "varying float v_Alpha;\n" +
 
       "void main(void) {\n" +
       "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n" +
-      "  gl_FragColor = textureColor * u_Alpha;\n" +
+      "  gl_FragColor = textureColor * v_Alpha;\n" +
       "}";
   }
 
@@ -327,10 +330,11 @@ public abstract class GLShader {
       "#endif\n" +
 
       "uniform vec4 u_Color;\n" +
-      "uniform float u_Alpha;\n" +
+
+      "varying float v_Alpha;\n" +
 
       "void main(void) {\n" +
-      "  gl_FragColor = u_Color * u_Alpha;\n" +
+      "  gl_FragColor = u_Color * v_Alpha;\n" +
       "}";
   }
 
@@ -346,8 +350,11 @@ public abstract class GLShader {
     /** This core's shader program. */
     public final GLProgram prog;
 
-    /** Prepares this core's shader to render. */
-    public abstract void prepare(int fbufWidth, int fbufHeight);
+    /** Called to setup this core's shader after initially being bound. */
+    public abstract void activate(int fbufWidth, int fbufHeight);
+
+    /** Called before each primitive to update the current alpha. */
+    public abstract void prepare(float alpha, boolean justActivated);
 
     /** Flushes this core's queued geometry to the GPU. */
     public abstract void flush();
@@ -384,7 +391,7 @@ public abstract class GLShader {
   /** Handles the extra bits needed when we're using textures or flat color. */
   protected static abstract class Extras {
     /** Performs additional binding to prepare for a texture or color render. */
-    public abstract void prepare(int texOrColor, float alpha, boolean justActivated);
+    public abstract void prepare(int texOrColor, boolean justActivated);
 
     /** Called prior to flushing this shader. Defaults to NOOP. */
     public void willFlush() {}
@@ -396,24 +403,19 @@ public abstract class GLShader {
   /** The default texture extras. */
   protected class TextureExtras extends Extras {
     private final Uniform1i uTexture;
-    private final Uniform1f uAlpha;
     private int lastTex;
-    private float lastAlpha;
 
     public TextureExtras(GLProgram prog) {
       uTexture = prog.getUniform1i("u_Texture");
-      uAlpha = prog.getUniform1f("u_Alpha");
     }
 
     @Override
-    public void prepare(int tex, float alpha, boolean justActivated) {
+    public void prepare(int tex, boolean justActivated) {
       ctx.checkGLError("textureShader.prepare start");
-      boolean stateChanged = (tex != lastTex || alpha != lastAlpha);
+      boolean stateChanged = (tex != lastTex);
       if (!justActivated && stateChanged)
         flush();
       if (stateChanged) {
-        uAlpha.bind(alpha);
-        lastAlpha = alpha;
         lastTex = tex;
         ctx.checkGLError("textureShader.prepare end");
       }
@@ -432,30 +434,24 @@ public abstract class GLShader {
   /** The default color extras. */
   protected class ColorExtras extends Extras {
     private final Uniform4f uColor;
-    private final Uniform1f uAlpha;
     private int lastColor;
-    private float lastAlpha;
 
     public ColorExtras(GLProgram prog) {
       uColor = prog.getUniform4f("u_Color");
-      uAlpha = prog.getUniform1f("u_Alpha");
     }
 
     @Override
-    public void prepare(int color, float alpha, boolean justActivated) {
+    public void prepare(int color, boolean justActivated) {
       ctx.checkGLError("colorShader.prepare start");
-      boolean stateChanged = (color != lastColor || alpha != lastAlpha);
+      boolean stateChanged = (color != lastColor);
       if (!justActivated && stateChanged)
         flush();
       if (stateChanged) {
-        float a = ((color >> 24) & 0xff) / 255f;
         float r = ((color >> 16) & 0xff) / 255f;
         float g = ((color >> 8) & 0xff) / 255f;
         float b = ((color >> 0) & 0xff) / 255f;
         uColor.bind(r, g, b, 1);
         lastColor = color;
-        uAlpha.bind(alpha * a);
-        lastAlpha = alpha;
         ctx.checkGLError("colorShader.prepare end");
       }
     }
