@@ -38,13 +38,17 @@ import playn.html.HtmlUrlParameters.Renderer;
 
 public class HtmlPlatform extends AbstractPlatform {
 
-  public static class Configuration {
+  public static class Config {
     public Mode mode = Renderer.requestedMode();
     public boolean transparentCanvas = false;
     public boolean antiAliasing = true;
     public float scaleFactor = 1;
     // Scale up the canvas on fullscreen. Highly experimental.
     public boolean experimentalFullscreen = false;
+  }
+
+  /* @deprecated Use {@link Config}. */
+  @Deprecated public static class Configuration extends Config {
   }
 
   /** Used by {@link #register(Mode)}. */
@@ -75,21 +79,21 @@ public class HtmlPlatform extends AbstractPlatform {
    * Prepares the HTML platform for operation.
    */
   public static HtmlPlatform register() {
-    return register(new Configuration());
+    return register(new Config());
   }
 
   /**
    * Prepares the HTML platform for operation.
-   * @deprecated use register(Configuration) instead.
+   * @deprecated use register(Config) instead.
    *
    * @param mode indicates whether to force the use of WebGL, force the use of Canvas, or to
    * autodetect whether the browser supports WebGL and use it if possible.
    */
   @Deprecated
   public static HtmlPlatform register(Mode mode) {
-    Configuration configuration = new Configuration();
-    configuration.mode = mode;
-    HtmlPlatform platform = new HtmlPlatform(configuration);
+    Config config = new Config();
+    config.mode = mode;
+    HtmlPlatform platform = new HtmlPlatform(config);
     PlayN.setPlatform(platform);
     platform.init();
     return platform;
@@ -98,10 +102,10 @@ public class HtmlPlatform extends AbstractPlatform {
   /**
    * Prepares the HTML platform for operation.
    *
-   * @param configuration platform-specific settings.
+   * @param config platform-specific settings.
    */
-  public static HtmlPlatform register(Configuration configuration) {
-    HtmlPlatform platform = new HtmlPlatform(configuration);
+  public static HtmlPlatform register(Config config) {
+    HtmlPlatform platform = new HtmlPlatform(config);
     PlayN.setPlatform(platform);
     platform.init();
     return platform;
@@ -182,7 +186,7 @@ public class HtmlPlatform extends AbstractPlatform {
 
   private static AgentInfo agentInfo = computeAgentInfo();
 
-  protected HtmlPlatform(Configuration configuration) {
+  protected HtmlPlatform(Config config) {
     super(log);
     if (!GWT.isProdMode()) {
       log.info("You are running in GWT Development Mode. "
@@ -196,7 +200,7 @@ public class HtmlPlatform extends AbstractPlatform {
      * our own exceptions here.
      */
     try {
-      graphics = createGraphics(configuration);
+      graphics = createGraphics(config);
       pointer = new HtmlPointer(this, graphics.rootElement());
       mouse = new HtmlMouse(this, graphics.rootElement());
       touch = new HtmlTouch(this, graphics.rootElement());
@@ -347,18 +351,18 @@ public class HtmlPlatform extends AbstractPlatform {
     return Type.HTML;
   }
 
-  private HtmlGraphics createGraphics(Configuration configuration) {
+  private HtmlGraphics createGraphics(Config config) {
     try {
-      switch (configuration.mode) {
+      switch (config.mode) {
       case CANVAS:
         return new HtmlGraphicsCanvas(configuration);
       case DOM:
-        return new HtmlGraphicsDom(configuration);
+        return new HtmlGraphicsDom(config);
       case WEBGL:
-        return new HtmlGraphicsGL(this, configuration);
+        return new HtmlGraphicsGL(this, config);
       default:
       case AUTODETECT:
-        return hasGLSupport() ? new HtmlGraphicsGL(this, configuration) : new HtmlGraphicsCanvas(configuration);
+        return hasGLSupport() ? new HtmlGraphicsGL(this, config) : new HtmlGraphicsCanvas(config);
       }
 
     // HtmlGraphicsGL ctor throws a runtime exception if the context creation fails.

@@ -77,7 +77,7 @@ public abstract class HtmlGraphics implements Graphics {
   // Temporary hack to fix mouse coordinates for scaled fullscreen mode.
   static float experimentalScale = 1;
 
-  protected HtmlGraphics(HtmlPlatform.Configuration configuration) {
+  protected HtmlGraphics(HtmlPlatform.Config config) {
     Document doc = Document.get();
 
     dummyCanvas = doc.createCanvasElement();
@@ -101,7 +101,7 @@ public abstract class HtmlGraphics implements Graphics {
     measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
     rootElement.appendChild(measureElement);
 
-    if (configuration.experimentalFullscreen) {
+    if (config.experimentalFullscreen) {
       Window.addResizeHandler(new ResizeHandler() {
       @Override
       public void onResize(ResizeEvent event) {

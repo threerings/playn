@@ -29,8 +29,8 @@ class HtmlGraphicsDom extends HtmlGraphics {
 
   private final HtmlGroupLayerDom rootLayer;
 
-  public HtmlGraphicsDom(HtmlPlatform.Configuration configuration) {
-    super(configuration);
+  public HtmlGraphicsDom(HtmlPlatform.Config config) {
+    super(config);
     Element div = Document.get().createDivElement();
     div.getStyle().setOverflow(Overflow.HIDDEN);
     rootElement.appendChild(div);
