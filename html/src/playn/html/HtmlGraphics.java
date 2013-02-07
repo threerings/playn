@@ -77,52 +77,6 @@ public abstract class HtmlGraphics implements Graphics {
   // Temporary hack to fix mouse coordinates for scaled fullscreen mode.
   static float experimentalScale = 1;
 
-  protected HtmlGraphics(HtmlPlatform.Config config) {
-    Document doc = Document.get();
-
-    dummyCanvas = doc.createCanvasElement();
-    dummyCtx = dummyCanvas.getContext2d();
-
-    rootElement = doc.getElementById("playn-root");
-    if (rootElement == null) {
-      rootElement = doc.createDivElement();
-      rootElement.setAttribute("style", "width: 640px; height: 480px");
-      doc.getBody().appendChild(rootElement);
-    } else {
-      // clear the contents of the "playn-root" element, if present
-      rootElement.setInnerHTML("");
-    }
-
-    // create a hidden element used to measure font heights
-    measureElement = doc.createDivElement();
-    measureElement.getStyle().setVisibility(Style.Visibility.HIDDEN);
-    measureElement.getStyle().setPosition(Style.Position.ABSOLUTE);
-    measureElement.getStyle().setTop(-500, Unit.PX);
-    measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
-    rootElement.appendChild(measureElement);
-
-    if (config.experimentalFullscreen) {
-      Window.addResizeHandler(new ResizeHandler() {
-      @Override
-      public void onResize(ResizeEvent event) {
-        if (fullScreenWidth() == event.getWidth() && fullScreenHeight() == event.getHeight()) {
-          experimentalScale = Math.min((float) fullScreenWidth() / (float) width(), (float) fullScreenHeight() / (float) height());
-          int yOfs = (int) ((fullScreenHeight() - height() * experimentalScale) / 3.f); // less distance to the top
-          int xOfs = (int) ((fullScreenWidth() - width() * experimentalScale) / 2.f);
-          rootElement().setAttribute("style", 
-              "width:"+experimentalScale * width()+"px;height:"+ experimentalScale*height()+ "px;position:absolute;left:"+xOfs+"px;top:"+yOfs);
-          // This is needed to work around a focus bug in Chrome :(
-          Window.alert("Switching to fullscreen mode.");
-          Document.get().getBody().addClassName("fullscreen");
-        } else {
-          experimentalScale = 1;
-          rootElement().removeAttribute("style");
-          Document.get().getBody().removeClassName("fullscreen");
-        }
-      }}); 
-    }
-  }
-
   /**
    * Sizes or resizes the root element that contains the PlayN view.
    * @param width the new width, in pixels, of the view.
@@ -131,6 +85,20 @@ public abstract class HtmlGraphics implements Graphics {
   public void setSize(int width, int height) {
     rootElement.getStyle().setWidth(width, Unit.PX);
     rootElement.getStyle().setHeight(height, Unit.PX);
+  }
+
+  /**
+   * Registers metrics for the specified font in the specified style and size. This overrides the
+   * default font metrics calculation (which is hacky and inaccurate). If you want to ensure
+   * somewhat consistent font layout across browsers, you should register font metrics for every
+   * combination of font, style and size that you use in your app.
+   *
+   * @param lineHeight the height of a line of text in the specified font (in pixels).
+   */
+  public void registerFontMetrics(String name, Font.Style style, float size, float lineHeight) {
+    HtmlFont font = new HtmlFont(name, style, size);
+    HtmlFontMetrics metrics = getFontMetrics(font); // get emwidth via default measurement
+    fontMetrics.put(font, new HtmlFontMetrics(lineHeight, metrics.emwidth));
   }
 
   @Override
@@ -196,6 +164,52 @@ public abstract class HtmlGraphics implements Graphics {
   @Override
   public HtmlGLContext ctx() {
     return null;
+  }
+
+  protected HtmlGraphics(HtmlPlatform.Config config) {
+    Document doc = Document.get();
+
+    dummyCanvas = doc.createCanvasElement();
+    dummyCtx = dummyCanvas.getContext2d();
+
+    rootElement = doc.getElementById("playn-root");
+    if (rootElement == null) {
+      rootElement = doc.createDivElement();
+      rootElement.setAttribute("style", "width: 640px; height: 480px");
+      doc.getBody().appendChild(rootElement);
+    } else {
+      // clear the contents of the "playn-root" element, if present
+      rootElement.setInnerHTML("");
+    }
+
+    // create a hidden element used to measure font heights
+    measureElement = doc.createDivElement();
+    measureElement.getStyle().setVisibility(Style.Visibility.HIDDEN);
+    measureElement.getStyle().setPosition(Style.Position.ABSOLUTE);
+    measureElement.getStyle().setTop(-500, Unit.PX);
+    measureElement.getStyle().setOverflow(Style.Overflow.VISIBLE);
+    rootElement.appendChild(measureElement);
+
+    if (config.experimentalFullscreen) {
+      Window.addResizeHandler(new ResizeHandler() {
+      @Override
+      public void onResize(ResizeEvent event) {
+        if (fullScreenWidth() == event.getWidth() && fullScreenHeight() == event.getHeight()) {
+          experimentalScale = Math.min((float) fullScreenWidth() / (float) width(), (float) fullScreenHeight() / (float) height());
+          int yOfs = (int) ((fullScreenHeight() - height() * experimentalScale) / 3.f); // less distance to the top
+          int xOfs = (int) ((fullScreenWidth() - width() * experimentalScale) / 2.f);
+          rootElement().setAttribute("style",
+              "width:"+experimentalScale * width()+"px;height:"+ experimentalScale*height()+ "px;position:absolute;left:"+xOfs+"px;top:"+yOfs);
+          // This is needed to work around a focus bug in Chrome :(
+          Window.alert("Switching to fullscreen mode.");
+          Document.get().getBody().addClassName("fullscreen");
+        } else {
+          experimentalScale = 1;
+          rootElement().removeAttribute("style");
+          Document.get().getBody().removeClassName("fullscreen");
+        }
+      }});
+    }
   }
 
   Scale scale() {
