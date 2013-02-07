@@ -50,7 +50,7 @@ public class IndexedTrisShader extends GLShader {
     "  v_Color = a_Color;\n" +
     "}";
 
-  private static final int VERTEX_SIZE = 11; // 11 floats per vertex
+  private static final int VERTEX_SIZE = 14; // 14 floats per vertex
   private static final int START_VERTS = 16*4;
   private static final int EXPAND_VERTS = 16*4;
   private static final int START_ELEMS = 6*START_VERTS/4;
