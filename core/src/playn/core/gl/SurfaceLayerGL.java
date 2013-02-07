@@ -44,9 +44,16 @@ public class SurfaceLayerGL extends LayerGL implements SurfaceLayer {
   }
 
   @Override
-  public void paint(InternalTransform parentTransform, float parentAlpha, GLShader curShader) {
+  public void paint(InternalTransform parentTransform, float curRed, float curGreen, float curBlue,
+      float curAlpha, GLShader curShader) {
     if (!visible()) return;
-    surface.paint(localTransform(parentTransform), parentAlpha * alpha,
+
+    if (tint != null) {
+      curRed *= tint.red;
+      curGreen *= tint.green;
+      curBlue *= tint.blue;
+    }
+    surface.paint(localTransform(parentTransform), curRed, curGreen, curBlue, curAlpha * alpha,
                   (shader == null) ? curShader : shader);
   }
 

@@ -28,10 +28,10 @@ public class IndexedTrisShader extends GLShader {
     "attribute vec2 a_Translation;\n" +
     "attribute vec2 a_Position;\n" +
     "attribute vec2 a_TexCoord;\n" +
-    "attribute float a_Alpha;\n" +
+    "attribute vec4 a_Color;\n" +
 
     "varying vec2 v_TexCoord;\n" +
-    "varying float v_Alpha;\n" +
+    "varying vec4 v_Color;\n" +
 
     "void main(void) {\n" +
     // Transform the vertex.
@@ -47,7 +47,7 @@ public class IndexedTrisShader extends GLShader {
     "  gl_Position.y = 1.0 - gl_Position.y;\n" +
 
     "  v_TexCoord = a_TexCoord;\n" +
-    "  v_Alpha = a_Alpha;\n" +
+    "  v_Color = a_Color;\n" +
     "}";
 
   private static final int VERTEX_SIZE = 11; // 11 floats per vertex
@@ -88,12 +88,12 @@ public class IndexedTrisShader extends GLShader {
 
   protected class ITCore extends Core {
     private final Uniform2f uScreenSize;
-    private final Attrib aMatrix, aTranslation, aPosition, aTexCoord, aAlpha;
+    private final Attrib aMatrix, aTranslation, aPosition, aTexCoord, aColor;
 
     private final GLBuffer.Float vertices;
     private final GLBuffer.Short elements;
 
-    private float alpha;
+    private float red, green, blue, alpha;
 
     public ITCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
@@ -104,7 +104,7 @@ public class IndexedTrisShader extends GLShader {
       aTranslation = prog.getAttrib("a_Translation", 2, GL20.GL_FLOAT);
       aPosition = prog.getAttrib("a_Position", 2, GL20.GL_FLOAT);
       aTexCoord = prog.getAttrib("a_TexCoord", 2, GL20.GL_FLOAT);
-      aAlpha = prog.getAttrib("a_Alpha", 1, GL20.GL_FLOAT);
+      aColor = prog.getAttrib("a_Color", 4, GL20.GL_FLOAT);
 
       // create our vertex and index buffers
       vertices = ctx.createFloatBuffer(START_VERTS*VERTEX_SIZE);
@@ -122,14 +122,17 @@ public class IndexedTrisShader extends GLShader {
       aPosition.bind(VERTEX_STRIDE, 24);
       if (aTexCoord != null)
         aTexCoord.bind(VERTEX_STRIDE, 32);
-      aAlpha.bind(VERTEX_STRIDE, 40);
+      aColor.bind(VERTEX_STRIDE, 40);
 
       elements.bind(GL20.GL_ELEMENT_ARRAY_BUFFER);
       ctx.checkGLError("Shader.prepare bind");
     }
 
     @Override
-    public void prepare(float alpha, boolean justActivated) {
+    public void prepare(float red, float green, float blue, float alpha, boolean justActivated) {
+      this.red = red;
+      this.green = green;
+      this.blue = blue;
       this.alpha = alpha;
     }
 
@@ -204,7 +207,7 @@ public class IndexedTrisShader extends GLShader {
     protected void addVertex(float m00, float m01, float m10, float m11, float tx, float ty,
                              float x, float y, float sx, float sy) {
       vertices.add(m00, m01, m10, m11, tx, ty).add(x, y).add(sx, sy);
-      vertices.add(alpha);
+      vertices.add(red, green).add(blue, alpha);
     }
 
     protected int beginPrimitive(int vertexCount, int elemCount) {

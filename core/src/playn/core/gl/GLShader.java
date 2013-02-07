@@ -103,7 +103,7 @@ public abstract class GLShader {
   private int texEpoch, colorEpoch;
 
   /** Prepares this shader to render the specified texture, etc. */
-  public GLShader prepareTexture(int tex, float alpha) {
+  public GLShader prepareTexture(int tex, float red, float green, float blue, float alpha) {
     // if our GL context has been lost and regained we may need to recreate our core
     if (texEpoch != ctx.epoch()) {
       // we don't destroy because the underlying resources are gone and destroying using our stale
@@ -124,13 +124,13 @@ public abstract class GLShader {
       texCore.activate(ctx.curFbufWidth, ctx.curFbufHeight);
       if (GLContext.STATS_ENABLED) ctx.stats.shaderBinds++;
     }
-    texCore.prepare(alpha, justActivated);
+    texCore.prepare(red, green, blue, alpha, justActivated);
     texExtras.prepare(tex, justActivated);
     return this;
   }
 
   /** Prepares this shader to render the specified color, etc. */
-  public GLShader prepareColor(int color, float alpha) {
+  public GLShader prepareColor(float red, float green, float blue, float alpha) {
     // if our GL context has been lost and regained we may need to recreate our core
     if (colorEpoch != ctx.epoch()) {
       // we don't destroy because the underlying resources are gone and destroying using our stale
@@ -151,8 +151,8 @@ public abstract class GLShader {
       colorCore.activate(ctx.curFbufWidth, ctx.curFbufHeight);
       if (GLContext.STATS_ENABLED) ctx.stats.shaderBinds++;
     }
-    colorCore.prepare(alpha, justActivated);
-    colorExtras.prepare(color, justActivated);
+    colorCore.prepare(red, green, blue, alpha, justActivated);
+    colorExtras.prepare(0, justActivated);
     return this;
   }
 
@@ -304,11 +304,12 @@ public abstract class GLShader {
       "uniform sampler2D u_Texture;\n" +
 
       "varying vec2 v_TexCoord;\n" +
-      "varying float v_Alpha;\n" +
+      "varying vec4 v_Color;\n" +
 
       "void main(void) {\n" +
       "  vec4 textureColor = texture2D(u_Texture, v_TexCoord);\n" +
-      "  gl_FragColor = textureColor * v_Alpha;\n" +
+      "  textureColor.rgb *= v_Color.rgb;\n" +
+      "  gl_FragColor = textureColor * v_Color.a;\n" +
       "}";
   }
 
@@ -329,12 +330,10 @@ public abstract class GLShader {
       "precision highp float;\n" +
       "#endif\n" +
 
-      "uniform vec4 u_Color;\n" +
-
-      "varying float v_Alpha;\n" +
+      "varying vec4 v_Color;\n" +
 
       "void main(void) {\n" +
-      "  gl_FragColor = u_Color * v_Alpha;\n" +
+      "  gl_FragColor = v_Color;\n" +
       "}";
   }
 
@@ -353,8 +352,9 @@ public abstract class GLShader {
     /** Called to setup this core's shader after initially being bound. */
     public abstract void activate(int fbufWidth, int fbufHeight);
 
-    /** Called before each primitive to update the current alpha. */
-    public abstract void prepare(float alpha, boolean justActivated);
+    /** Called before each primitive to update the current color. */
+    public abstract void prepare(float red, float green, float blue, float alpha,
+                                 boolean justActivated);
 
     /** Flushes this core's queued geometry to the GPU. */
     public abstract void flush();
@@ -391,7 +391,7 @@ public abstract class GLShader {
   /** Handles the extra bits needed when we're using textures or flat color. */
   protected static abstract class Extras {
     /** Performs additional binding to prepare for a texture or color render. */
-    public abstract void prepare(int texOrColor, boolean justActivated);
+    public abstract void prepare(int tex, boolean justActivated);
 
     /** Called prior to flushing this shader. Defaults to NOOP. */
     public void willFlush() {}
@@ -432,28 +432,14 @@ public abstract class GLShader {
   }
 
   /** The default color extras. */
+  // TODO(bruno): Remove?
   protected class ColorExtras extends Extras {
-    private final Uniform4f uColor;
-    private int lastColor;
-
     public ColorExtras(GLProgram prog) {
-      uColor = prog.getUniform4f("u_Color");
     }
 
     @Override
-    public void prepare(int color, boolean justActivated) {
-      ctx.checkGLError("colorShader.prepare start");
-      boolean stateChanged = (color != lastColor);
-      if (!justActivated && stateChanged)
-        flush();
-      if (stateChanged) {
-        float r = ((color >> 16) & 0xff) / 255f;
-        float g = ((color >> 8) & 0xff) / 255f;
-        float b = ((color >> 0) & 0xff) / 255f;
-        uColor.bind(r, g, b, 1);
-        lastColor = color;
-        ctx.checkGLError("colorShader.prepare end");
-      }
+    public void prepare(int tex, boolean justActivated) {
+      // Nothing at all
     }
   }
 }

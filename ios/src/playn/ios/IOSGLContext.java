@@ -308,7 +308,7 @@ public class IOSGLContext extends GLContext {
   void paintLayers(GroupLayerGL rootLayer) {
     checkGLError("updateLayers start");
     bindFramebuffer();
-    rootLayer.paint(rootTransform, 1, null); // paint all the layers
+    rootLayer.paint(rootTransform, 1, 1, 1, 1, null); // paint all the layers
     checkGLError("updateLayers end");
     useShader(null, false); // guarantee a flush
     if (STATS_ENABLED) stats.frames++;

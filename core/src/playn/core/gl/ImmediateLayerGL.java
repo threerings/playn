@@ -115,10 +115,18 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
   }
 
   @Override
-  public void paint(InternalTransform curTransform, float curAlpha, GLShader curShader) {
+  public void paint(InternalTransform curTransform, float curRed, float curGreen, float curBlue,
+      float curAlpha, GLShader curShader) {
     if (!visible()) return;
+
     InternalTransform xform = localTransform(curTransform);
     surface.topTransform().set(xform);
+    if (tint != null) {
+      curRed *= tint.red;
+      curGreen *= tint.green;
+      curBlue *= tint.blue;
+    }
+    surface.setColor(curRed, curGreen, curBlue);
     surface.setAlpha(curAlpha * alpha);
     surface.setShader((shader == null) ? curShader : shader);
     render(xform);

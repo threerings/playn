@@ -46,6 +46,26 @@ public interface Layer {
     Layer hitTest (Layer layer, Point p);
   }
 
+  class Tint {
+    /** Multipliers for each color channel. */
+    public float red, green, blue;
+
+    protected Tint(float red, float green, float blue) {
+      set(red, green, blue);
+    }
+
+    protected Tint() {
+      set(1, 1, 1);
+    }
+
+    public Tint set(float red, float green, float blue) {
+      this.red = red;
+      this.green = green;
+      this.blue = blue;
+      return this;
+    }
+  }
+
   /**
    * Destroys this layer, removing it from its parent layer. Any resources associated with this
    * layer are freed, and it cannot be reused after being destroyed. Destroying a layer that has
@@ -108,6 +128,13 @@ public interface Layer {
    * @return a reference to this layer for call chaining.
    */
   Layer setInteractive(boolean interactive);
+
+  /**
+   * Return the color tint for this layer, which can be modified to recolor it.
+   * <p>
+   * <em>Note:</em> Tinting is only supported on OpenGL renderers.
+   */
+  Tint tint();
 
   /**
    * Return the global alpha value for this layer.

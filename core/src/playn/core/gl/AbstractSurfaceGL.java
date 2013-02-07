@@ -36,8 +36,7 @@ abstract class AbstractSurfaceGL implements Surface {
   protected final GLContext ctx;
   protected final List<InternalTransform> transformStack = new ArrayList<InternalTransform>();
 
-  protected int fillColor;
-  protected float alpha = 1;
+  protected float red = 1, green = 1, blue = 1, alpha = 1;
   protected ImageGL fillPattern;
   protected GLShader shader;
 
@@ -64,7 +63,8 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface drawImage(Image image, float x, float y, float dw, float dh) {
     bindFramebuffer();
     ((ImageGL) image).draw(shader, topTransform(), x, y, dw, dh,
-                           0, 0, image.width(), image.height(), alpha);
+                           0, 0, image.width(), image.height(),
+                           red, green, blue, alpha);
     return this;
   }
 
@@ -72,7 +72,8 @@ abstract class AbstractSurfaceGL implements Surface {
   public Surface drawImage(Image image, float dx, float dy, float dw, float dh,
                            float sx, float sy, float sw, float sh) {
     bindFramebuffer();
-    ((ImageGL) image).draw(shader, topTransform(), dx, dy, dw, dh, sx, sy, sw, sh, alpha);
+    ((ImageGL) image).draw(shader, topTransform(), dx, dy, dw, dh, sx, sy, sw, sh,
+                           red, green, blue, alpha);
     return this;
   }
 
@@ -109,12 +110,12 @@ abstract class AbstractSurfaceGL implements Surface {
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        shader.prepareTexture(tex, alpha);
+        shader.prepareTexture(tex, red, green, blue, alpha);
         shader.addQuad(l, 0, 0, length, width,
                        0, 0, length/fillPattern.width(), width/fillPattern.height());
       }
     } else {
-      shader.prepareColor(fillColor, alpha);
+      shader.prepareColor(red, green, blue, alpha);
       shader.addQuad(l, 0, 0, length, width, 0, 0, 1, 1);
     }
     return this;
@@ -128,12 +129,12 @@ abstract class AbstractSurfaceGL implements Surface {
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        shader.prepareTexture(tex, alpha);
+        shader.prepareTexture(tex, red, green, blue, alpha);
         float tw = fillPattern.width(), th = fillPattern.height(), r = x+width, b = y+height;
         shader.addQuad(topTransform(), x, y, x+width, y+height, x / tw, y / th, r / tw, b / th);
       }
     } else {
-      shader.prepareColor(fillColor, alpha);
+      shader.prepareColor(red, green, blue, alpha);
       shader.addQuad(topTransform(), x, y, x+width, y+height, 0, 0, 1, 1);
     }
     return this;
@@ -147,11 +148,11 @@ abstract class AbstractSurfaceGL implements Surface {
     if (fillPattern != null) {
       int tex = fillPattern.ensureTexture(true, true);
       if (tex > 0) {
-        shader.prepareTexture(tex, alpha);
+        shader.prepareTexture(tex, red, green, blue, alpha);
         shader.addTriangles(topTransform(), xys, fillPattern.width(), fillPattern.height(), indices);
       }
     } else {
-      shader.prepareColor(fillColor, alpha);
+      shader.prepareColor(red, green, blue, alpha);
       shader.addTriangles(topTransform(), xys, 1, 1, indices);
     }
     return this;
@@ -165,7 +166,7 @@ abstract class AbstractSurfaceGL implements Surface {
       throw new IllegalStateException("No fill pattern currently set");
     int tex = fillPattern.ensureTexture(true, true);
     if (tex > 0) {
-      GLShader shader = ctx.trisShader(this.shader).prepareTexture(tex, alpha);
+      GLShader shader = ctx.trisShader(this.shader).prepareTexture(tex, red, green, blue, alpha);
       shader.addTriangles(topTransform(), xys, sxys, indices);
     }
     return this;
@@ -213,9 +214,18 @@ abstract class AbstractSurfaceGL implements Surface {
   @Override
   public Surface setFillColor(int color) {
     // TODO: Add it to the state stack.
-    this.fillColor = color;
+    setColor(
+      (color & 0xff0000) / (float)0xff0000,
+      (color & 0x00ff00) / (float)0x00ff00,
+      (color & 0x0000ff) / (float)0x0000ff);
     this.fillPattern = null;
     return this;
+  }
+
+  void setColor(float red, float green, float blue) {
+    this.red = red;
+    this.green = green;
+    this.blue = blue;
   }
 
   @Override

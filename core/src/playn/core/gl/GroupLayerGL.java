@@ -75,7 +75,8 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
     }
 
     @Override
-    protected void render (InternalTransform xform, float alpha, GLShader shader) {
+    protected void render(InternalTransform xform, float red, float green, float blue,
+        float alpha, GLShader shader) {
       xform.translate(originX, originY);
       xform.transform(pos.set(-originX, -originY), pos);
       xform.transform(size.set(width, height), size);
@@ -83,7 +84,7 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
       ctx.startClipped((int) pos.x, (int) pos.y,
                        Math.round(Math.abs(size.x)), Math.round(Math.abs(size.y)));
       try {
-        super.render(xform, alpha, shader);
+        super.render(xform, red, green, blue, alpha, shader);
       } finally {
         ctx.endClipped();
       }
@@ -157,16 +158,25 @@ public class GroupLayerGL extends LayerGL implements GroupLayer, ParentLayer {
   }
 
   @Override
-  public void paint(InternalTransform curTransform, float curAlpha, GLShader curShader) {
+  public void paint(InternalTransform curTransform, float curRed, float curGreen, float curBlue,
+                    float curAlpha, GLShader curShader) {
     if (!visible()) return;
-    render(localTransform(curTransform), curAlpha * alpha, (shader == null) ? curShader : shader);
+
+    if (tint != null) {
+      curRed *= tint.red;
+      curGreen *= tint.green;
+      curBlue *= tint.blue;
+    }
+    render(localTransform(curTransform), curRed, curGreen, curBlue, curAlpha * alpha,
+        (shader == null) ? curShader : shader);
   }
 
-  protected void render(InternalTransform xform, float alpha, GLShader shader) {
+  protected void render(InternalTransform xform, float red, float green, float blue,
+      float alpha, GLShader shader) {
     // iterate manually to avoid creating an Iterator as garbage, this is inner-loop territory
     List<LayerGL> children = impl.children;
     for (int ii = 0, ll = children.size(); ii < ll; ii++) {
-      children.get(ii).paint(xform, alpha, shader);
+      children.get(ii).paint(xform, red, green, blue, alpha, shader);
     }
   }
 }

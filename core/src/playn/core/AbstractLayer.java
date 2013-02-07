@@ -71,6 +71,7 @@ public abstract class AbstractLayer implements Layer {
   protected int flags;
   protected Interactor<?> rootInteractor;
   protected HitTester hitTester;
+  protected Tint tint;
 
   protected AbstractLayer() {
     this(new StockInternalTransform());
@@ -120,6 +121,14 @@ public abstract class AbstractLayer implements Layer {
       setFlag(Flag.INTERACTIVE, interactive);
     }
     return this;
+  }
+
+  @Override
+  public Tint tint() {
+    if (tint == null) {
+      tint = new Tint();
+    }
+    return tint;
   }
 
   @Override

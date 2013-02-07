@@ -70,7 +70,7 @@ public class GL20Context extends GLContext {
   public void paintLayers(GroupLayerGL rootLayer) {
     checkGLError("paintLayers");
     bindFramebuffer();
-    rootLayer.paint(rootXform, 1, null); // paint all the layers
+    rootLayer.paint(rootXform, 1, 1, 1, 1, null); // paint all the layers
     useShader(null, false); // flush any pending shader
     if (STATS_ENABLED) stats.frames++;
   }

@@ -56,5 +56,6 @@ public abstract class LayerGL extends AbstractLayer {
     return savedLocal.concatenate(transform(), originX, originY);
   }
 
-  public abstract void paint(InternalTransform curTransform, float curAlpha, GLShader curShader);
+  public abstract void paint(InternalTransform curTransform, float curRed, float curGreen, float curBlue,
+      float curAlpha, GLShader curShader);
 }

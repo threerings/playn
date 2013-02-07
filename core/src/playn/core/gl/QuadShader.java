@@ -31,7 +31,7 @@ public class QuadShader extends GLShader {
     "attribute vec3 a_Vertex;\n" +
 
     "varying vec2 v_TexCoord;\n" +
-    "varying float v_Alpha;\n" +
+    "varying vec4 v_Color;\n" +
 
     "void main(void) {\n" +
     // Extract the transform &c data for this quad.
@@ -39,7 +39,7 @@ public class QuadShader extends GLShader {
     "vec4 mat = u_Data[index+0];\n" +
     "vec4 txc = u_Data[index+1];\n" +
     "vec4 tcs = u_Data[index+2];\n" +
-    "v_Alpha = u_Data[index+3].a;\n" + // TODO(bruno): Use the entire vec4 for tinting
+    "v_Color = u_Data[index+3];\n" +
 
     // Transform the vertex.
     "mat3 transform = mat3(\n" +
@@ -125,7 +125,7 @@ public class QuadShader extends GLShader {
     private final GLBuffer.Short elems;
 
     private int quadCounter;
-    private float alpha;
+    private float red, green, blue, alpha;
 
     public QuadCore(String vertShader, String fragShader) {
       super(vertShader, fragShader);
@@ -167,7 +167,10 @@ public class QuadShader extends GLShader {
     }
 
     @Override
-    public void prepare(float alpha, boolean justActivated) {
+    public void prepare(float red, float green, float blue, float alpha, boolean justActivated) {
+      this.red = red;
+      this.green = green;
+      this.blue = blue;
       this.alpha = alpha;
     }
 
@@ -199,8 +202,7 @@ public class QuadShader extends GLShader {
       data.add(sx1, sy1);
       data.add(sx2 - sx1, sy3 - sy1);
       data.skip(2);
-      data.skip(3); // TODO(bruno): Stick RGB in here
-      data.add(alpha);
+      data.add(red, green).add(blue, alpha);
       quadCounter++;
 
       if (quadCounter >= maxQuads)
