@@ -29,6 +29,7 @@ import playn.core.gl.GL20;
 import playn.core.gl.GroupLayerGL;
 import playn.core.gl.ImageLayerGL;
 import playn.core.gl.ImmediateLayerGL;
+import playn.core.gl.Scale;
 import playn.core.gl.SurfaceLayerGL;
 
 class HtmlGraphicsGL extends HtmlGraphics {
@@ -43,6 +44,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
     canvas.setWidth(rootElement.getOffsetWidth());
     canvas.setHeight(rootElement.getOffsetHeight());
     rootElement.appendChild(canvas);
+
     try {
       WebGLContextAttributes attrs = WebGLContextAttributes.create();
       attrs.setAlpha(config.transparentCanvas);
@@ -127,11 +129,6 @@ class HtmlGraphicsGL extends HtmlGraphics {
   }
 
   @Override
-  public float scaleFactor() {
-    return ctx.scale.factor;
-  }
-
-  @Override
   public GL20 gl20() {
     return ctx.gl;
   }
@@ -139,6 +136,11 @@ class HtmlGraphicsGL extends HtmlGraphics {
   @Override
   public HtmlGLContext ctx() {
     return ctx;
+  }
+
+  @Override
+  Scale scale() {
+    return ctx.scale;
   }
 
   @Override
