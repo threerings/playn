@@ -36,6 +36,7 @@ class FlashImage extends AbstractImage implements Image {
 
   protected BitmapData imageData = null;
   private final String url;
+  private boolean repeatX, repeatY;
 
   FlashImage(String url) {
     this.url = url;
@@ -87,6 +88,25 @@ class FlashImage extends AbstractImage implements Image {
   }
 
   @Override
+  public boolean repeatX() {
+    return repeatX;
+  }
+
+  @Override
+  public boolean repeatY() {
+    return repeatY;
+  }
+
+  @Override
+  public void setRepeat(boolean repeatX, boolean repeatY) {
+    if (repeatX != this.repeatX || repeatY != this.repeatY) {
+      this.repeatX = repeatX;
+      this.repeatY = repeatY;
+      // TODO
+    }
+  }
+
+  @Override
   public Region subImage(float x, float y, float width, float height) {
     return new FlashImageRegion(this, x, y, width, height);
   }
@@ -118,7 +138,7 @@ class FlashImage extends AbstractImage implements Image {
   }
 
   @Override
-  public int ensureTexture(boolean repeatX, boolean repeatY) {
+  public int ensureTexture() {
     return 0; // not supported
   }
 
