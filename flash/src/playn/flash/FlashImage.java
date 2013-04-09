@@ -24,6 +24,7 @@ import flash.gwt.FlashImport;
 
 import playn.core.Image;
 import playn.core.Pattern;
+import playn.core.gl.Scale;
 import playn.core.util.Callback;
 import playn.core.util.Callbacks;
 
@@ -72,6 +73,11 @@ class FlashImage extends AbstractImage implements Image {
   @Override
   public float height() {
     return imageData == null ? 0 : imageData.getHeight();
+  }
+
+  @Override
+  public Scale scale() {
+    return Scale.ONE;
   }
 
   @Override
