@@ -1,11 +1,11 @@
 /**
  * Copyright 2010 The PlayN Authors
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -35,7 +35,7 @@ import org.lwjgl.opengl.GL11;
 import playn.core.Asserts;
 import playn.core.gl.GL20Context;
 
-class JavaGLContext extends GL20Context {
+class JavaGLContext extends GL20Context implements JavaGLContextInterface {
 
   public static final boolean CHECK_ERRORS = Boolean.getBoolean("playn.glerrors");
 
@@ -66,11 +66,11 @@ class JavaGLContext extends GL20Context {
       super.viewWasResized();
   }
 
-  void updateTexture(int tex, BufferedImage image) {
+  public void updateTexture(int tex, BufferedImage image) {
     ByteBuffer buf = convertImageData(image);
     bindTexture(tex);
     GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, image.getWidth(), image.getHeight(), 0,
-                      GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
+        GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
     checkGLError("updateTexture");
   }
 
@@ -83,8 +83,8 @@ class JavaGLContext extends GL20Context {
     ColorModel glAlphaColorModel = new ComponentColorModel(
         ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[] {8, 8, 8, 8}, true, false,
         Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE);
-    WritableRaster raster = Raster.createInterleavedRaster(
-      DataBuffer.TYPE_BYTE, img.getWidth(), img.getHeight(), 4, null);
+    WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, img.getWidth(),
+        img.getHeight(), 4, null);
     BufferedImage texImage = new BufferedImage(glAlphaColorModel, raster, true, null);
 
     Graphics g = texImage.getGraphics();

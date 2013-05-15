@@ -46,8 +46,9 @@ public class JavaGraphics extends GraphicsGL {
     // needing to configure LWJGL native libraries
     this.ctx = config.headless ? new GL20Context(platform, null, config.scaleFactor, false) {
       @Override
-      protected void viewWasResized () {}
-    } : new JavaGLContext(platform, config.scaleFactor, config.width, config.height);
+			protected void viewWasResized() {
+			}
+		} : config.useGLES ? new JavaGLESContext(platform, config.scaleFactor, config.width, config.height) : new JavaGLContext(platform, config.scaleFactor, config.width, config.height);
     this.rootLayer = new GroupLayerGL(ctx);
   }
 

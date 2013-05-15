@@ -62,6 +62,8 @@ public class JavaPlatform extends AbstractPlatform {
 
     /** If set, emulates Touch and disables Mouse. For testing. */
     public boolean emulateTouch;
+
+		public boolean useGLES;
   }
 
   /**
