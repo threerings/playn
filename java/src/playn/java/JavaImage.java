@@ -123,6 +123,6 @@ public abstract class JavaImage extends ImageGL<Graphics2D> {
   @Override
   protected void updateTexture(int tex) {
     Asserts.checkState(img != null);
-    ((JavaGLContext) ctx).updateTexture(tex, img);
+    ((JavaGLContextInterface) ctx).updateTexture(tex, img);
   }
 }
