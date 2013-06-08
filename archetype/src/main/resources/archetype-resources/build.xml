@@ -13,6 +13,7 @@
   <property name="src.dir"     value="src/main/java"/>
   <property name="war.dir"     value="src/main/webapp"/>
   <property name="target.dir"  value="target"/>
+  <property name="resource.dir" value="src/main/resources"/>
   <property name="classes.dir" value="${symbol_dollar}{target.dir}/classes"/>
   <property name="webapp.dir"  value="${symbol_dollar}{target.dir}/webapp"/>
 
@@ -20,8 +21,7 @@
   <property name="maven-ant.vers" value="2.1.3"/>
   <property name="maven-ant.dir" value="${symbol_dollar}{user.home}/.m2/ant-support"/>
   <property name="maven-ant.jar" value="${symbol_dollar}{maven-ant.dir}/maven-ant-tasks-${symbol_dollar}{maven-ant.vers}.jar"/>
-  <property name="maven-ant.url"
-            value="http://mirrors.ibiblio.org/pub/mirrors/apache/maven/binaries"/>
+  <property name="maven-ant.url" value="http://apache.webxcreen.org/maven/ant-tasks/${maven-ant.vers}/binaries"/>
   <condition property="maven-ant.exists"><available file="${symbol_dollar}{maven-ant.jar}"/></condition>
   <target name="-download-maven-ant" unless="maven-ant.exists">
     <mkdir dir="${symbol_dollar}{maven-ant.dir}"/>
@@ -108,7 +108,7 @@
     </javac>
     <!-- copy all of our resources into the classes directory -->
     <copy todir="${symbol_dollar}{classes.dir}">
-      <fileset dir="core/${symbol_dollar}{src.dir}" includes="**" excludes="**/*.java"/>
+      <fileset dir="assets/${symbol_dollar}${resource.dir}"/>
     </copy>
   </target>
 
@@ -179,11 +179,12 @@
   </target>
 
   <target name="run-java" depends="compile" description="Runs game in JVM.">
-    <java fork="true" dir="core" classname="${symbol_dollar}{java.classname}">
+    <java fork="true" dir="java" classname="${symbol_dollar}{java.classname}">
       <classpath>
         <pathelement location="${symbol_dollar}{classes.dir}"/>
         <path refid="java.classpath"/>
       </classpath>
+      <sysproperty key="java.library.path" value="target/natives"/>
     </java>
   </target>
 </project>
