@@ -22,6 +22,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
@@ -78,25 +79,59 @@ class JavaGLContext extends GL20Context {
     Asserts.checkNotNull(img);
     ByteBuffer imageBuffer;
 
-    // TODO(jgw): There has *got* to be a better way. None of the BufferedImage types match
-    // GL_RGBA, so we have to go through these stupid contortions to get a color model.
-    ColorModel glAlphaColorModel = new ComponentColorModel(
-        ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[] {8, 8, 8, 8}, true, false,
-        Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE);
-    WritableRaster raster = Raster.createInterleavedRaster(
-      DataBuffer.TYPE_BYTE, img.getWidth(), img.getHeight(), 4, null);
-    BufferedImage texImage = new BufferedImage(glAlphaColorModel, raster, true, null);
-
-    Graphics g = texImage.getGraphics();
-    g.setColor(new Color(0f, 0f, 0f, 0f));
-    g.fillRect(0, 0, 256, 256);
-    g.drawImage(img, 0, 0, null);
-
-    // Build a byte buffer from the temporary image that be used by OpenGL to produce a texture.
-    DataBufferByte dbuf = (DataBufferByte) texImage.getRaster().getDataBuffer();
-    imageBuffer = ByteBuffer.allocateDirect(dbuf.getSize());
+    
+    Object o = img.getRaster().getDataBuffer();
+    if (o instanceof DataBufferByte)
+    {
+    	
+    	//DMG: The comments below do not apply when we're dealing with DataBufferInt's which
+    	//is the kind of object we get back with canvas calls. Significantly more efficient.
+    	//See CanvasDemo.
+     
+	    // TODO(jgw): There has *got* to be a better way. None of the BufferedImage types match
+	    // GL_RGBA, so we have to go through these stupid contortions to get a color model.
+	    ColorModel glAlphaColorModel = new ComponentColorModel(
+	        ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[] {8, 8, 8, 8}, true, false,
+	        Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE);
+	    WritableRaster raster = Raster.createInterleavedRaster(
+	      DataBuffer.TYPE_BYTE, img.getWidth(), img.getHeight(), 4, null);
+	    BufferedImage texImage = new BufferedImage(glAlphaColorModel, raster, true, null);
+	
+	    Graphics g = texImage.getGraphics();
+	    g.drawImage(img, 0, 0, null);
+	
+    
+	    DataBufferByte dbuf = (DataBufferByte) texImage.getRaster().getDataBuffer();
+    
+    	imageBuffer = ByteBuffer.allocateDirect(dbuf.getSize());
+        imageBuffer.order(ByteOrder.nativeOrder());
+        imageBuffer.put(dbuf.getData());
+        imageBuffer.flip();
+        return imageBuffer;
+    }
+    
+    DataBufferInt dbuf  = (DataBufferInt) img.getRaster().getDataBuffer() ;
+    imageBuffer = ByteBuffer.allocateDirect(img.getWidth() * img.getHeight() * 4);
     imageBuffer.order(ByteOrder.nativeOrder());
-    imageBuffer.put(dbuf.getData());
+    
+    for(int b = 0 ; b < dbuf.getNumBanks(); b++)
+    {
+    	int[] bank = dbuf.getData(b) ;
+	    for(int i = 0 ; i < bank.length ; i++)
+	    {
+	    	int rgb = bank[i]; //always returns TYPE_INT_ARGB
+	    	byte alpha = (byte) ((rgb >> 24) & 0xFF);
+	    	byte red =   (byte) ((rgb >> 16) & 0xFF);
+	    	byte green = (byte) ((rgb >>  8) & 0xFF);
+	    	byte blue =  (byte) ((rgb      ) & 0xFF);
+	    	
+	    	//put for GL_RGBA
+	    	imageBuffer.put(red);
+	    	imageBuffer.put(green);
+	    	imageBuffer.put(blue);
+	    	imageBuffer.put(alpha);	    	
+	    }
+    }
     imageBuffer.flip();
 
     return imageBuffer;
