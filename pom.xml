@@ -260,5 +260,15 @@
         <gwt.xdisable>true</gwt.xdisable>
       </properties>
     </profile>
+    <profile>
+      <id>deploy-local</id>
+      <distributionManagement>
+        <repository>
+          <id>local</id>
+          <name>Local maven repository</name>
+          <url>${deploy-local.dir}</url>
+        </repository>
+      </distributionManagement>
+    </profile>
   </profiles>
 </project>
