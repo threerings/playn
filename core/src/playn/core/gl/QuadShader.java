@@ -166,6 +166,15 @@ public class QuadShader extends GLShader {
     private final GLBuffer.Float data;
     private final GLBuffer.Short vertices, elements;
 
+    /**
+     * Array to allow fast writing of data before sending to the GL buffer.
+     */
+    private final float[] arrayData;
+    /**
+     * The first free index in arrayData.
+     */
+    private int arrIndex;
+
     private int quadCounter;
     private float arTint, gbTint;
 
@@ -173,6 +182,8 @@ public class QuadShader extends GLShader {
       super(vertShader, fragShader);
 
       data = ctx.createFloatBuffer(maxQuads*vec4sPerQuad()*4);
+      arrayData = new float[maxQuads*vec4sPerQuad()*4];
+      arrIndex = 0;
 
       // compile the shader and get our uniform and attribute
       uScreenSize = prog.getUniform2f("u_ScreenSize");
@@ -218,9 +229,11 @@ public class QuadShader extends GLShader {
     public void flush() {
       if (quadCounter == 0)
         return;
+      data.add(arrayData, 0, arrIndex);
       uData.bind(data, quadCounter * vec4sPerQuad());
       elements.drawElements(GL20.GL_TRIANGLES, ELEMENTS_PER_QUAD*quadCounter);
       quadCounter = 0;
+      arrIndex = 0;
     }
 
     @Override
@@ -238,18 +251,32 @@ public class QuadShader extends GLShader {
                         float x3, float y3, float sx3, float sy3,
                         float x4, float y4, float sx4, float sy4) {
       float dw = x2 - x1, dh = y3 - y1;
-      data.add(m00*dw, m01*dw, m10*dh, m11*dh, tx + m00*x1 + m10*y1, ty + m01*x1 + m11*y1);
-      data.add(sx1, sy1);
-      data.add(sx2 - sx1, sy3 - sy1);
-      addExtraData(data);
+
+      arrayData[arrIndex++] = m00 * dw;
+      arrayData[arrIndex++] = m01 * dw;
+      arrayData[arrIndex++] = m10 * dh;
+      arrayData[arrIndex++] = m11 * dh;
+      arrayData[arrIndex++] = tx + m00 * x1 + m10 * y1;
+      arrayData[arrIndex++] = ty + m01 * x1 + m11 * y1;
+      arrayData[arrIndex++] = sx1;
+      arrayData[arrIndex++] = sy1;
+      arrayData[arrIndex++] = sx2 - sx1;
+      arrayData[arrIndex++] = sy3 - sy1;
+
+      addExtraData();
       quadCounter++;
 
       if (quadCounter >= maxQuads)
         QuadShader.this.flush();
     }
 
-    protected void addExtraData(GLBuffer.Float data) {
-      data.add(arTint, gbTint);
+    protected void addData(float data) {
+      arrayData[arrIndex++] = data;
+    }
+
+    protected void addExtraData() {
+      addData(arTint);
+      addData(gbTint);
     }
   }
 }
