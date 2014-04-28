@@ -90,8 +90,13 @@ public class CanvasSurface implements Surface {
 
   @Override
   public Surface fillTriangles(float[] xys, int[] indices) {
+    return fillTriangles(xys, xys.length, indices, indices.length);
+  }
+
+  @Override
+  public Surface fillTriangles(float[] xys, int xysLen, int[] indices, int indicesLen) {
     Path path = canvas.createPath();
-    for (int ii = 0; ii < indices.length; ii += 3) {
+    for (int ii = 0; ii < indicesLen; ii += 3) {
       int a = 2*indices[ii], b = 2*indices[ii+1], c = 2*indices[ii+2];
       path.moveTo(xys[a], xys[a+1]);
       path.lineTo(xys[b], xys[b+1]);
@@ -107,6 +112,13 @@ public class CanvasSurface implements Surface {
     // canvas-based surfaces can't handle texture coordinates, so ignore them; the caller has been
     // warned of this sub-optimal fallback behavior in this method's javadocs
     return fillTriangles(xys, indices);
+  }
+
+  @Override
+  public Surface fillTriangles(float[] xys, float[] sxys, int xysLen, int[] indices, int indicesLen) {
+    // canvas-based surfaces can't handle texture coordinates, so ignore them; the caller has been
+    // warned of this sub-optimal fallback behavior in this method's javadocs
+    return fillTriangles(xys, xysLen, indices, indicesLen);
   }
 
   @Override

@@ -238,12 +238,12 @@ public class IndexedTrisShader extends GLShader {
       offset = addVert(vertData, offset, stableAttrs, x4, y4, sx4, sy4);
       vertices.skip(offset - vertices.position());
 
-      addElems(vertIdx, QUAD_INDICES);
+      addElems(vertIdx, QUAD_INDICES, QUAD_INDICES.length);
     }
 
     @Override
     public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
-                             float[] xys, float tw, float th, int[] indices) {
+                             float[] xys, int xysLen, float tw, float th, int[] indices, int indicesLen) {
       stableAttrs[0] = m00;
       stableAttrs[1] = m01;
       stableAttrs[2] = m10;
@@ -252,7 +252,7 @@ public class IndexedTrisShader extends GLShader {
       stableAttrs[5] = ty;
       addExtraStableAttrs(stableAttrs, 6);
 
-      int vertIdx = beginPrimitive(xys.length/2, indices.length);
+      int vertIdx = beginPrimitive(xysLen/2, indicesLen);
       int offset = vertices.position();
       float[] vertData = vertices.array();
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
@@ -261,12 +261,12 @@ public class IndexedTrisShader extends GLShader {
       }
       vertices.skip(offset - vertices.position());
 
-      addElems(vertIdx, indices);
+      addElems(vertIdx, indices, indicesLen);
     }
 
     @Override
     public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
-                             float[] xys, float[] sxys, int[] indices) {
+                             float[] xys, float[] sxys, int xysLen, int[] indices, int indicesLen) {
       stableAttrs[0] = m00;
       stableAttrs[1] = m01;
       stableAttrs[2] = m10;
@@ -275,7 +275,7 @@ public class IndexedTrisShader extends GLShader {
       stableAttrs[5] = ty;
       addExtraStableAttrs(stableAttrs, 6);
 
-      int vertIdx = beginPrimitive(xys.length/2, indices.length);
+        int vertIdx = beginPrimitive(xysLen/2, indicesLen);
       int offset = vertices.position();
       float[] vertData = vertices.array();
       for (int ii = 0, ll = xys.length; ii < ll; ii += 2) {
@@ -283,7 +283,7 @@ public class IndexedTrisShader extends GLShader {
       }
       vertices.skip(offset - vertices.position());
 
-      addElems(vertIdx, indices);
+      addElems(vertIdx, indices, indicesLen);
     }
 
     @Override
@@ -327,10 +327,10 @@ public class IndexedTrisShader extends GLShader {
       return vertIdx;
     }
 
-    protected final void addElems(int vertIdx, int[] indices) {
+    protected final void addElems(int vertIdx, int[] indices, int indicesLen) {
       short[] data = elements.array();
       int offset = elements.position();
-      for (int ii = 0, ll = indices.length; ii < ll; ii++) {
+      for (int ii = 0; ii < indicesLen; ii++) {
         data[offset++] = (short)(vertIdx+indices[ii]);
       }
       elements.skip(offset - elements.position());
