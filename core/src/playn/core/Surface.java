@@ -200,11 +200,17 @@ public interface Surface {
    * every rendering call.
    *
    * @param xys the xy coordinates of the triangles, as an array: {@code [x1, y1, x2, y2, ...]}.
-   * @param xysLen number of coordinates to be used. This must be not greater than {@code xys.length}
+   * @param xysOffset the offset of the coordinates array, must not be negative and no greater than {@code
+   * xys.length}
+   * @param xysLen the number of coordinates to read, must be no less than zero and no greater than
+   * {@code xys.length - xysOffset}
    * @param indices the index of each vertex of each triangle in the {@code xys} array.
-   * @param indicesLen number of indices to be used. This must be not greater than {@code indices.length}
+   * @param indicesOffset the offset of the indices array, must not be negative and no greater than {@code
+   * indices.length}
+   * @param indicesLen the number of indices to read, must be no less than zero and no greater than
+   * {@code indices.length - indicesOffset}
    */
-  Surface fillTriangles(float[] xys, int xysLen, int[] indices, int indicesLen);
+  Surface fillTriangles(float[] xys, int xysOffset, int xysLen, int[] indices, int indicesOffset, int indicesLen);
 
   /**
    * Fills the supplied batch of triangles with the current fill pattern. Note: this method only
@@ -230,11 +236,18 @@ public interface Surface {
    * @param xys the xy coordinates of the triangles, as an array: {@code [x1, y1, x2, y2, ...]}.
    * @param sxys the texture coordinates for each vertex of the triangles, as an array:
    * {@code [sx1, sy1, sx2, sy2, ...]}. This must be the same length as {@code xys}.
-   * @param xysLen number of coordinates to be used. This must be not greater than {@code xys.length}
+   * @param xysOffset the offset of the coordinates array, must not be negative and no greater than {@code
+   * xys.length}
+   * @param xysLen the number of coordinates to read, must be no less than zero and no greater than
+   * {@code xys.length - xysOffset}
    * @param indices the index of each vertex of each triangle in the {@code xys} array.
-   * @param indicesLen number of indices to be used. This must be not greater than {@code indices.length}
+   * @param indicesOffset the offset of the indices array, must not be negative and no greater than {@code
+   * indices.length}
+   * @param indicesLen the number of indices to read, must be no less than zero and no greater than
+   * {@code indices.length - indicesOffset}
    *
    * @throws IllegalStateException if no fill pattern is currently set.
    */
-  Surface fillTriangles(float[] xys, float[] sxys, int xysLen, int[] indices, int indicesLen);
+  Surface fillTriangles(float[] xys, float[] sxys, int xysOffset, int xysLen,
+                        int[] indices, int indicesOffset, int indicesLen);
 }

@@ -150,11 +150,12 @@ abstract class AbstractSurfaceGL implements Surface {
 
   @Override
   public Surface fillTriangles(float[] xys, int[] indices) {
-    return fillTriangles(xys, xys.length, indices, indices.length);
+    return fillTriangles(xys, 0, xys.length, indices, 0, indices.length);
   }
 
   @Override
-  public Surface fillTriangles(float[] xys, int xysLen, int[] indices, int indicesLen) {
+  public Surface fillTriangles(float[] xys, int xysOffset, int xysLen,
+                               int[] indices, int indicesOffset, int indicesLen) {
     bindFramebuffer();
 
     GLShader shader = ctx.trisShader(this.shader);
@@ -162,23 +163,26 @@ abstract class AbstractSurfaceGL implements Surface {
       int tex = fillPattern.ensureTexture();
       if (tex > 0) {
         shader.prepareTexture(tex, tint);
-        shader.addTriangles(topTransform(), xys, xysLen, fillPattern.width(), fillPattern.height(), indices, indicesLen);
+        shader.addTriangles(topTransform(), xys, xysOffset, xysLen,
+                fillPattern.width(), fillPattern.height(), indices, indicesOffset, indicesLen);
       }
     } else {
       int tex = ctx.fillImage().ensureTexture();
       shader.prepareTexture(tex, Tint.combine(fillColor, tint));
-      shader.addTriangles(topTransform(), xys, xysLen, 1, 1, indices, indicesLen);
+      shader.addTriangles(topTransform(), xys, xysOffset, xysLen,
+              1, 1, indices, indicesOffset, indicesLen);
     }
     return this;
   }
 
   @Override
   public Surface fillTriangles(float[] xys, float[] sxys, int[] indices) {
-    return fillTriangles(xys, sxys, xys.length, indices, indices.length);
+    return fillTriangles(xys, sxys, 0, xys.length, indices, 0, indices.length);
   }
 
   @Override
-  public Surface fillTriangles(float[] xys, float[] sxys, int xysLen, int[] indices, int indicesLen) {
+  public Surface fillTriangles(float[] xys, float[] sxys, int xysOffset, int xysLen,
+                               int[] indices, int indicesOffset, int indicesLen) {
     bindFramebuffer();
 
     if (fillPattern == null)
@@ -186,7 +190,7 @@ abstract class AbstractSurfaceGL implements Surface {
     int tex = fillPattern.ensureTexture();
     if (tex > 0) {
       GLShader shader = ctx.trisShader(this.shader).prepareTexture(tex, tint);
-      shader.addTriangles(topTransform(), xys, sxys, xysLen, indices, indicesLen);
+      shader.addTriangles(topTransform(), xys, sxys, xysOffset, xysLen, indices, indicesOffset, indicesLen);
     }
     return this;
   }

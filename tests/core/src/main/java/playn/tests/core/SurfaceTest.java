@@ -65,11 +65,19 @@ public class SurfaceTest extends Test {
     final Pattern pattern = tile.toPattern();
 
     int samples = 128; // big enough to force a buffer size increase
-    final float[] verts = new float[(samples+1)*4];
-    final int[] indices = new int[samples*6];
-    tessellateCurve(0, 40*(float)Math.PI, verts, indices, new F() {
-      public float apply (float x) { return (float)Math.sin(x/20)*50; }
-    });
+    final int vertsOffset = 47;
+    final int vertsLen = (samples+1)*4;
+    final int indicesOffset = 67;
+    final int indicesLen = samples*6;
+    final float[] verts = new float[vertsOffset+vertsLen];
+    final int[] indices = new int[indicesOffset+indicesLen];
+    tessellateCurve(0, 40*(float)Math.PI,
+            verts, vertsOffset, vertsLen,
+            indices, indicesOffset,
+            new F() {
+              public float apply (float x) { return (float)Math.sin(x/20)*50; }
+            }
+    );
 
     float ygap = 20, ypos = 10;
 
@@ -110,7 +118,7 @@ public class SurfaceTest extends Test {
         surf.setFillPattern(pattern).fillRect(10, 0, 100, 100);
         // use same fill pattern for the triangles
         surf.translate(0, 160);
-        surf.fillTriangles(verts, indices);
+        surf.fillTriangles(verts, vertsOffset, vertsLen, indices, indicesOffset, indicesLen);
       }
     }, 120, 210, "ImmediateLayer patterned fillRect, fillTriangles");
 
@@ -218,8 +226,9 @@ public class SurfaceTest extends Test {
     public float apply (float x);
   }
 
-  void tessellateCurve (float minx, float maxx, float[] verts, int[] indices, F f) {
-    int slices = (verts.length-1)/4, vv = 0;
+  void tessellateCurve (float minx, float maxx, float[] verts, int vertsOffset, int vertsLen,
+                        int[] indices, int indicesOffset, F f) {
+    int slices = (vertsLen-1)/4, vv = vertsOffset;
     float dx = (maxx-minx)/slices;
     for (float x = minx; x < maxx; x += dx) {
       verts[vv++] = x;
@@ -227,8 +236,8 @@ public class SurfaceTest extends Test {
       verts[vv++] = x;
       verts[vv++] = f.apply(x);
     }
-    for (int ss = 0, ii = 0; ss < slices; ss++) {
-      int base = ss*2;
+    for (int ss = 0, ii = indicesOffset; ss < slices; ss++) {
+      int base = ss*2 + vertsOffset;
       indices[ii++] = base;
       indices[ii++] = base+1;
       indices[ii++] = base+3;
