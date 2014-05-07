@@ -172,15 +172,24 @@ public abstract class GLShader {
    * Adds a collection of triangles to the current render operation.
    *
    * @param xys a list of x/y coordinates as: {@code [x1, y1, x2, y2, ...]}.
+   * @param xysOffset the offset of the coordinates array, must not be negative and no greater than {@code
+   * xys.length}
+   * @param xysLen the number of coordinates to read, must be no less than zero and no greater than
+   * {@code xys.length - xysOffset}
    * @param tw the width of the texture for which we will auto-generate texture coordinates.
    * @param th the height of the texture for which we will auto-generate texture coordinates.
    * @param indices the index of the triangle vertices in the supplied {@code xys} array. This must
    * be in proper winding order for OpenGL rendering.
+   * @param indicesOffset the offset of the indices array, must not be negative and no greater than {@code
+   * indices.length}
+   * @param indicesLen the number of indices to read, must be no less than zero and no greater than
+   * {@code indices.length - indicesOffset}
    */
-  public void addTriangles(InternalTransform local, float[] xys, float tw, float th, int[] indices) {
+  public void addTriangles(InternalTransform local, float[] xys, int xysOffset, int xysLen,
+                           float tw, float th, int[] indices, int indicesOffset, int indicesLen) {
     texCore.addTriangles(local.m00(), local.m01(), local.m10(), local.m11(), local.tx(), local.ty(),
-                         xys, tw, th, indices);
-    if (GLContext.STATS_ENABLED) ctx.stats.trisRendered += indices.length/3;
+                         xys, xysOffset, xysLen, tw, th, indices, indicesOffset, indicesLen);
+    if (GLContext.STATS_ENABLED) ctx.stats.trisRendered += indicesLen/3;
   }
 
   /**
@@ -189,13 +198,22 @@ public abstract class GLShader {
    * @param xys a list of x/y coordinates as: {@code [x1, y1, x2, y2, ...]}.
    * @param sxys a list of sx/sy texture coordinates as: {@code [sx1, sy1, sx2, sy2, ...]}. This
    * must be of the same length as {@code xys}.
+   * @param xysOffset the offset of the coordinates array, must not be negative and no greater than {@code
+   * xys.length}
+   * @param xysLen the number of coordinates to read, must be no less than zero and no greater than
+   * {@code xys.length - xysOffset}
    * @param indices the index of the triangle vertices in the supplied {@code xys} array. This must
    * be in proper winding order for OpenGL rendering.
+   * @param indicesOffset the offset of the indices array, must not be negative and no greater than {@code
+   * indices.length}
+   * @param indicesLen the number of indices to read, must be no less than zero and no greater than
+   * {@code indices.length - indicesOffset}
    */
-  public void addTriangles(InternalTransform local, float[] xys, float[] sxys, int[] indices) {
+  public void addTriangles(InternalTransform local, float[] xys, float[] sxys, int xysOffset, int xysLen,
+                           int[] indices, int indicesOffset, int indicesLen) {
     texCore.addTriangles(local.m00(), local.m01(), local.m10(), local.m11(), local.tx(), local.ty(),
-                         xys, sxys, indices);
-    if (GLContext.STATS_ENABLED) ctx.stats.trisRendered += indices.length/3;
+                         xys, sxys, xysOffset, xysLen, indices, indicesOffset, indicesLen);
+    if (GLContext.STATS_ENABLED) ctx.stats.trisRendered += indicesLen/3;
   }
 
   /**
@@ -351,13 +369,15 @@ public abstract class GLShader {
 
     /** See {@link GLShader#addTriangles}. */
     public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
-                             float[] xys, float tw, float th, int[] indices) {
+                             float[] xys, int xysOffset, int xysLen, float tw, float th,
+                             int[] indices, int indicesOffset, int indicesLen) {
       throw new UnsupportedOperationException("Triangles not supported by this shader");
     }
 
     /** See {@link GLShader#addTriangles}. */
     public void addTriangles(float m00, float m01, float m10, float m11, float tx, float ty,
-                             float[] xys, float[] sxys, int[] indices) {
+                             float[] xys, float[] sxys, int xysOffset, int xysLen,
+                             int[] indices, int indicesOffset, int indicesLen) {
       throw new UnsupportedOperationException("Triangles not supported by this shader");
     }
 
