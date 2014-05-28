@@ -49,6 +49,7 @@
     <gwt.version>2.6.0</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>2.9.0</lwjgl.version>
+    <jinput.version>2.0.5</jinput.version>
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL

@@ -63,6 +63,8 @@ public interface Platform {
   Mouse mouse();
 
   Touch touch();
+  
+  Gamepads gamepads();
 
   Storage storage();
 }

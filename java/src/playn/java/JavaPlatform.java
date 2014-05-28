@@ -28,6 +28,7 @@ import org.lwjgl.opengl.Display;
 
 import playn.core.AbstractPlatform;
 import playn.core.Game;
+import playn.core.Gamepads;
 import playn.core.Json;
 import playn.core.Key;
 import playn.core.Keyboard;
@@ -132,6 +133,7 @@ public class JavaPlatform extends AbstractPlatform {
   private final JavaKeyboard keyboard;
   private final JavaPointer pointer = new JavaPointer();
   private final TouchImpl touch;
+  private final JavaGamepads gamepads;
   private final JavaGraphics graphics;
   private final JavaMouse mouse;
   private final JavaAssets assets = new JavaAssets(this);
@@ -151,6 +153,7 @@ public class JavaPlatform extends AbstractPlatform {
     keyboard = createKeyboard();
     storage = new JavaStorage(this, config);
     touch = createTouch(config);
+    gamepads = new JavaGamepads(this);
     if (touch instanceof JavaEmulatedTouch) {
       mouse = ((JavaEmulatedTouch)touch).createMouse(this);
     } else {
@@ -235,6 +238,11 @@ public class JavaPlatform extends AbstractPlatform {
   @Override
   public Touch touch() {
     return touch;
+  }
+  
+  @Override
+  public Gamepads gamepads() {
+    return gamepads;
   }
 
   @Override
@@ -330,6 +338,7 @@ public class JavaPlatform extends AbstractPlatform {
     graphics.init();
     mouse.init();
     keyboard.init(keyListener);
+    gamepads.init();
     game.init();
   }
 
@@ -354,6 +363,7 @@ public class JavaPlatform extends AbstractPlatform {
     mouse.update();
     keyboard.update();
     pointer.update();
+    gamepads.update();
 
     // Execute any pending runnables.
     runQueue.execute();
@@ -374,13 +384,38 @@ public class JavaPlatform extends AbstractPlatform {
       return;
 
     SharedLibraryExtractor extractor = new SharedLibraryExtractor();
-    File nativesDir = null;
     try {
-      nativesDir = extractor.extractLibrary("lwjgl", null).getParentFile();
+      File nativesDir = nativesDir = extractor.extractLibrary("lwjgl", null).getParentFile();
+      System.setProperty("org.lwjgl.librarypath", nativesDir.getAbsolutePath());
     } catch (Throwable ex) {
       throw new RuntimeException("Unable to extract LWJGL native libraries.", ex);
     }
-    System.setProperty("org.lwjgl.librarypath", nativesDir.getAbsolutePath());
+    
+    try {
+        String[] jinputLibs;
+        if (extractor.isWindows) {
+              if(extractor.is64Bit) {
+                  jinputLibs = new String[] {"jinput-dx8_64.dll", "jinput-raw_64.dll"};
+              }else {
+                  jinputLibs =  new String[] {"jinput-dx8.dll", "jinput-raw.dll", "jinput-wintab.dll"};
+              }
+          } else if (extractor.isLinux) {
+            jinputLibs =  new String[] { "libjinput-linux" + (extractor.is64Bit ? "64.so" : ".so") };
+        } else if (extractor.isMac) {
+            jinputLibs =  new String[] { "libjinput" + "-osx.jnilib"};
+        } else {
+          jinputLibs =  new String[] { "jinput" };
+        }
+      File nativesDir = null;
+      for(String jinputLib : jinputLibs) {
+        nativesDir = extractor.extractLibrary(jinputLib, "jinput").getParentFile();
+      }
+      if(null != nativesDir) {
+        System.setProperty("net.java.games.input.librarypath", nativesDir.getAbsolutePath());
+      }
+    } catch (Throwable ex) {
+      throw new RuntimeException("Unable to extract jinput native libraries.", ex);
+    }
   }
 
   protected boolean isInJavaWebStart() {

@@ -28,10 +28,10 @@ import java.util.zip.CRC32;
  */
 public class SharedLibraryExtractor {
 
-  private final boolean isWindows = System.getProperty("os.name").contains("Windows");
-  private final boolean isLinux = System.getProperty("os.name").contains("Linux");
-  private final boolean isMac = System.getProperty("os.name").contains("Mac");
-  private final boolean is64Bit = System.getProperty("os.arch").equals("amd64");
+  final boolean isWindows = System.getProperty("os.name").contains("Windows");
+  final boolean isLinux = System.getProperty("os.name").contains("Linux");
+  final boolean isMac = System.getProperty("os.name").contains("Mac");
+  final boolean is64Bit = System.getProperty("os.arch").equals("amd64");
 
   /**
    * Extracts the specified library into the specified temp directory (if it has not already been
@@ -91,14 +91,27 @@ public class SharedLibraryExtractor {
     }
     throw new FileNotFoundException("Unable to find shared lib for '" + libraryName + "'");
   }
+  
+  private String[] platformSpecificSuffix = new String[]{".dll", ".so", ".jnilib", ".dylib"};
 
+  private boolean isPlatformDependentName(String libraryName) {
+      for(String suffix : platformSpecificSuffix) {
+          if(libraryName.endsWith(suffix)) {
+              return true;
+          }
+      }
+      return false;
+  }
+  
   /** Maps a platform independent library name to one or more platform dependent names. */
   private String[] platformNames(String libraryName) {
-    if (isWindows) return new String[] { libraryName + (is64Bit ? "64.dll" : ".dll") };
-    if (isLinux) return new String[] { "lib" + libraryName + (is64Bit ? "64.so" : ".so") };
-    if (isMac) return new String[] { "lib" + libraryName + ".jnilib",
-                                     "lib" + libraryName + ".dylib" };
-    return new String[] { libraryName };
+      if(!isPlatformDependentName(libraryName)) {
+        if (isWindows) return new String[] { libraryName + (is64Bit ? "64.dll" : ".dll") };
+        if (isLinux) return new String[] { "lib" + libraryName + (is64Bit ? "64.so" : ".so") };
+        if (isMac) return new String[] { "lib" + libraryName + ".jnilib",
+                                         "lib" + libraryName + ".dylib" };
+      }
+      return new String[] { libraryName };
   }
 
   /** Returns a CRC of the remaining bytes in the stream. */

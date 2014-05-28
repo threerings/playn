@@ -25,6 +25,8 @@ import playn.core.Storage;
 import playn.core.Audio;
 import playn.core.PlayN;
 import playn.core.Game;
+import playn.core.Gamepads;
+import playn.core.GamepadsStub;
 import playn.core.Json;
 import playn.core.Keyboard;
 import playn.core.Net;
@@ -161,6 +163,7 @@ public class HtmlPlatform extends AbstractPlatform {
   private final HtmlPointer pointer;
   private final HtmlMouse mouse;
   private final HtmlTouch touch;
+  private final Gamepads gamepads = new HtmlGamepads();
   private final HtmlStorage storage = new HtmlStorage(this);
 
   // installs backwards compat Date.now() if needed and calls it
@@ -395,4 +398,10 @@ public class HtmlPlatform extends AbstractPlatform {
   private static native double now () /*-{
     return Date.now();
   }-*/;
+
+  @Override
+  public Gamepads gamepads() {
+    return gamepads;
+  }
+  
 }
