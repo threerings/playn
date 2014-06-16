@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 The PlayN Authors
+ * Copyright 2014 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -33,7 +33,7 @@ public class JavaLWJGLKeyboard extends JavaKeyboard {
   @Override
   public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
     Object result = JOptionPane.showInputDialog(
-      frame, label, "", JOptionPane.QUESTION_MESSAGE, null, null, initVal);
+            frame, label, "", JOptionPane.QUESTION_MESSAGE, null, null, initVal);
     callback.onSuccess((String) result);
   }
 

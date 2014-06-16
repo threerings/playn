@@ -181,7 +181,7 @@ public class TestsGame extends Game.Default {
 
   // defers display of menu by one frame to avoid the right click or touch being processed by the
   // menu when it is displayed
-  void displayMenuLater() {
+  public void displayMenuLater() {
     invokeLater(new Runnable() {
       public void run() {
         displayMenu();
@@ -189,7 +189,7 @@ public class TestsGame extends Game.Default {
     });
   }
 
-  void displayMenu() {
+  public void displayMenu() {
     clearTest();
     clearRoot();
     GroupLayer root = graphics().rootLayer();

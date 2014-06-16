@@ -16,15 +16,13 @@
 package playn.java;
 
 import playn.core.Events;
-import playn.core.Mouse;
-import playn.core.Mouse.ButtonEvent.Impl;
 import playn.core.TouchImpl;
 import pythagoras.f.Point;
 
 /** Implements touches using a special customized JavaMouse mouse. For testing.
  * TODO: show multitouch points on screen
  * TODO: allow pivot slide */
-public class JavaEmulatedTouch extends TouchImpl
+public abstract class JavaEmulatedTouch extends TouchImpl
 {
   private boolean mouseDown;
   private Point pivot;
@@ -39,33 +37,7 @@ public class JavaEmulatedTouch extends TouchImpl
     pivot = new Point(x, y);
   }
 
-  JavaMouse createMouse (JavaPlatform platform) {
-    return new JavaLWJGLMouse(platform) {
-
-      @Override public boolean hasMouse() {
-        return false;
-      }
-
-      @Override protected boolean onMouseDown(Mouse.ButtonEvent.Impl event) {
-        JavaEmulatedTouch.this.onMouseDown(event.time(), event.x(), event.y());
-        return false;
-      }
-
-      @Override protected boolean onMouseMove(Mouse.MotionEvent.Impl event) {
-        JavaEmulatedTouch.this.onMouseMove(event.time(), event.x(), event.y());
-        return false;
-      }
-
-      @Override protected boolean onMouseUp(Impl event) {
-        JavaEmulatedTouch.this.onMouseUp(event.time(), event.x(), event.y());
-        return false;
-      }
-
-      @Override protected boolean onMouseWheelScroll(playn.core.Mouse.WheelEvent.Impl event) {
-        return false;
-      }
-    };
-  }
+  abstract JavaMouse createMouse (JavaPlatform platform);
 
   void onMouseDown(double time, float x, float y) {
     currentId+=2; // skip an id in case of pivot

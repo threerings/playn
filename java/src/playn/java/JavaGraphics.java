@@ -19,13 +19,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 
 import pythagoras.f.Point;
 
@@ -42,7 +37,7 @@ import playn.core.gl.GroupLayerGL;
 import playn.core.gl.Scale;
 import static playn.core.PlayN.*;
 
-public class JavaGraphics extends GraphicsGL {
+public abstract class JavaGraphics extends GraphicsGL {
 
   protected final JavaPlatform platform;
   protected final GL20Context ctx;
@@ -56,7 +51,7 @@ public class JavaGraphics extends GraphicsGL {
     // initialization of LWJGL; this allows tests to run against non-graphics services without
     // needing to configure LWJGL native libraries
     this.ctx = config.headless ? new GL20Context(platform, null, config.scaleFactor, false) :
-      new JavaGLContext(platform, config.scaleFactor);
+      createJavaGLContext(platform, config.scaleFactor);
     this.rootLayer = new GroupLayerGL(ctx);
 
     // set up the dummy font contexts
@@ -66,12 +61,9 @@ public class JavaGraphics extends GraphicsGL {
     Graphics2D aGfx = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
     aGfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     aFontContext = aGfx.getFontRenderContext();
-
-    if (!config.headless) {
-      setDisplayMode(ctx.scale.scaledCeil(config.width), ctx.scale.scaledCeil(config.height),
-                     config.fullscreen);
-    }
   }
+
+  protected abstract JavaGLContext createJavaGLContext(JavaPlatform platform, float scaleFactor);
 
   /**
    * Registers a font with the graphics system.
@@ -94,51 +86,7 @@ public class JavaGraphics extends GraphicsGL {
    * Changes the size of the PlayN window.
    */
   public void setSize(int width, int height, boolean fullscreen) {
-    int swidth = ctx.scale.scaledCeil(width), sheight = ctx.scale.scaledCeil(height);
-    setDisplayMode(swidth, sheight, fullscreen);
     ctx.setSize(width, height);
-  }
-
-  protected void setDisplayMode(int width, int height, boolean fullscreen) {
-    try {
-      // check if current mode is suitable
-      DisplayMode mode = Display.getDisplayMode();
-      if (fullscreen == Display.isFullscreen() &&
-          mode.getWidth() == width && mode.getHeight() == height)
-        return;
-
-      if (fullscreen) {
-        // try and find a mode matching width and height
-        DisplayMode matching = null;
-        for (DisplayMode test : Display.getAvailableDisplayModes()) {
-          if (test.getWidth() == width && test.getHeight() == height && test.isFullscreenCapable()) {
-            matching = test;
-          }
-        }
-
-        if (matching == null) {
-          platform.log().info("Could not find a matching fullscreen mode, available: " +
-                              Arrays.asList(Display.getAvailableDisplayModes()));
-        } else {
-          mode = matching;
-        }
-
-      } else {
-        mode = new DisplayMode(width, height);
-      }
-
-      platform.log().debug("Updating display mode: " + mode + ", fullscreen: " + fullscreen);
-      // TODO: fix crashes when fullscreen is toggled repeatedly
-      if (fullscreen) {
-        Display.setDisplayModeAndFullscreen(mode);
-        // TODO: fix alt-tab, maybe add a key listener or something?
-      } else {
-        Display.setDisplayMode(mode);
-      }
-
-    } catch (LWJGLException ex) {
-      throw new RuntimeException(ex);
-    }
   }
 
   @Override
@@ -183,16 +131,6 @@ public class JavaGraphics extends GraphicsGL {
   }
 
   @Override
-  public int screenWidth() {
-    return ctx.scale.invScaledFloor(Display.getDesktopDisplayMode().getWidth());
-  }
-
-  @Override
-  public int screenHeight() {
-    return ctx.scale.invScaledFloor(Display.getDesktopDisplayMode().getHeight());
-  }
-
-  @Override
   public GL20 gl20() {
     return ctx.gl;
   }
@@ -210,12 +148,7 @@ public class JavaGraphics extends GraphicsGL {
     return new JavaAsyncImage(ctx, width, height);
   }
 
-  protected void init() {
-    DisplayMode mode = Display.getDisplayMode();
-    ctx.setSize(ctx.scale.invScaledFloor(mode.getWidth()),
-                ctx.scale.invScaledFloor(mode.getHeight()));
-    ctx.init();
-  }
+  protected abstract void init();
 
   protected void paint() {
     ctx.paint(rootLayer);

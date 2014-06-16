@@ -3,7 +3,9 @@
 .classpath
 .project
 .settings
+.idea
 target
+gen
 
 # /html/
 /html/tests/playn/shared/json

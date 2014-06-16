@@ -19,6 +19,7 @@
     <module>assets</module>
     <module>core</module>
     <module>java</module>
+    <module>swing-java</module>
   </modules>
 
   <profiles>

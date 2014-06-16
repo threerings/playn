@@ -15,7 +15,7 @@
  */
 package playn.tests;
 
-import playn.java.JavaPlatform;
+import playn.java.JavaLWJGLPlatform;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -25,8 +25,8 @@ public abstract class AbstractPlayNTest {
 
   @BeforeClass
   public static void initializePlatform() {
-    JavaPlatform.Config config = new JavaPlatform.Config();
+    JavaLWJGLPlatform.Config config = new JavaLWJGLPlatform.Config();
     config.headless = true;
-    JavaPlatform.register(config);
+    JavaLWJGLPlatform.register(config);
   }
 }

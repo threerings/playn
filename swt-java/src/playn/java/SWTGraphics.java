@@ -25,7 +25,7 @@ import org.eclipse.swt.opengl.GLData;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.LWJGLException;
 
-public class SWTGraphics extends JavaGraphics {
+public class SWTGraphics extends JavaLWJGLGraphics {
 
   private final SWTPlatform platform;
   GLCanvas canvas; // initialized in createGLContext

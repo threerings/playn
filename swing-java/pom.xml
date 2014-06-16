@@ -7,34 +7,28 @@
     <version>1.9-SNAPSHOT</version>
   </parent>
 
-  <artifactId>playn-java</artifactId>
+  <artifactId>playn-swing-java</artifactId>
   <packaging>jar</packaging>
-  <name>PlayN Java</name>
-  <description>The PlayN Java (JVM) backend</description>
+  <name>PlayN Java via Swing</name>
+  <description>The PlayN Java (JVM) backend hosted by Swing</description>
 
   <dependencies>
     <dependency>
       <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-core</artifactId>
+      <artifactId>playn-java</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>jlayer</groupId>
-      <artifactId>mp3spi</artifactId>
-      <version>1.9.5</version>
+      <groupId>org.jogamp.jogl</groupId>
+      <artifactId>jogl-all</artifactId>
+      <version>${jogl.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>13.0.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.java-websocket</groupId>
-      <artifactId>Java-WebSocket</artifactId>
-      <version>1.3.0</version>
+      <groupId>org.jogamp.gluegen</groupId>
+      <artifactId>gluegen-rt</artifactId>
+      <version>${jogl.version}</version>
     </dependency>
   </dependencies>
 

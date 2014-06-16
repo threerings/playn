@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 The PlayN Authors
+ * Copyright 2014 The PlayN Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -82,10 +82,10 @@ class JavaLWJGLMouse extends JavaMouse {
 
   private static int getButton(int lwjglButton) {
     switch (lwjglButton) {
-    case 0:  return BUTTON_LEFT;
-    case 2:  return BUTTON_MIDDLE;
-    case 1:  return BUTTON_RIGHT;
-    default: return lwjglButton;
+      case 0:  return BUTTON_LEFT;
+      case 2:  return BUTTON_MIDDLE;
+      case 1:  return BUTTON_RIGHT;
+      default: return lwjglButton;
     }
   }
 }

@@ -23,9 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-
 import playn.core.AbstractPlatform;
 import playn.core.Game;
 import playn.core.Json;
@@ -40,7 +37,7 @@ import playn.core.TouchImpl;
 import playn.core.TouchStub;
 import playn.core.json.JsonImpl;
 
-public class JavaPlatform extends AbstractPlatform {
+public abstract class JavaPlatform extends AbstractPlatform {
 
   /** Defines JavaPlatform configurable parameters. */
   public static class Config {
@@ -84,33 +81,6 @@ public class JavaPlatform extends AbstractPlatform {
      * window title. Currently only supported for SWT backend. */
     public String appName = "Game";
   }
-
-  /**
-   * Registers the Java platform with a default configuration.
-   */
-  public static JavaPlatform register() {
-    return register(new Config());
-  }
-
-  /**
-   * Registers the Java platform with the specified configuration.
-   */
-  public static JavaPlatform register(Config config) {
-    // guard against multiple-registration (only in headless mode because this can happen when
-    // running tests in Maven; in non-headless mode, we want to fail rather than silently ignore
-    // erroneous repeated registration)
-    if (config.headless && testInstance != null) {
-      return testInstance;
-    }
-    JavaPlatform instance = new JavaPlatform(config);
-    if (config.headless) {
-      testInstance = instance;
-    }
-    PlayN.setPlatform(instance);
-    return instance;
-  }
-
-  private static JavaPlatform testInstance;
 
   private static float getDefaultScaleFactor() {
     String sfprop = System.getProperty("playn.scaleFactor", "1");
@@ -172,19 +142,11 @@ public class JavaPlatform extends AbstractPlatform {
       keyListener = null;
     }
 
-    if (!config.headless) {
-      setTitle(config.appName);
-    }
     convertImagesOnLoad = config.convertImagesOnLoad;
   }
 
-  /**
-   * Sets the title of the window.
-   *
-   * @param title the window title
-   */
-  public void setTitle(String title) {
-    Display.setTitle(title);
+  public Config config() {
+    return config;
   }
 
   @Override
@@ -278,53 +240,13 @@ public class JavaPlatform extends AbstractPlatform {
     pointer.setPropagateEvents(propagate);
   }
 
-  @Override
-  public void run(final Game game) {
-    if (!config.headless) {
-      try {
-        Display.create();
-      } catch (LWJGLException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    init(game);
+  protected abstract JavaGraphics createGraphics(Config config);
 
-    boolean wasActive = Display.isActive();
-    while (!Display.isCloseRequested()) {
-      // Notify the app if lose or regain focus (treat said as pause/resume).
-      boolean newActive = Display.isActive();
-      if (wasActive != newActive) {
-        if (wasActive)
-          onPause();
-        else
-          onResume();
-        wasActive = newActive;
-      }
-      processFrame(game);
-      Display.update();
-      // Sleep until it's time for the next frame.
-      Display.sync(60);
-    }
+  protected abstract TouchImpl createTouch(Config config);
 
-    shutdown();
-  }
+  protected abstract JavaMouse createMouse();
 
-  protected JavaGraphics createGraphics(Config config) {
-    return new JavaGraphics(this, config);
-  }
-  protected TouchImpl createTouch(Config config) {
-    if (config.emulateTouch) {
-      return new JavaEmulatedTouch();
-    } else {
-      return new TouchStub();
-    }
-  }
-  protected JavaMouse createMouse() {
-    return new JavaLWJGLMouse(this);
-  }
-  protected JavaKeyboard createKeyboard() {
-    return new JavaLWJGLKeyboard();
-  }
+  protected abstract JavaKeyboard createKeyboard();
 
   protected void init(Game game) {
     graphics.init();
@@ -368,20 +290,7 @@ public class JavaPlatform extends AbstractPlatform {
     active = !active;
   }
 
-  protected void unpackNatives() {
-    // avoid native library unpacking if we're running in Java Web Start
-    if (isInJavaWebStart())
-      return;
-
-    SharedLibraryExtractor extractor = new SharedLibraryExtractor();
-    File nativesDir = null;
-    try {
-      nativesDir = extractor.extractLibrary("lwjgl", null).getParentFile();
-    } catch (Throwable ex) {
-      throw new RuntimeException("Unable to extract LWJGL native libraries.", ex);
-    }
-    System.setProperty("org.lwjgl.librarypath", nativesDir.getAbsolutePath());
-  }
+  protected abstract void unpackNatives();
 
   protected boolean isInJavaWebStart() {
     try {

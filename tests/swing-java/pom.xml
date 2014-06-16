@@ -7,8 +7,8 @@
     <version>1.9-SNAPSHOT</version>
   </parent>
 
-  <artifactId>playn-tests-java</artifactId>
-  <name>PlayN Tests Java</name>
+  <artifactId>playn-tests-swing-java</artifactId>
+  <name>PlayN Tests Swing Java</name>
 
   <properties>
     <mainClass>playn.tests.java.TestsGameJava</mainClass>
@@ -30,8 +30,20 @@
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-lwjgl-java</artifactId>
+      <artifactId>playn-swing-java</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jogamp.jogl</groupId>
+      <artifactId>jogl-all-main</artifactId>
+      <version>${jogl.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jogamp.gluegen</groupId>
+      <artifactId>gluegen-rt-main</artifactId>
+      <version>${jogl.version}</version>
     </dependency>
   </dependencies>
 
@@ -66,10 +78,10 @@
 
   <profiles>
     <profile>
-      <id>java</id>
+      <id>javaSwing</id>
       <build>
         <plugins>
-          <!-- allows testing of Java backend via: mvn test -Pjava -->
+          <!-- allows testing of Java backend via: mvn test -PjavaSwing -->
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>

@@ -35,7 +35,9 @@
     <module>html</module>
     <module>ios</module>
     <module>java</module>
+    <module>lwjgl-java</module>
     <module>swt-java</module>
+    <module>swing-java</module>
     <module>tests</module>
     <module>webgl</module>
   </modules>
@@ -49,6 +51,7 @@
     <gwt.version>2.6.0</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>2.9.0</lwjgl.version>
+    <jogl.version>2.1.5-01</jogl.version>
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL

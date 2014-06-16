@@ -24,7 +24,7 @@ import playn.core.Game;
 import playn.core.PlayN;
 import playn.core.TouchImpl;
 
-public class SWTPlatform extends JavaPlatform {
+public class SWTPlatform extends JavaLWJGLPlatform {
 
   protected static final long FRAME_MILLIS = 1000/60; // TODO: allow config?
   private long lastFrame;

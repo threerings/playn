@@ -22,9 +22,7 @@ import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
+import playn.core.gl.GL20;
 import playn.core.gl.GL20Context;
 
 public class JavaGLContext extends GL20Context {
@@ -54,8 +52,8 @@ public class JavaGLContext extends GL20Context {
     return convertedImage;
   }
 
-  public JavaGLContext(JavaPlatform platform, float scaleFactor) {
-    super(platform, new JavaGL20(), scaleFactor, CHECK_ERRORS);
+  public JavaGLContext(JavaPlatform platform, GL20 gl, float scaleFactor) {
+    super(platform, gl, scaleFactor, CHECK_ERRORS);
   }
 
   void updateTexture(int tex, BufferedImage image) {
@@ -73,16 +71,16 @@ public class JavaGLContext extends GL20Context {
       bbuf.asIntBuffer().put(ibuf.getData());
       bbuf.position(bbuf.position()+iSize);
       bbuf.flip();
-      format = GL12.GL_BGRA;
-      type = GL12.GL_UNSIGNED_INT_8_8_8_8_REV;
+      format = GL20.GL_BGRA;
+      type = GL20.GL_UNSIGNED_INT_8_8_8_8_REV;
 
     } else if (image.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
       DataBufferByte dbbuf = (DataBufferByte)dbuf;
       bbuf = checkGetImageBuffer(dbbuf.getSize());
       bbuf.put(dbbuf.getData());
       bbuf.flip();
-      format = GL11.GL_RGBA;
-      type = GL12.GL_UNSIGNED_INT_8_8_8_8;
+      format = GL20.GL_RGBA;
+      type = GL20.GL_UNSIGNED_INT_8_8_8_8;
 
     } else {
       // Something went awry and convertImage thought this image was in a good form already,
@@ -91,7 +89,7 @@ public class JavaGLContext extends GL20Context {
     }
 
     bindTexture(tex);
-    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, image.getWidth(), image.getHeight(), 0,
+    gl.glTexImage2D(GL20.GL_TEXTURE_2D, 0, GL20.GL_RGBA, image.getWidth(), image.getHeight(), 0,
                       format, type, bbuf);
     checkGLError("updateTexture");
   }

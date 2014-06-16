@@ -16,6 +16,7 @@
 package playn.tests.java;
 
 import playn.core.PlayN;
+import playn.java.JavaLWJGLPlatform;
 import playn.java.JavaPlatform;
 
 import playn.tests.core.TestsGame;
@@ -31,7 +32,7 @@ public class TestsGameJava {
     }
     config.width = 800;
     config.height = 600;
-    JavaPlatform platform = JavaPlatform.register(config);
+    JavaLWJGLPlatform platform = JavaLWJGLPlatform.register(config);
     platform.setTitle("Tests");
     // let the caller know that we accept some args
     platform.log().info("Usage: TestsGameJava [@Nx] [test#]");
