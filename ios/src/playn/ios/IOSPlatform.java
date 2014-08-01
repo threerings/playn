@@ -23,6 +23,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import playn.core.AbstractPlatform;
+import playn.core.Game;
+import playn.core.Json;
+import playn.core.Mouse;
+import playn.core.MouseStub;
+import playn.core.PlayN;
+import playn.core.json.JsonImpl;
 import cli.MonoTouch.CoreAnimation.CAAnimation;
 import cli.MonoTouch.Foundation.NSAction;
 import cli.MonoTouch.Foundation.NSNotification;
@@ -32,25 +39,15 @@ import cli.MonoTouch.Foundation.NSString;
 import cli.MonoTouch.Foundation.NSTimer;
 import cli.MonoTouch.Foundation.NSUrl;
 import cli.MonoTouch.UIKit.UIApplication;
-import cli.MonoTouch.UIKit.UIApplicationDelegate;
 import cli.MonoTouch.UIKit.UIDeviceOrientation;
 import cli.MonoTouch.UIKit.UIInterfaceOrientation;
 import cli.MonoTouch.UIKit.UIScreen;
 import cli.MonoTouch.UIKit.UIView;
 import cli.MonoTouch.UIKit.UIViewController;
 import cli.MonoTouch.UIKit.UIWindow;
-import cli.System.Action;
 import cli.System.Drawing.RectangleF;
 import cli.System.Threading.ThreadPool;
 import cli.System.Threading.WaitCallback;
-
-import playn.core.AbstractPlatform;
-import playn.core.Game;
-import playn.core.Json;
-import playn.core.Mouse;
-import playn.core.MouseStub;
-import playn.core.PlayN;
-import playn.core.json.JsonImpl;
 
 /**
  * Provides access to all the PlayN services on iOS.
@@ -159,12 +156,15 @@ public class IOSPlatform extends AbstractPlatform {
 
   /**
    * Registers your application using the supplied configuration and window.
-   *
-   * The window is used for a game integrated as a part of application. An iOS application
-   * typically just works on one screen so that the game has to share the window created by other
-   * controllers (typically created by the story board). If no window is specified, the platform
-   * will create one taking over the whole application.
-   *
+   * 
+   * The window is used for a game integrated as a part of application. An iOS application typically
+   * just works on one screen so that the game has to share the window created by other controllers
+   * (typically created by the story board). If no window is specified, the platform will create one
+   * taking over the whole application.
+   * 
+   * You have to participate the lifecyle management of a game if it's used as a part of application
+   * by manually calling {@link #activate()} and {@link #terminate()} in pairs.
+   * 
    * Note that PlayN will still install a RootViewController on the supplied UIWindow. If a custom
    * root view controller is needed, your application should subclass {@link IOSRootViewController}
    * or replicate its functionality in your root view controller.
@@ -237,6 +237,28 @@ public class IOSPlatform extends AbstractPlatform {
   public void setOrientationChangeListener(OrientationChangeListener listener) {
     orientationChangeListener = listener;
     dispatchOrientationChange(currentOrientation);
+  }
+
+
+  
+  /**
+   * Activate the platform manually if the game is used as a part of larger application.
+   * 
+   * The other part of an application has to intervene the lifecycle management since the platform
+   * is created and destroyed by other controllers and will miss the DidBecomeActiveNotification and
+   * WillTerminateNotification events. 
+   * 
+   * Don't forget {@link #terminate()} to terminate the platform.  
+   * 
+   **/
+  public void activate(){
+      didBecomeActive();
+  }
+  
+  
+  /** Terminate the platform manually in combination with {@link #activate()} */
+  public void terminate(){
+    willTerminate();
   }
 
   protected IOSPlatform(UIApplication app, UIWindow window, Config config) {
