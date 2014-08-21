@@ -15,15 +15,18 @@
  */
 package playn.tests.core;
 
-import playn.core.CanvasImage;
-import playn.core.Font;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
-import playn.core.TextWrap;
+import playn.core.*;
 import playn.core.util.TextBlock;
-import static playn.core.PlayN.graphics;
 
 public class ScaledTextTest extends Test {
+
+  protected final TextFormat infoFormat;
+
+  public ScaledTextTest(Platform platform) {
+    super(platform);
+    infoFormat = new TextFormat().
+            withFont(platform.graphics().createFont("Helvetica", Font.Style.PLAIN, 12));
+  }
 
   @Override
   public String getName() {
@@ -39,30 +42,27 @@ public class ScaledTextTest extends Test {
   public void init() {
     String text = "The quick brown fox jumped over the lazy dog.";
     TextFormat format = new TextFormat().
-      withFont(graphics().createFont("Helvetica", Font.Style.PLAIN, 18));
-    TextBlock block = new TextBlock(graphics().layoutText(text, format, new TextWrap(100)));
+      withFont(platform.graphics().createFont("Helvetica", Font.Style.PLAIN, 18));
+    TextBlock block = new TextBlock(platform, platform.graphics().layoutText(text, format, new TextWrap(100)));
 
     float x = 5;
     for (float scale : new float[] { 1f, 2f, 3f }) {
       float swidth = block.bounds.width() * scale, sheight = block.bounds.height() * scale;
-      CanvasImage image = graphics().createImage(swidth, sheight);
+      CanvasImage image = platform.graphics().createImage(swidth, sheight);
       image.canvas().setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, swidth-0.5f, sheight-0.5f);
       image.canvas().scale(scale, scale);
       image.canvas().setFillColor(0xFF000000);
       block.fill(image.canvas(), TextBlock.Align.RIGHT, 0, 0);
-      graphics().rootLayer().addAt(graphics().createImageLayer(image), x, 5);
+      platform.graphics().rootLayer().addAt(platform.graphics().createImageLayer(image), x, 5);
       addInfo(image, x + swidth/2, sheight + 10);
       x += swidth + 5;
     }
   }
 
   protected void addInfo (CanvasImage image, float cx, float y) {
-    TextLayout ilayout = graphics().layoutText(image.width() + "x" + image.height(), infoFormat);
-    CanvasImage iimage = graphics().createImage(ilayout.width(), ilayout.height());
+    TextLayout ilayout = platform.graphics().layoutText(image.width() + "x" + image.height(), infoFormat);
+    CanvasImage iimage = platform.graphics().createImage(ilayout.width(), ilayout.height());
     iimage.canvas().setFillColor(0xFF000000).fillText(ilayout, 0, 0);
-    graphics().rootLayer().addAt(graphics().createImageLayer(iimage), cx - iimage.width()/2, y);
+    platform.graphics().rootLayer().addAt(platform.graphics().createImageLayer(iimage), cx - iimage.width()/2, y);
   }
-
-  protected final TextFormat infoFormat = new TextFormat().
-    withFont(graphics().createFont("Helvetica", Font.Style.PLAIN, 12));
 }

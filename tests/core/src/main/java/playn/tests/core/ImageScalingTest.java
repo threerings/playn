@@ -15,6 +15,7 @@
  */
 package playn.tests.core;
 
+import playn.core.Platform;
 import pythagoras.f.FloatMath;
 
 import playn.core.Image;
@@ -28,6 +29,10 @@ public class ImageScalingTest extends Test {
   private boolean pointerPressed;
   private ImageLayer player1, player2;
   private ImageLayer slayer1, slayer2;
+
+  public ImageScalingTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

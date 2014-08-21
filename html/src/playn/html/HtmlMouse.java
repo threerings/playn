@@ -34,6 +34,7 @@ class HtmlMouse extends MouseImpl {
   private boolean isRequestingMouseLock;
 
   HtmlMouse(final HtmlPlatform platform, final Element rootElement) {
+    super(platform);
     this.platform = platform;
     this.rootElement = rootElement;
 
@@ -74,7 +75,7 @@ class HtmlMouse extends MouseImpl {
             dy = y - lastY;
           }
           if (onMouseMove(new MotionEvent.Impl(
-            new Events.Flags.Impl(), PlayN.currentTime(), x, y, dx, dy))) {
+            new Events.Flags.Impl(), platform.time(), x, y, dx, dy))) {
             ev.preventDefault();
           }
         }
@@ -92,7 +93,7 @@ class HtmlMouse extends MouseImpl {
       public void handleEvent(NativeEvent ev, float x, float y) {
         inDragSequence = true;
         if (onMouseDown(new ButtonEvent.Impl(
-          new Events.Flags.Impl(), PlayN.currentTime(), x, y, getMouseButton(ev))))
+          new Events.Flags.Impl(), platform.time(), x, y, getMouseButton(ev))))
           ev.preventDefault();
       }
     });
@@ -104,7 +105,7 @@ class HtmlMouse extends MouseImpl {
         if (inDragSequence) {
           inDragSequence = false;
           if (onMouseUp(new ButtonEvent.Impl(
-            new Events.Flags.Impl(), PlayN.currentTime(), x, y, getMouseButton(ev))))
+            new Events.Flags.Impl(), platform.time(), x, y, getMouseButton(ev))))
             ev.preventDefault();
         }
         handleRequestsInUserEventContext();
@@ -132,7 +133,7 @@ class HtmlMouse extends MouseImpl {
       @Override
       public void handleEvent(NativeEvent ev) {
         if (onMouseWheelScroll(new WheelEvent.Impl(
-          new Events.Flags.Impl(), PlayN.currentTime(), lastMousePt.x, lastMousePt.y,
+          new Events.Flags.Impl(), platform.time(), lastMousePt.x, lastMousePt.y,
           getMouseWheelVelocity(ev))))
           ev.preventDefault();
       }
@@ -224,15 +225,15 @@ class HtmlMouse extends MouseImpl {
   public void lock() {
     if (isLockSupported()) {
       isRequestingMouseLock = true;
-      PlayN.log().debug("Requesting mouse lock (supported)");
+      platform.log().debug("Requesting mouse lock (supported)");
     } else {
-      PlayN.log().debug("Requesting mouse lock -- but unsupported");
+      platform.log().debug("Requesting mouse lock -- but unsupported");
     }
   }
 
   @Override
   public void unlock() {
-    PlayN.log().debug("Requesting mouse unlock");
+    platform.log().debug("Requesting mouse unlock");
     isRequestingMouseLock = false;
     if (isLockSupported()) {
       unlockImpl();

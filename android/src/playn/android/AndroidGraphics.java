@@ -66,6 +66,7 @@ public class AndroidGraphics extends GraphicsGL {
   final GroupLayerGL rootLayer;
 
   public AndroidGraphics(AndroidPlatform platform, AndroidGL20 gfx, Bitmap.Config bitmapConfig) {
+    super(platform);
     this.platform = platform;
     this.preferredBitmapConfig = bitmapConfig;
     ctx = new AndroidGLContext(platform, gfx);
@@ -223,7 +224,7 @@ public class AndroidGraphics extends GraphicsGL {
 
   @Override
   protected SurfaceGL createSurfaceGL(float width, float height) {
-    return new AndroidSurfaceGL(platform.activity.getCacheDir(), ctx, width, height);
+    return new AndroidSurfaceGL(platform, ctx, width, height);
   }
 
   void paint() {

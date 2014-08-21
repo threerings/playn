@@ -15,17 +15,17 @@
  */
 package playn.tests.core;
 
+import playn.core.*;
 import pythagoras.f.FloatMath;
 import pythagoras.f.Vector;
 
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.Touch;
-import playn.core.Layer;
-import playn.core.Pointer;
 import static playn.core.PlayN.*;
 
 class LayerClickTest extends Test {
+
+  public LayerClickTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

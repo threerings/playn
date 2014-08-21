@@ -51,6 +51,7 @@ public class JavaGraphics extends GraphicsGL {
   final FontRenderContext aaFontContext, aFontContext;
 
   public JavaGraphics(JavaPlatform platform, JavaPlatform.Config config) {
+    super(platform);
     this.platform = platform;
     // if we're being run in headless mode, create a stub GL context which does not trigger the
     // initialization of LWJGL; this allows tests to run against non-graphics services without
@@ -83,7 +84,7 @@ public class JavaGraphics extends GraphicsGL {
   public void registerFont(String name, String path) {
     try {
       java.awt.Font font = java.awt.Font.createFont(
-        java.awt.Font.TRUETYPE_FONT, ((JavaAssets) assets()).getAssetStream(path));
+        java.awt.Font.TRUETYPE_FONT, platform.assets().getAssetStream(path));
       _fonts.put(name, font);
     } catch (Exception e) {
       platform.reportError("Failed to load font [name=" + name + ", path=" + path + "]", e);

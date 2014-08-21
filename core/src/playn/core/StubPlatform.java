@@ -75,10 +75,10 @@ public class StubPlatform extends AbstractPlatform {
     }
   };
 
-  private Touch touch = new TouchStub();
-  private Mouse mouse = new MouseStub();
+  private Touch touch = new TouchStub(this);
+  private Mouse mouse = new MouseStub(this);
   private Json json = new JsonImpl();
-  private Pointer pointer = new PointerImpl() {};
+  private Pointer pointer = new PointerImpl(this) {};
   private final long start = System.currentTimeMillis();
 
   public StubPlatform() {

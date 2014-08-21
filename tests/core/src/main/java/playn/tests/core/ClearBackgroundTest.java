@@ -16,6 +16,7 @@
 
 package playn.tests.core;
 
+import playn.core.Platform;
 import pythagoras.f.FloatMath;
 
 import playn.core.Color;
@@ -29,6 +30,10 @@ public class ClearBackgroundTest extends Test {
   private ImageLayer square;
   static int width = 100;
   static int height = 100;
+
+  public ClearBackgroundTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

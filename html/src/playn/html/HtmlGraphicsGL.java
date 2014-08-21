@@ -37,9 +37,11 @@ class HtmlGraphicsGL extends HtmlGraphics {
   private final CanvasElement canvas;
   private final HtmlGLContext ctx;
   private final GroupLayerGL rootLayer;
+  private final HtmlPlatform platform;
 
   HtmlGraphicsGL(HtmlPlatform platform, HtmlPlatform.Config config) throws RuntimeException {
     super(config);
+    this.platform = platform;
     canvas = Document.get().createCanvasElement();
     canvas.setWidth(rootElement.getOffsetWidth());
     canvas.setHeight(rootElement.getOffsetHeight());
@@ -108,7 +110,7 @@ class HtmlGraphicsGL extends HtmlGraphics {
 
   @Override
   public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
-    return new ImmediateLayerGL(ctx, renderer);
+    return new ImmediateLayerGL(platform, ctx, renderer);
   }
 
   @Override

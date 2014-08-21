@@ -16,22 +16,23 @@
 
 package playn.tests.core;
 
-import playn.core.CanvasImage;
-import playn.core.Font;
-import playn.core.ImageLayer;
-import playn.core.Layer;
-import playn.core.Pointer;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
-import playn.core.TextWrap;
+import playn.core.*;
 import playn.core.gl.GLShader;
 import playn.core.gl.IndexedTrisShader;
 import playn.core.util.TextBlock;
-import static playn.core.PlayN.graphics;
 
 public abstract class Test {
 
   public static final int UPDATE_RATE = 25;
+
+  final Platform platform;
+  final TextFormat textFmt;
+
+  public Test(Platform platform) {
+    this.platform = platform;
+    this.textFmt = new TextFormat().withFont(
+            platform.graphics().createFont("Helvetica", Font.Style.PLAIN, 12));
+  }
 
   public abstract String getName();
 
@@ -72,34 +73,34 @@ public abstract class Test {
 
   protected float addTest(float lx, float ly, Layer layer, float lwidth, float lheight,
                           String descrip, float twidth) {
-    graphics().rootLayer().addAt(layer, lx + (twidth-lwidth)/2, ly);
+    platform.graphics().rootLayer().addAt(layer, lx + (twidth-lwidth)/2, ly);
     return addDescrip(descrip, lx, ly + lheight + 5, twidth);
   }
 
   protected float addDescrip(String descrip, float x, float y, float width) {
     ImageLayer layer = createDescripLayer(descrip, width);
-    graphics().rootLayer().addAt(layer, Math.round(x + (width - layer.width())/2), y);
+    platform.graphics().rootLayer().addAt(layer, Math.round(x + (width - layer.width())/2), y);
     return y + layer.height();
   }
 
-  protected static ImageLayer createDescripLayer(String descrip, float width) {
-    return graphics().createImageLayer(wrapText(descrip, width, TextBlock.Align.CENTER));
+  protected ImageLayer createDescripLayer(String descrip, float width) {
+    return platform.graphics().createImageLayer(wrapText(descrip, width, TextBlock.Align.CENTER));
   }
 
-  protected static CanvasImage wrapText(String text, float width, TextBlock.Align align) {
-    TextLayout[] layouts = graphics().layoutText(text, TEXT_FMT, new TextWrap(width));
-    return new TextBlock(layouts).toImage(align, 0xFF000000);
+  protected CanvasImage wrapText(String text, float width, TextBlock.Align align) {
+    TextLayout[] layouts = platform.graphics().layoutText(text, textFmt, new TextWrap(width));
+    return new TextBlock(platform, layouts).toImage(align, 0xFF000000);
   }
 
-  protected static CanvasImage formatText (String text, boolean border) {
-    return formatText(TEXT_FMT, text, border);
+  protected CanvasImage formatText (String text, boolean border) {
+    return formatText(platform, textFmt, text, border);
   }
 
-  protected static CanvasImage formatText (TextFormat format, String text, boolean border) {
-    TextLayout layout = graphics().layoutText(text, format);
+  protected static CanvasImage formatText (Platform platform, TextFormat format, String text, boolean border) {
+    TextLayout layout = platform.graphics().layoutText(text, format);
     float margin = border ? 10 : 0;
     float width = layout.width()+2*margin, height = layout.height()+2*margin;
-    CanvasImage image = graphics().createImage(width, height);
+    CanvasImage image = platform.graphics().createImage(width, height);
     image.canvas().setStrokeColor(0xFF000000);
     image.canvas().setFillColor(0xFF000000);
     image.canvas().fillText(layout, margin, margin);
@@ -108,9 +109,9 @@ public abstract class Test {
     return image;
   }
 
-  protected static ImageLayer createButton (String text, final Runnable onClick) {
+  protected ImageLayer createButton (String text, final Runnable onClick) {
     CanvasImage image = formatText(text, true);
-    ImageLayer button = graphics().createImageLayer(image);
+    ImageLayer button = platform.graphics().createImageLayer(image);
     button.addListener(new Pointer.Adapter() {
       @Override public void onPointerStart(Pointer.Event event) {
         onClick.run();
@@ -121,12 +122,12 @@ public abstract class Test {
 
   protected float addButton (String text, Runnable onClick, float x, float y) {
     ImageLayer button = createButton(text, onClick);
-    graphics().rootLayer().addAt(button, x, y);
+    platform.graphics().rootLayer().addAt(button, x, y);
     return x + button.width() + 10;
   }
 
   protected GLShader createSepiaShader() {
-    return (graphics().ctx() == null) ? null : new IndexedTrisShader(graphics().ctx()) {
+    return (platform.graphics().ctx() == null) ? null : new IndexedTrisShader(platform.graphics().ctx()) {
       @Override protected String textureFragmentShader() {
         return "#ifdef GL_ES\n" +
           "precision highp float;\n" +
@@ -145,7 +146,4 @@ public abstract class Test {
       }
     };
   }
-
-  protected static final TextFormat TEXT_FMT = new TextFormat().withFont(
-    graphics().createFont("Helvetica", Font.Style.PLAIN, 12));
 }

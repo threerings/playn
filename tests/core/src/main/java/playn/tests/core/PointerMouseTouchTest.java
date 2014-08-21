@@ -20,42 +20,30 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import playn.core.*;
 import pythagoras.f.Point;
 import pythagoras.f.Vector;
 
-import playn.core.CanvasImage;
-import playn.core.Events;
-import playn.core.Font;
-import playn.core.GroupLayer;
-import playn.core.ImageLayer;
-import playn.core.ImmediateLayer;
-import playn.core.Layer;
-import playn.core.Mouse;
-import playn.core.TextWrap;
 import playn.core.Mouse.WheelEvent;
-import playn.core.Pointer;
-import playn.core.Surface;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
 import playn.core.Mouse.ButtonEvent;
 import playn.core.Mouse.MotionEvent;
 import playn.core.Pointer.Event;
-import playn.core.Touch;
 import playn.tests.core.TestsGame.NToggle;
 import playn.tests.core.TestsGame.Toggle;
-import static playn.core.PlayN.*;
 
 class PointerMouseTouchTest extends Test {
-  private TextFormat baseFormat = new TextFormat().
-      withFont(graphics().createFont("Times New Roman", Font.Style.PLAIN, 20));
-  private TextFormat logFormat = new TextFormat().
-      withFont(graphics().createFont("Times New Roman", Font.Style.PLAIN, 12));
+  private TextFormat baseFormat;
+  private TextFormat logFormat;
 
   private TextLogger logger;
   private TextMapper motionLabel;
 
   private Toggle preventDefault, capture;
   private NToggle<String> propagate;
+
+  public PointerMouseTouchTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {
@@ -69,38 +57,43 @@ class PointerMouseTouchTest extends Test {
 
   @Override
   public void init() {
+    baseFormat = new TextFormat().
+            withFont(platform.graphics().createFont("Times New Roman", Font.Style.PLAIN, 20));
+    logFormat = new TextFormat().
+            withFont(platform.graphics().createFont("Times New Roman", Font.Style.PLAIN, 12));
+
     float y = 20, x = 20;
 
-    preventDefault = new Toggle("Prevent Default");
-    graphics().rootLayer().addAt(preventDefault.layer, x, y);
+    preventDefault = new Toggle(platform, "Prevent Default");
+    platform.graphics().rootLayer().addAt(preventDefault.layer, x, y);
     x += preventDefault.layer.image().width() + 5;
 
-    capture = new Toggle("Capture");
-    graphics().rootLayer().addAt(capture.layer, x, y);
+    capture = new Toggle(platform, "Capture");
+    platform.graphics().rootLayer().addAt(capture.layer, x, y);
     x += capture.layer.image().width() + 5;
 
-    propagate = new NToggle<String>("Propagation", "Off", "On", "On (stop)") {
+    propagate = new NToggle<String>(platform, "Propagation", "Off", "On", "On (stop)") {
       @Override
       public void set(int value) {
         super.set(value);
-        platform().setPropagateEvents(value != 0);
+        platform.setPropagateEvents(value != 0);
       }
     };
-    graphics().rootLayer().addAt(propagate.layer, x, y);
+    platform.graphics().rootLayer().addAt(propagate.layer, x, y);
     y += propagate.layer.image().height() + 5;
     x = 20;
 
     float boxWidth = 300, boxHeight = 110;
     final Box mouse = new Box("Mouse", 0xffff8080, boxWidth, boxHeight);
-    graphics().rootLayer().addAt(mouse.layer, x, y);
+    platform.graphics().rootLayer().addAt(mouse.layer, x, y);
     y += mouse.layer.height() + 5;
 
     final Box pointer = new Box("Pointer", 0xff80ff80, boxWidth, boxHeight);
-    graphics().rootLayer().addAt(pointer.layer, x, y);
+    platform.graphics().rootLayer().addAt(pointer.layer, x, y);
     y += pointer.layer.height() + 5;
 
     final Box touch = new Box("Touch", 0xff8080ff, boxWidth, boxHeight);
-    graphics().rootLayer().addAt(touch.layer, x, y);
+    platform.graphics().rootLayer().addAt(touch.layer, x, y);
 
     y = mouse.layer.ty();
     x += touch.layer.width() + 5;
@@ -109,14 +102,14 @@ class PointerMouseTouchTest extends Test {
     y += createLabel("Event Log", 0, x, y).height();
     logger = new TextLogger(375, 15, logFormat);
     logger.layer.setTranslation(x, y);
-    graphics().rootLayer().add(logger.layer);
+    platform.graphics().rootLayer().add(logger.layer);
     y += logger.layer.height() + 5;
 
     // setup the motion logger and its layer
     y += createLabel("Motion Log", 0, x, y).height();
     motionLabel = new TextMapper(375, 6, logFormat);
     motionLabel.layer.setTranslation(x, y);
-    graphics().rootLayer().add(motionLabel.layer);
+    platform.graphics().rootLayer().add(motionLabel.layer);
 
     // add mouse layer listener
     mouse.label.addListener(new Mouse.LayerListener() {
@@ -321,22 +314,22 @@ class PointerMouseTouchTest extends Test {
   }
 
   protected ImageLayer createLabel(String text, int bg, float x, float y) {
-    return createLabel(text, graphics().rootLayer(), 0xFF202020, bg, x, y, 0);
+    return createLabel(text, platform.graphics().rootLayer(), 0xFF202020, bg, x, y, 0);
   }
 
   protected ImageLayer createLabel(String text, GroupLayer parent,
                                    int fg, int bg, float x, float y, float padding) {
-    TextLayout layout = graphics().layoutText(text, baseFormat);
+    TextLayout layout = platform.graphics().layoutText(text, baseFormat);
     float twidth = layout.width() + padding * 2;
     float theight = layout.height() + padding * 2;
-    CanvasImage image = graphics().createImage(twidth, theight);
+    CanvasImage image = platform.graphics().createImage(twidth, theight);
     if (bg != 0) {
       image.canvas().setFillColor(bg);
       image.canvas().fillRect(0, 0, twidth, theight);
     }
     image.canvas().setFillColor(fg);
     image.canvas().fillText(layout, padding, padding);
-    ImageLayer imageLayer = graphics().createImageLayer(image);
+    ImageLayer imageLayer = platform.graphics().createImageLayer(image);
     imageLayer.setTranslation(x, y);
     parent.add(imageLayer);
     return imageLayer;
@@ -374,8 +367,8 @@ class PointerMouseTouchTest extends Test {
     private boolean dirty;
 
     public Label(float wid, float hei, TextFormat format) {
-      image = graphics().createImage(wid, hei);
-      layer = graphics().createImageLayer(image);
+      image = platform.graphics().createImage(wid, hei);
+      layer = platform.graphics().createImageLayer(image);
       this.format = format;
     }
 
@@ -391,14 +384,14 @@ class PointerMouseTouchTest extends Test {
 
       image.canvas().clear();
       image.canvas().setFillColor(0xFF202020);
-      layout = graphics().layoutText(text, format, TextWrap.MANUAL);
+      layout = platform.graphics().layoutText(text, format, TextWrap.MANUAL);
       float yy = 0;
       for (int line = 0; line < layout.length; line++) {
           image.canvas().fillText(layout[line], 0, yy);
           yy += layout[line].height();
       }
       if (yy > image.height()) {
-        log().error("Clipped");
+        platform.log().error("Clipped");
       }
       dirty = false;
     }
@@ -407,7 +400,7 @@ class PointerMouseTouchTest extends Test {
   protected class TextMapper extends Label {
     public Map<String, String> values = new TreeMap<String, String>();
     public TextMapper(float wid, int lines, TextFormat format) {
-      super(wid, graphics().layoutText(".", format).height() * lines, format);
+      super(wid, platform.graphics().layoutText(".", format).height() * lines, format);
     }
 
     public void set(String name, String value) {
@@ -432,7 +425,7 @@ class PointerMouseTouchTest extends Test {
     private final int lineCount;
 
     public TextLogger(float wid, int lines, TextFormat format) {
-      super(wid, graphics().layoutText(".", format).height() * lines, format);
+      super(wid, platform.graphics().layoutText(".", format).height() * lines, format);
       this.lineCount = lines;
     }
 
@@ -456,8 +449,8 @@ class PointerMouseTouchTest extends Test {
     final ImageLayer label;
 
     Box (String text, int color, float wid, float hei) {
-      layer = graphics().createGroupLayer(wid, hei);
-      layer.add(graphics().createImmediateLayer(this));
+      layer = platform.graphics().createGroupLayer(wid, hei);
+      layer.add(platform.graphics().createImmediateLayer(this));
       label = createLabel(text, layer, 0xff000000, color, 0, 0, 40);
       layer.addAt(label, (wid - label.image().width()) / 2, (hei - label.image().height()) / 2);
       layer.setHitTester(this);

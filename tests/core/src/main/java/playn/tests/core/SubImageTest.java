@@ -3,23 +3,21 @@
 
 package playn.tests.core;
 
+import playn.core.*;
 import pythagoras.f.FloatMath;
 
-import playn.core.Canvas;
-import playn.core.CanvasImage;
-import playn.core.GroupLayer;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.ImmediateLayer;
-import playn.core.Surface;
 import static playn.core.PlayN.*;
-import playn.core.SurfaceImage;
+
 import playn.core.util.Callback;
 
 public class SubImageTest extends Test {
 
   private int elapsed;
   private Image.Region osci;
+
+  public SubImageTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

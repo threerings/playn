@@ -16,13 +16,9 @@
 
 package playn.tests.core;
 
-import playn.core.CanvasImage;
-import playn.core.Color;
-import playn.core.GroupLayer;
-import playn.core.Image;
-import playn.core.ImageLayer;
+import playn.core.*;
 import playn.core.util.Callback;
-import playn.core.SurfaceImage;
+
 import static playn.core.PlayN.*;
 
 public class ImageTypeTest extends Test {
@@ -46,6 +42,10 @@ public class ImageTypeTest extends Test {
 
   Image imageGroundTruth;
   ImageLayer groundTruthLayer;
+
+  public ImageTypeTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

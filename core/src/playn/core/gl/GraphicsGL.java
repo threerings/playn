@@ -15,17 +15,18 @@
  */
 package playn.core.gl;
 
-import playn.core.Graphics;
-import playn.core.GroupLayer;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.ImmediateLayer;
-import playn.core.SurfaceImage;
+import playn.core.*;
 
 /**
  * Handles the common implementation of {@link Graphics} for GL-based backends.
  */
 public abstract class GraphicsGL implements Graphics {
+
+  private final Platform platform;
+
+  public GraphicsGL(Platform platform) {
+    this.platform = platform;
+  }
 
   @Override
   public int width() {
@@ -70,7 +71,7 @@ public abstract class GraphicsGL implements Graphics {
 
   @Override
   public ImmediateLayer createImmediateLayer(ImmediateLayer.Renderer renderer) {
-    return new ImmediateLayerGL(ctx(), renderer);
+    return new ImmediateLayerGL(platform, ctx(), renderer);
   }
 
   @Override

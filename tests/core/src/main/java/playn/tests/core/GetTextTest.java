@@ -17,10 +17,15 @@ package playn.tests.core;
 
 import playn.core.ImageLayer;
 import playn.core.Keyboard;
+import playn.core.Platform;
 import playn.core.util.Callback;
 import static playn.core.PlayN.*;
 
 class GetTextTest extends Test {
+
+  public GetTextTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

@@ -18,9 +18,15 @@ package playn.tests.core;
 import playn.core.CanvasImage;
 import playn.core.GroupLayer;
 import playn.core.ImageLayer;
+import playn.core.Platform;
+
 import static playn.core.PlayN.*;
 
 public class DepthTest extends Test {
+  public DepthTest(Platform platform) {
+    super(platform);
+  }
+
   @Override
   public String getName() {
     return "DepthTest";

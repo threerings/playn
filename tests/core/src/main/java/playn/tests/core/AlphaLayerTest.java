@@ -16,11 +16,7 @@
 
 package playn.tests.core;
 
-import playn.core.CanvasImage;
-import playn.core.Color;
-import playn.core.GroupLayer;
-import playn.core.Image;
-import playn.core.SurfaceImage;
+import playn.core.*;
 import playn.core.util.Callback;
 import static playn.core.PlayN.*;
 
@@ -28,6 +24,10 @@ public class AlphaLayerTest extends Test {
 
   static float width = 100, height = 100;
   static int offset = 5;
+
+  public AlphaLayerTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

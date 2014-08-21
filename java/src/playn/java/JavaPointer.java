@@ -16,11 +16,16 @@
 package playn.java;
 
 import playn.core.Events;
+import playn.core.Platform;
 import playn.core.PointerImpl;
 
 class JavaPointer extends PointerImpl {
 
   private boolean mouseDown;
+
+  protected JavaPointer(Platform platform) {
+    super(platform);
+  }
 
   void onMouseDown(double time, float x, float y) {
     onPointerStart(new Event.Impl(new Events.Flags.Impl(), time, x, y, false), false);

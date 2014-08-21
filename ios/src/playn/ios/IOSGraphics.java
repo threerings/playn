@@ -63,6 +63,7 @@ public class IOSGraphics extends GraphicsGL {
 
   public IOSGraphics(IOSPlatform platform, int screenWidth, int screenHeight,
                      float viewScale, float touchScale, boolean interpolateCanvasDrawing) {
+    super(platform);
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
     this.touchScale = touchScale;

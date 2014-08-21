@@ -18,6 +18,7 @@ package playn.java;
 import playn.core.Events;
 import playn.core.Mouse;
 import playn.core.Mouse.ButtonEvent.Impl;
+import playn.core.Platform;
 import playn.core.TouchImpl;
 import pythagoras.f.Point;
 
@@ -30,6 +31,10 @@ public class JavaEmulatedTouch extends TouchImpl
   private Point pivot;
   private float x, y;
   private int currentId;
+
+  protected JavaEmulatedTouch(Platform platform) {
+    super(platform);
+  }
 
   @Override public boolean hasTouch() {
     return true;

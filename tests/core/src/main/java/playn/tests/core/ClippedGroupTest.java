@@ -15,16 +15,8 @@
  */
 package playn.tests.core;
 
+import playn.core.*;
 import pythagoras.f.FloatMath;
-
-import playn.core.CanvasImage;
-import playn.core.GroupLayer;
-import playn.core.ImageLayer;
-import playn.core.ImmediateLayer;
-import playn.core.Layer;
-import playn.core.Surface;
-import playn.core.SurfaceImage;
-import static playn.core.PlayN.graphics;
 
 public class ClippedGroupTest extends Test {
 
@@ -33,6 +25,10 @@ public class ClippedGroupTest extends Test {
   private ImageLayer i1;
   private GroupLayer inner, g5Inner;
   private ImageLayer s1;
+
+  public ClippedGroupTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {
@@ -46,16 +42,16 @@ public class ClippedGroupTest extends Test {
 
   @Override
   public void init() {
-    GroupLayer rootLayer = graphics().rootLayer();
+    GroupLayer rootLayer = platform.graphics().rootLayer();
 
-    final CanvasImage img = graphics().createImage(100, 50);
-    img.canvas().setFillGradient(graphics().createLinearGradient(
+    final CanvasImage img = platform.graphics().createImage(100, 50);
+    img.canvas().setFillGradient(platform.graphics().createLinearGradient(
                                    0, 0, 100, 100, new int[] { 0xFF0000FF, 0xFF00FF00 },
                                    new float[] { 0, 1 }));
     img.canvas().fillRoundRect(0, 0, 100, 50, 10);
 
     // create an immediate layer that draws the boundaries of our clipped group layers
-    rootLayer.add(graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
+    rootLayer.add(platform.graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
       public void render(Surface surf) {
         // draw the border of our various clipped groups
         surf.setFillColor(0xFF000000);
@@ -78,42 +74,42 @@ public class ClippedGroupTest extends Test {
     }));
 
     // create a group layer with a static clip, and a rotating image inside
-    g1 = graphics().createGroupLayer(100, 100);
+    g1 = platform.graphics().createGroupLayer(100, 100);
     // test the origin not being at zero/zero
     g1.setOrigin(50, 0);
-    i1 = graphics().createImageLayer(img);
+    i1 = platform.graphics().createImageLayer(img);
     i1.setOrigin(i1.width()/2, i1.height()/2);
     g1.addAt(i1, 50, 50);
     rootLayer.addAt(g1, 75, 25);
 
-    g2 = graphics().createGroupLayer(100, 100);
+    g2 = platform.graphics().createGroupLayer(100, 100);
     g2.setOrigin(50, 50);
-    g2.addAt(graphics().createImageLayer(img), (100 - img.width())/2, (100 - img.height())/2);
+    g2.addAt(platform.graphics().createImageLayer(img), (100 - img.width())/2, (100 - img.height())/2);
     rootLayer.addAt(g2, 200, 75);
 
     // nest a group layer inside with an animated origin
-    inner = graphics().createGroupLayer();
-    inner.addAt(graphics().createImageLayer(img), (100 - img.width())/2, (100 - img.height())/2);
-    g3 = graphics().createGroupLayer(100, 100);
+    inner = platform.graphics().createGroupLayer();
+    inner.addAt(platform.graphics().createImageLayer(img), (100 - img.width())/2, (100 - img.height())/2);
+    g3 = platform.graphics().createGroupLayer(100, 100);
     g3.add(inner);
     rootLayer.addAt(g3, 275, 25);
 
     // create a group layer with a static clip, and a rotating surface image inside
-    g4 = graphics().createGroupLayer(100, 100);
-    SurfaceImage si = graphics().createSurface(100, 50);
+    g4 = platform.graphics().createGroupLayer(100, 100);
+    SurfaceImage si = platform.graphics().createSurface(100, 50);
     si.surface().setFillColor(0xFF99CCFF).fillRect(0, 0, 100, 50);
-    s1 = graphics().createImageLayer(si);
+    s1 = platform.graphics().createImageLayer(si);
     s1.setOrigin(s1.width()/2, s1.height()/2);
     g4.addAt(s1, 50, 50);
     rootLayer.addAt(g4, 400, 25);
 
     // put a large clipped group inside a small one
-    g5Inner = graphics().createGroupLayer(150, 150);
-    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), -img.width(), -img.height());
-    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), -img.width(), img.height());
-    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), img.width(), -img.height());
-    g5Inner.addAt(graphics().createImageLayer(img).setScale(2), img.width(), img.height());
-    g5 = graphics().createGroupLayer(100, 100);
+    g5Inner = platform.graphics().createGroupLayer(150, 150);
+    g5Inner.addAt(platform.graphics().createImageLayer(img).setScale(2), -img.width(), -img.height());
+    g5Inner.addAt(platform.graphics().createImageLayer(img).setScale(2), -img.width(), img.height());
+    g5Inner.addAt(platform.graphics().createImageLayer(img).setScale(2), img.width(), -img.height());
+    g5Inner.addAt(platform.graphics().createImageLayer(img).setScale(2), img.width(), img.height());
+    g5 = platform.graphics().createGroupLayer(100, 100);
     g5.addAt(g5Inner, -25, -25);
     rootLayer.addAt(g5, 525, 25);
   }

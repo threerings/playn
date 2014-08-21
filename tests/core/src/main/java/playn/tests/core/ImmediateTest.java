@@ -15,10 +15,8 @@
  */
 package playn.tests.core;
 
-import playn.core.GroupLayer;
-import playn.core.CanvasImage;
-import playn.core.ImmediateLayer;
-import playn.core.Surface;
+import playn.core.*;
+
 import static playn.core.PlayN.*;
 
 import pythagoras.f.FloatMath;
@@ -26,6 +24,10 @@ import pythagoras.f.FloatMath;
 public class ImmediateTest extends Test {
 
   private float elapsed, rotation;
+
+  public ImmediateTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

@@ -20,6 +20,10 @@ package playn.core;
  */
 public class MouseStub extends MouseImpl {
 
+  public MouseStub(Platform platform) {
+    super(platform);
+  }
+
   @Override
   public boolean hasMouse() {
     return false;

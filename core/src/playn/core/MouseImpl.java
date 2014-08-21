@@ -23,10 +23,16 @@ import pythagoras.f.Point;
 public abstract class MouseImpl implements Mouse {
 
   private boolean enabled = true;
-  private Dispatcher dispatcher = Dispatcher.SINGLE;
+  private Dispatcher dispatcher;
   private Listener listener;
   private AbstractLayer activeLayer;
   private AbstractLayer hoverLayer;
+  private final Platform platform;
+
+  protected MouseImpl(Platform platform) {
+    this.platform = platform;
+    this.dispatcher = Dispatcher.single(platform);
+  }
 
   @Override
   public boolean hasMouse() {
@@ -74,7 +80,7 @@ public abstract class MouseImpl implements Mouse {
   }
 
   public void setPropagateEvents(boolean propagate) {
-    dispatcher = Dispatcher.select(propagate);
+    dispatcher = Dispatcher.select(platform, propagate);
   }
 
   protected boolean onMouseDown(ButtonEvent.Impl event) {
@@ -86,7 +92,7 @@ public abstract class MouseImpl implements Mouse {
       listener.onMouseDown(event);
     }
 
-    GroupLayer root = PlayN.graphics().rootLayer();
+    GroupLayer root = platform.graphics().rootLayer();
     if (root.interactive()) {
       Point p = new Point(event.x(), event.y());
       root.transform().inverseTransform(p, p);
@@ -109,7 +115,7 @@ public abstract class MouseImpl implements Mouse {
       listener.onMouseMove(event);
     }
 
-    GroupLayer root = PlayN.graphics().rootLayer();
+    GroupLayer root = platform.graphics().rootLayer();
     if (root.interactive()) {
       Point p = new Point(event.x(), event.y());
       root.transform().inverseTransform(p, p);

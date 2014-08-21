@@ -110,8 +110,8 @@ public class HtmlPlatform extends AbstractPlatform {
    *
    * @param cursor the {@link Cursor} to use, or null to hide the cursor.
    */
-  public static void setCursor(Cursor cursor) {
-    Element rootElement = ((HtmlGraphics) PlayN.graphics()).rootElement();
+  public void setCursor(Cursor cursor) {
+    Element rootElement = graphics().rootElement();
     if (cursor == null) {
       rootElement.getStyle().setProperty("cursor", "none");
     } else {
@@ -122,8 +122,8 @@ public class HtmlPlatform extends AbstractPlatform {
   /**
    * Disable the right-click context menu.
    */
-  public static void disableRightClickContextMenu() {
-    Element rootElement = ((HtmlGraphics) PlayN.graphics()).rootElement();
+  public void disableRightClickContextMenu() {
+    Element rootElement = graphics().rootElement();
     disableRightClickImpl(rootElement);
   }
 
@@ -156,7 +156,7 @@ public class HtmlPlatform extends AbstractPlatform {
   private final HtmlAudio audio = new HtmlAudio();
   private final HtmlGraphics graphics;
   private final HtmlJson json = new HtmlJson();
-  private final HtmlKeyboard keyboard = new HtmlKeyboard();
+  private final HtmlKeyboard keyboard = new HtmlKeyboard(this);
   private final HtmlNet net = new HtmlNet(this);
   private final HtmlPointer pointer;
   private final HtmlMouse mouse;
@@ -258,7 +258,7 @@ public class HtmlPlatform extends AbstractPlatform {
 
   @Override
   public void run(final Game game) {
-    game.init();
+    game.init(this);
     // Game loop.
     paintCallback = new TimerCallback() {
       @Override
