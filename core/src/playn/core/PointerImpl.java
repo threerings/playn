@@ -23,9 +23,15 @@ import pythagoras.f.Point;
 public abstract class PointerImpl implements Pointer {
 
   private boolean enabled = true;
-  private Dispatcher dispatcher = Dispatcher.SINGLE;
+  private Dispatcher dispatcher;
   private Listener listener;
   private final Dispatcher.CaptureState active = new Dispatcher.CaptureState();
+  private final Platform platform;
+
+  protected PointerImpl(Platform platform) {
+    this.platform = platform;
+    this.dispatcher = Dispatcher.single(platform);
+  }
 
   @Override
   public boolean isEnabled() {
@@ -50,7 +56,7 @@ public abstract class PointerImpl implements Pointer {
   @Override
   public void cancelLayerDrags() {
     if (active.layer != null) {
-      Event.Impl event = new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), 0, 0, false);
+      Event.Impl event = new Event.Impl(new Events.Flags.Impl(), platform.time(), 0, 0, false);
       event.captureState = active;
       dispatcher.dispatch(Listener.class, event, CANCEL, null);
       active.clear();
@@ -58,7 +64,7 @@ public abstract class PointerImpl implements Pointer {
   }
 
   public void setPropagateEvents(boolean propagate) {
-    dispatcher = Dispatcher.select(propagate);
+    dispatcher = Dispatcher.select(platform, propagate);
   }
 
   protected boolean onPointerStart(Event.Impl event, boolean preventDefault) {
@@ -70,7 +76,7 @@ public abstract class PointerImpl implements Pointer {
       listener.onPointerStart(event);
     }
 
-    GroupLayer root = PlayN.graphics().rootLayer();
+    GroupLayer root = platform.graphics().rootLayer();
     if (root.interactive()) {
       Point p = new Point(event.x(), event.y());
       root.transform().inverseTransform(p, p);

@@ -19,10 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static playn.core.PlayN.*;
-import playn.core.CanvasImage;
-import playn.core.ImageLayer;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
+
+import playn.core.*;
 
 /**
  * Tests pause/resume notifications.
@@ -31,6 +29,10 @@ public class PauseResumeTest extends Test {
 
   private final List<String> notifications = new ArrayList<String>();
   private ImageLayer layer;
+
+  public PauseResumeTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

@@ -24,6 +24,6 @@ public class TestsGameActivity extends GameActivity {
 
   @Override
   public void main(){
-    PlayN.run(new TestsGame());
+    platform().run(new TestsGame());
   }
 }

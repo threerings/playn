@@ -57,9 +57,9 @@ public class AndroidPlatform extends AbstractPlatform {
     json = new JsonImpl();
     keyboard = new AndroidKeyboard(this);
     net = new AndroidNet(this);
-    pointer = new AndroidPointer();
+    pointer = new AndroidPointer(this);
     storage = new AndroidStorage(this);
-    touch = new TouchImpl();
+    touch = new TouchImpl(this);
   }
 
   static void debugLog(String message) {
@@ -134,7 +134,7 @@ public class AndroidPlatform extends AbstractPlatform {
 
   @Override
   public Mouse mouse() {
-    return new MouseStub();
+    return new MouseStub(this);
   }
 
   @Override
@@ -155,7 +155,7 @@ public class AndroidPlatform extends AbstractPlatform {
   @Override
   public void run(Game game) {
     this.game = game;
-    game.init();
+    game.init(this);
   }
 
   @Override

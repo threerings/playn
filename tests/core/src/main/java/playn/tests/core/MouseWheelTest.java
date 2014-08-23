@@ -15,12 +15,8 @@
  */
 package playn.tests.core;
 
-import playn.core.CanvasImage;
-import playn.core.GroupLayer;
-import playn.core.ImageLayer;
-import playn.core.Mouse;
+import playn.core.*;
 import playn.core.Mouse.WheelEvent;
-import static playn.core.PlayN.graphics;
 
 public class MouseWheelTest extends Test
 {
@@ -30,28 +26,32 @@ public class MouseWheelTest extends Test
 
   private ImageLayer il;
 
-  @Override public void init () {
-    GroupLayer slider = graphics().createGroupLayer();
+  public MouseWheelTest(Platform platform) {
+    super(platform);
+  }
 
-    CanvasImage image = graphics().createImage(WIDTH + 10, HEIGHT);
+  @Override public void init () {
+    GroupLayer slider = platform.graphics().createGroupLayer();
+
+    CanvasImage image = platform.graphics().createImage(WIDTH + 10, HEIGHT);
     image.canvas().setFillColor(0xff808080);
     image.canvas().fillRect(0, 0, WIDTH + 10, HEIGHT);
-    ImageLayer bg = graphics().createImageLayer(image);
+    ImageLayer bg = platform.graphics().createImageLayer(image);
     slider.add(bg);
 
-    image = graphics().createImage(WIDTH, HWIDTH);
+    image = platform.graphics().createImage(WIDTH, HWIDTH);
     image.canvas().setFillColor(0xffffffff);
     image.canvas().fillRect(0, 0, WIDTH, HWIDTH);
     image.canvas().setStrokeColor(0xff000000);
     image.canvas().drawLine(0, HWIDTH / 2, WIDTH, HWIDTH / 2);
     image.canvas().setStrokeColor(0xffff0000);
     image.canvas().strokeRect(0, 0, WIDTH - 1, HWIDTH - 1);
-    slider.add(il = graphics().createImageLayer(image));
+    slider.add(il = platform.graphics().createImageLayer(image));
     il.setOrigin(0, HWIDTH / 2);
     il.setTranslation(0, HEIGHT / 2);
     il.setDepth(1);
 
-    graphics().rootLayer().add(slider);
+    platform.graphics().rootLayer().add(slider);
     slider.setTranslation(25, 25);
 
     bg.addListener(new Mouse.LayerAdapter() {

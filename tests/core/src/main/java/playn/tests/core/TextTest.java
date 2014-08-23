@@ -15,29 +15,21 @@
  */
 package playn.tests.core;
 
+import playn.core.*;
 import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
-import playn.core.Canvas;
-import playn.core.CanvasImage;
 import playn.core.Font.Style;
-import playn.core.Image;
-import playn.core.ImageLayer;
 import playn.core.Keyboard.TextType;
 import playn.core.Pointer.Event;
-import playn.core.Pointer;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
-import playn.core.TextWrap;
 import playn.core.util.Callback;
 import playn.core.util.TextBlock;
-import static playn.core.PlayN.graphics;
-import static playn.core.PlayN.keyboard;
 
 public class TextTest extends Test {
+
   private class NToggle<T> extends TestsGame.NToggle<T> {
     public NToggle(String name, T...values) {
-      super(name, values);
+      super(platform, name, values);
     }
     @Override public void set (int idx) {
       super.set(idx);
@@ -63,6 +55,10 @@ public class TextTest extends Test {
   ImageLayer text;
   Rectangle row;
 
+  public TextTest(Platform platform) {
+    super(platform);
+  }
+
   @Override
   public String getName() {
     return "TextTest";
@@ -87,11 +83,11 @@ public class TextTest extends Test {
     addToRow((font = new NToggle<String>("Font", "Times New Roman", "Helvetica")).layer);
 
     class SetText extends Pointer.Adapter implements Callback<String> {
-      final ImageLayer layer = graphics().createImageLayer(TestsGame.makeButtonImage("Set Text"));{
+      final ImageLayer layer = platform.graphics().createImageLayer(TestsGame.makeButtonImage(platform, "Set Text"));{
         layer.addListener(this);
       }
       @Override public void onPointerEnd(Event event) {
-        keyboard().getText(TextType.DEFAULT, "Test text", sample.replace("\n", "\\n"), this);
+        platform.keyboard().getText(TextType.DEFAULT, "Test text", sample.replace("\n", "\\n"), this);
       }
       public void onSuccess(String result) {
         if (result == null) return;
@@ -105,22 +101,22 @@ public class TextTest extends Test {
     addToRow((lineBounds = new Toggle("Lines")).layer);
 
     // test laying out the empty string
-    TextLayout layout = graphics().layoutText("", new TextFormat());
-    ImageLayer empty = graphics().createImageLayer(makeLabel(
+    TextLayout layout = platform.graphics().layoutText("", new TextFormat());
+    ImageLayer empty = platform.graphics().createImageLayer(makeLabel(
       "Empty string size " + layout.width() + "x" + layout.height()));
     newRow();
     addToRow(empty);
 
     newRow();
 
-    addToRow((text = graphics().createImageLayer(makeTextImage())));
+    addToRow((text = platform.graphics().createImageLayer(makeTextImage())));
   }
 
   protected void addToRow (ImageLayer layer) {
-    graphics().rootLayer().add(layer.setTranslation(row.x + row.width, row.y));
+    platform.graphics().rootLayer().add(layer.setTranslation(row.x + row.width, row.y));
     row.width += layer.width() + 45;
     row.height = Math.max(row.height, layer.height());
-    if (row.width > graphics().width() * .6f) newRow();
+    if (row.width > platform.graphics().width() * .6f) newRow();
   }
 
   protected void newRow () {
@@ -135,20 +131,20 @@ public class TextTest extends Test {
   }
 
   protected Image makeLabel(String label) {
-    TextLayout layout = graphics().layoutText(label, new TextFormat());
-    CanvasImage image = graphics().createImage(layout.width(), layout.height());
+    TextLayout layout = platform.graphics().layoutText(label, new TextFormat());
+    CanvasImage image = platform.graphics().createImage(layout.width(), layout.height());
     image.canvas().setFillColor(0xFF000000);
     image.canvas().fillText(layout, 0, 0);
     return image;
   }
 
   protected Image makeTextImage() {
-    TextFormat format = new TextFormat(graphics().createFont(font.value(), style.value(), 24), true);
-    float wrapWidth = wrap.value() == 0 ? Float.MAX_VALUE : graphics().width()*wrap.value()/100;
-    TextBlock block = new TextBlock(graphics().layoutText(sample, format, new TextWrap(wrapWidth)));
+    TextFormat format = new TextFormat(platform.graphics().createFont(font.value(), style.value(), 24), true);
+    float wrapWidth = wrap.value() == 0 ? Float.MAX_VALUE : platform.graphics().width()*wrap.value()/100;
+    TextBlock block = new TextBlock(platform, platform.graphics().layoutText(sample, format, new TextWrap(wrapWidth)));
     float awidth = adjustWidth(block.bounds.width()), aheight = adjustHeight(block.bounds.height());
-    float pad = TextBlock.pad();
-    CanvasImage image = graphics().createImage(awidth+2*pad, aheight+2*pad);
+    float pad = block.pad();
+    CanvasImage image = platform.graphics().createImage(awidth+2*pad, aheight+2*pad);
     image.canvas().translate(pad, pad);
     image.canvas().setStrokeColor(0xFFFFCCCC).strokeRect(0, 0, awidth, aheight);
     render(image.canvas(), block, align.value(), lineBounds.value());

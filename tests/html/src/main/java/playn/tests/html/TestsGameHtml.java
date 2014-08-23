@@ -34,7 +34,7 @@ public class TestsGameHtml extends HtmlGame {
     HtmlPlatform platform = HtmlPlatform.register(config);
     platform.setTitle("Tests");
     platform.assets().setPathPrefix("testsgame/");
-    HtmlPlatform.disableRightClickContextMenu();
+    platform.disableRightClickContextMenu();
     PlayN.run(new TestsGame());
   }
 }

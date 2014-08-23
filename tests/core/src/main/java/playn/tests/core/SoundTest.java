@@ -6,17 +6,19 @@ package playn.tests.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import playn.core.CanvasImage;
-import playn.core.Sound;
-import playn.core.TextLayout;
+import playn.core.*;
 import playn.core.util.Callback;
-import playn.core.TextWrap;
+
 import static playn.core.PlayN.*;
 
 /**
  * Tests sound playback support.
  */
 public class SoundTest extends Test {
+
+  public SoundTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {
@@ -95,7 +97,7 @@ public class SoundTest extends Test {
     _actionsImage.canvas().setFillColor(0xFF000000);
 
     float y = 0;
-    for (TextLayout layout : graphics().layoutText(buf.toString(), TEXT_FMT, new TextWrap(300))) {
+    for (TextLayout layout : graphics().layoutText(buf.toString(), textFmt, new TextWrap(300))) {
       _actionsImage.canvas().fillText(layout, 0, y);
       y += layout.ascent() + layout.descent() + layout.leading();
     }

@@ -283,8 +283,8 @@ public class IOSPlatform extends AbstractPlatform {
     json = new JsonImpl();
     keyboard = new IOSKeyboard(this);
     net = new IOSNet(this);
-    pointer = new IOSPointer(graphics);
-    touch = new IOSTouch(graphics);
+    pointer = new IOSPointer(this);
+    touch = new IOSTouch(this);
     assets = new IOSAssets(this);
     storage = new IOSStorage();
 
@@ -365,7 +365,7 @@ public class IOSPlatform extends AbstractPlatform {
 
   @Override
   public Mouse mouse() {
-    return new MouseStub();
+    return new MouseStub(this);
   }
 
   @Override
@@ -415,7 +415,7 @@ public class IOSPlatform extends AbstractPlatform {
   public void run(Game game) {
     this.game = game;
     // initialize the game and start things off
-    game.init();
+    game.init(this);
     // start the main game loop
     gameView.RunWithFrameInterval(config.frameInterval);
     // make our main window visible

@@ -32,8 +32,9 @@ public class IOSPointer extends PointerImpl {
 
   private final IOSGraphics graphics;
 
-  public IOSPointer(IOSGraphics graphics) {
-    this.graphics = graphics;
+  public IOSPointer(IOSPlatform platform) {
+    super(platform);
+    this.graphics = platform.graphics();
   }
 
   void onTouchesBegan(NSSet touches, UIEvent event) {

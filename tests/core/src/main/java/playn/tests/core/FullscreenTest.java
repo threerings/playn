@@ -16,11 +16,16 @@
 package playn.tests.core;
 
 import playn.core.ImageLayer;
+import playn.core.Platform;
 
 import static playn.core.PlayN.*;
 
 public class FullscreenTest extends Test {
   private static Host host;
+
+  public FullscreenTest(Platform platform) {
+    super(platform);
+  }
 
   public static void setHost (Host host) {
     FullscreenTest.host = host;

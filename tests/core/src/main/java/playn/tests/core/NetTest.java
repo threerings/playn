@@ -31,6 +31,10 @@ public class NetTest extends Test {
   private String lastPostURL;
   private Net.WebSocket _websock;
 
+  public NetTest(Platform platform) {
+    super(platform);
+  }
+
   @Override
   public String getName() {
     return "NetTest";

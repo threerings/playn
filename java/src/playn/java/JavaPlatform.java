@@ -133,7 +133,7 @@ public class JavaPlatform extends AbstractPlatform {
   private final JavaStorage storage;
   private final JsonImpl json = new JsonImpl();
   private final JavaKeyboard keyboard;
-  private final JavaPointer pointer = new JavaPointer();
+  private final JavaPointer pointer = new JavaPointer(this);
   private final TouchImpl touch;
   private final JavaGraphics graphics;
   private final JavaMouse mouse;
@@ -319,9 +319,9 @@ public class JavaPlatform extends AbstractPlatform {
   }
   protected TouchImpl createTouch(Config config) {
     if (config.emulateTouch) {
-      return new JavaEmulatedTouch();
+      return new JavaEmulatedTouch(this);
     } else {
-      return new TouchStub();
+      return new TouchStub(this);
     }
   }
   protected JavaMouse createMouse() {
@@ -335,7 +335,7 @@ public class JavaPlatform extends AbstractPlatform {
     graphics.init();
     mouse.init();
     keyboard.init(keyListener);
-    game.init();
+    game.init(this);
   }
 
   protected void shutdown() {

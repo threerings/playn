@@ -15,6 +15,7 @@
  */
 package playn.tests.core;
 
+import playn.core.Platform;
 import pythagoras.f.FloatMath;
 
 import playn.core.Canvas;
@@ -26,6 +27,10 @@ public class CanvasStressTest extends Test {
   private Canvas canvas;
   private int noSegs = 30;
   private int direction = 1;
+
+  public CanvasStressTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

@@ -20,6 +20,10 @@ package playn.core;
  */
 public class TouchStub extends TouchImpl {
 
+  public TouchStub(Platform platform) {
+    super(platform);
+  }
+
   @Override
   public boolean hasTouch() {
     return false;

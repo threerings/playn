@@ -54,176 +54,183 @@ public class PlayN {
    * avoid littering their code with calls to the static {@link PlayN} methods, and for services
    * that can accept a mocked {@link Platform} for testing.
    */
+  @Deprecated
   public static Platform platform() {
     return platform;
   }
 
   /**
-   * Returns the platform {@link Platform.Type}.
+   * @deprecated use {@link Platform#type()} instead
    */
+  @Deprecated
   public static Platform.Type platformType() {
     return platform.type();
   }
 
   /**
-   * Call this method to start your {@link Game}. It must be called only once,
-   * and all work after this call is made will be performed in {@link Game}'s
-   * callback methods.
+   * @deprecated use {@link Platform#run(Game game)} instead
    */
+  @Deprecated
   public static void run(Game game) {
     platform.run(game);
   }
 
   /**
-   * Called when a backend (or other framework code) encounters an exception that it can recover
-   * from, but which it would like to report in some orderly fashion. <em>NOTE:</em> this method
-   * may be called from threads other than the main PlayN thread.
+   * @deprecated use {@link Platform#reportError(String message, Throwable err)} instead
    */
+  @Deprecated
   public static void reportError(String message, Throwable err) {
     platform.reportError(message, err);
   }
 
   /**
-   * Returns the current time, as a double value in millis since January 1, 1970, 00:00:00 GMT.
-   *
-   * <p> This is equivalent to the standard JRE {@code new Date().getTime();}, but it slightly
-   * terser, and avoids the use of {@code long} values, which are best avoided when translating to
-   * JavaScript. </p>
+   * @deprecated use {@link Platform#time()} instead
    */
+  @Deprecated
   public static double currentTime() {
     return platform.time();
   }
 
   /**
-   * Returns the number of milliseconds that have elapsed since the game started.
+   * @deprecated use {@link Platform#tick()} instead
    */
+  @Deprecated
   public static int tick() {
     return platform.tick();
   }
 
   /**
-   * Gets a random floating-point value in the range [0, 1).
+   * @deprecated use {@link Platform#random()} instead
    */
+  @Deprecated
   public static float random() {
     return platform.random();
   }
 
   /**
-   * Opens the given URL in the default browser.
+   * @deprecated use {@link Platform#openURL(String url)} instead
    */
+  @Deprecated
   public static void openURL(String url) {
     platform.openURL(url);
   }
 
   /**
-   * Queues the supplied runnable for invocation on the game thread prior to the next call to
-   * {@link Game.Default#update}.
+   * @deprecated use {@link Platform#invokeLater(Runnable runnable)} instead
    */
+  @Deprecated
   public static void invokeLater(Runnable runnable) {
     platform.invokeLater(runnable);
   }
 
   /**
-   * Configures a listener to be notified of lifecycle events. Any previous listener will be
-   * overwritten. Supply null to clear the listener.
+   * @deprecated use {@link Platform#setLifecycleListener(LifecycleListener listener)} instead
    */
+  @Deprecated
   public static void setLifecycleListener(LifecycleListener listener) {
     platform.setLifecycleListener(listener);
   }
 
   /**
-   * Configures the top-level error reporter. Any previous reporter will be overwritten. Supply
-   * null to revert to the default error reporter. <em>NOTE:</em> the error reporter may be called
-   * from any thread, not just the main PlayN thread. So an implementation must take care to get
-   * back onto the PlayN thread if it's going to do anything other than turn around and log the
-   * message.
+   * @deprecated use {@link Platform#setErrorReporter(ErrorReporter reporter)} instead
    */
+  @Deprecated
   public static void setErrorReporter(ErrorReporter reporter) {
     platform.setErrorReporter(reporter);
   }
 
   /**
-   * Configures whether events on a layer (pointer, touch and mouse) are automatically dispatched
-   * to the layer's ancestors. This is a global option that may affect performance, so applications
-   * must call this opt in.
+   * @deprecated use {@link Platform#setPropagateEvents(boolean propagate)} instead
    */
+  @Deprecated
   public static void setPropagateEvents(boolean propagate) {
     platform.setPropagateEvents(propagate);
   }
 
   /**
-   * Returns the {@link Audio} service.
+   * @deprecated use {@link Platform#audio()} instead
    */
+  @Deprecated
   public static Audio audio() {
     return platform.audio();
   }
 
   /**
-   * Returns the {@link Graphics} service.
+   * @deprecated use {@link Platform#graphics()} instead
    */
+  @Deprecated
   public static Graphics graphics() {
     return platform.graphics();
   }
 
   /**
-   * Returns the {@link Assets} service.
+   * @deprecated use {@link Platform#assets()} instead
    */
+  @Deprecated
   public static Assets assets() {
     return platform.assets();
   }
 
   /**
-   * Returns the {@link Json} service.
+   * @deprecated use {@link Platform#json()} instead
    */
+  @Deprecated
   public static Json json() {
     return platform.json();
   }
 
   /**
-   * Returns the {@link Keyboard} input service.
+   * @deprecated use {@link Platform#keyboard()} instead
    */
+  @Deprecated
   public static Keyboard keyboard() {
     return platform.keyboard();
   }
 
   /**
-   * Returns the {@link Log} service.
+   * @deprecated use {@link Platform#log()} instead
    */
+  @Deprecated
   public static Log log() {
     return platform.log();
   }
 
   /**
-   * Returns the {@link Net} service.
+   * @deprecated use {@link Platform#net()} instead
    */
+  @Deprecated
   public static Net net() {
     return platform.net();
   }
 
   /**
-   * Returns the {@link Pointer} input service.
+   * @deprecated use {@link Platform#pointer()} instead
    */
+  @Deprecated
   public static Pointer pointer() {
     return platform.pointer();
   }
 
   /**
-   * Returns the {@link Mouse} input service.
+   * @deprecated use {@link Platform#mouse()} instead
    */
+  @Deprecated
   public static Mouse mouse() {
     return platform.mouse();
   }
 
   /**
-   * Returns the {@link Touch} input service.
+   * @deprecated use {@link Platform#touch()} instead
    */
+  @Deprecated
   public static Touch touch() {
     return platform.touch();
   }
 
   /**
-   * Returns the {@link Storage} storage service.
+   * @deprecated use {@link Platform#storage()} instead
    */
+  @Deprecated
   public static Storage storage() {
     return platform.storage();
   }
@@ -232,6 +239,7 @@ public class PlayN {
    * Configures the current {@link Platform}. Do not call this directly unless you're implementing
    * a new platform.
    */
+  @Deprecated
   public static void setPlatform(Platform platform) {
     PlayN.platform = platform;
   }

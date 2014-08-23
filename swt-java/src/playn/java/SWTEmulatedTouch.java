@@ -17,9 +17,14 @@ package playn.java;
 
 import playn.core.Mouse;
 import playn.core.Mouse.ButtonEvent.Impl;
+import playn.core.Platform;
 
 public class SWTEmulatedTouch extends JavaEmulatedTouch
 {
+  protected SWTEmulatedTouch(Platform platform) {
+    super(platform);
+  }
+
   @Override JavaMouse createMouse (JavaPlatform platform) {
     final JavaEmulatedTouch self = this;
     return new SWTMouse((SWTPlatform)platform) {

@@ -20,22 +20,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static playn.core.PlayN.graphics;
-
 import playn.core.*;
 import playn.core.Pointer.Event;
-import static playn.core.PlayN.*;
 
 public class TestsGame extends Game.Default {
 
   /** Helpful class for allowing selection of an one of a set of values for a test. */
   public static class NToggle<T> {
-    public final ImageLayer layer = graphics().createImageLayer();
+    public final ImageLayer layer;
     public final String prefix;
     public final List<T> values = new ArrayList<T>();
     private int valueIdx;
+    private final Platform platform;
 
-    public NToggle(String name, T...values) {
+    public NToggle(Platform platform, String name, T...values) {
+      this.platform = platform;
+      this.layer = platform.graphics().createImageLayer();
       for (T value : values) {
         this.values.add(value);
       }
@@ -56,7 +56,7 @@ public class TestsGame extends Game.Default {
 
     public void set(int idx) {
       this.valueIdx = idx;
-      layer.setImage(makeButtonImage(prefix + toString(values.get(idx))));
+      layer.setImage(makeButtonImage(platform, prefix + toString(values.get(idx))));
     }
 
     public T value() {
@@ -69,14 +69,16 @@ public class TestsGame extends Game.Default {
   }
 
   public static class Toggle extends NToggle<Boolean> {
-    public Toggle (String name) {
-      super(name, Boolean.FALSE, Boolean.TRUE);
+    public Toggle (Platform platform, String name) {
+      super(platform, name, Boolean.FALSE, Boolean.TRUE);
     }
   }
 
-  public static Image makeButtonImage(String label) {
-    TextLayout layout = graphics().layoutText(label, BUTTON_FMT);
-    CanvasImage image = graphics().createImage(layout.width()+10, layout.height()+10);
+  public static Image makeButtonImage(Platform platform, String label) {
+    TextFormat buttonFmt = new TextFormat().withFont(
+            platform.graphics().createFont("Helvetica", Font.Style.PLAIN, 24));
+    TextLayout layout = platform.graphics().layoutText(label, buttonFmt);
+    CanvasImage image = platform.graphics().createImage(layout.width()+10, layout.height()+10);
     image.canvas().setFillColor(0xFFCCCCCC);
     image.canvas().fillRect(0, 0, image.width(), image.height());
     image.canvas().setFillColor(0xFF000000);
@@ -89,33 +91,9 @@ public class TestsGame extends Game.Default {
   // args passed to the Java launcher
   public static String[] args = {};
 
-  private Test[] tests = new Test[] {
-    new CanvasTest(),
-    new SurfaceTest(),
-    new SurfaceDrawLayerTest(),
-    new SubImageTest(),
-    new ClippedGroupTest(),
-    new CanvasStressTest(),
-    new PauseResumeTest(),
-    new ImmediateTest(),
-    new TextTest(),
-    new ScaledTextTest(),
-    new GetTextTest(),
-    new ImageTypeTest(),
-    new AlphaLayerTest(),
-    new ImageScalingTest(),
-    new DepthTest(),
-    new ClearBackgroundTest(),
-    new LayerClickTest(),
-    new PointerMouseTouchTest(),
-    new MouseWheelTest(),
-    new ShaderTest(),
-    new SoundTest(),
-    new NetTest(),
-    new FullscreenTest(),
-    /*new YourTest(),*/
-  };
+  private Test[] tests;
   private Test currentTest;
+  private TextFormat textFmt;
 
   public TestsGame () {
     super(Test.UPDATE_RATE);
@@ -123,11 +101,43 @@ public class TestsGame extends Game.Default {
 
   @Override
   public void init() {
+    Platform platform = platform();
+
+    textFmt = new TextFormat().withFont(
+            platform.graphics().createFont("Helvetica", Font.Style.PLAIN, 12));
+
+    tests = new Test[] {
+            new CanvasTest(platform),
+            new SurfaceTest(platform),
+            new SurfaceDrawLayerTest(platform),
+            new SubImageTest(platform),
+            new ClippedGroupTest(platform),
+            new CanvasStressTest(platform),
+            new PauseResumeTest(platform),
+            new ImmediateTest(platform),
+            new TextTest(platform),
+            new ScaledTextTest(platform),
+            new GetTextTest(platform),
+            new ImageTypeTest(platform),
+            new AlphaLayerTest(platform),
+            new ImageScalingTest(platform),
+            new DepthTest(platform),
+            new ClearBackgroundTest(platform),
+            new LayerClickTest(platform),
+            new PointerMouseTouchTest(platform),
+            new MouseWheelTest(platform),
+            new ShaderTest(platform),
+            new SoundTest(platform),
+            new NetTest(platform),
+            new FullscreenTest(platform),
+    /*new YourTest(),*/
+    };
+
     // display basic instructions
-    log().info("Right click, touch with two fingers, or type ESC to return to test menu.");
+    platform.log().info("Right click, touch with two fingers, or type ESC to return to test menu.");
 
     // add a listener for mouse and touch inputs
-    mouse().setListener(new Mouse.Adapter() {
+    platform.mouse().setListener(new Mouse.Adapter() {
       @Override
       public void onMouseDown(Mouse.ButtonEvent event) {
         if (currentTest != null && currentTest.usesPositionalInputs())
@@ -136,7 +146,7 @@ public class TestsGame extends Game.Default {
           displayMenuLater();
       }
     });
-    touch().setListener(new Touch.Adapter() {
+    platform.touch().setListener(new Touch.Adapter() {
       @Override
       public void onTouchStart(Touch.Event[] touches) {
         if (currentTest != null && currentTest.usesPositionalInputs()) return;
@@ -161,7 +171,7 @@ public class TestsGame extends Game.Default {
       }
       protected Set<Integer> _active = new HashSet<Integer>();
     });
-    keyboard().setListener(new Keyboard.Adapter() {
+    platform.keyboard().setListener(new Keyboard.Adapter() {
       @Override
       public void onKeyDown(Keyboard.Event event) {
         if (event.key() == Key.ESCAPE || event.key() == Key.BACK)
@@ -182,7 +192,7 @@ public class TestsGame extends Game.Default {
   // defers display of menu by one frame to avoid the right click or touch being processed by the
   // menu when it is displayed
   void displayMenuLater() {
-    invokeLater(new Runnable() {
+    platform().invokeLater(new Runnable() {
       public void run() {
         displayMenu();
       }
@@ -192,20 +202,21 @@ public class TestsGame extends Game.Default {
   void displayMenu() {
     clearTest();
     clearRoot();
-    GroupLayer root = graphics().rootLayer();
+    Graphics graphics = platform().graphics();
+    GroupLayer root = graphics.rootLayer();
     root.add(createWhiteBackground());
 
     float gap = 20, x = gap, y = gap, maxHeight = 0;
 
     String info = "Renderer: ";
-    if (graphics().ctx() == null) {
+    if (graphics.ctx() == null) {
       info += "canvas";
     } else {
-      info += "gl (quads=" + graphics().ctx().quadShaderInfo() + " tris=" +
-        graphics().ctx().trisShaderInfo() + ")";
+      info += "gl (quads=" + graphics.ctx().quadShaderInfo() + " tris=" +
+        graphics.ctx().trisShaderInfo() + ")";
     }
-    CanvasImage infoImg = Test.formatText(info, false);
-    graphics().rootLayer().addAt(graphics().createImageLayer(infoImg), x, y);
+    CanvasImage infoImg = Test.formatText(platform(), textFmt, info, false);
+    graphics.rootLayer().addAt(graphics.createImageLayer(infoImg), x, y);
     y += infoImg.height() + gap;
 
     for (Test test : tests) {
@@ -213,7 +224,7 @@ public class TestsGame extends Game.Default {
         continue;
       }
       ImageLayer button = createButton(test);
-      if (x + button.width() > graphics().width() - gap) {
+      if (x + button.width() > graphics.width() - gap) {
         x = gap;
         y += maxHeight + gap;
         maxHeight = 0;
@@ -225,7 +236,7 @@ public class TestsGame extends Game.Default {
   }
 
   ImageLayer createButton (final Test test) {
-    ImageLayer layer = graphics().createImageLayer(makeButtonImage(test.getName()));
+    ImageLayer layer = platform().graphics().createImageLayer(makeButtonImage(platform(), test.getName()));
     layer.addListener(new Pointer.Adapter() {
       @Override public void onPointerStart(Pointer.Event event) {
         startTest(test);
@@ -248,21 +259,21 @@ public class TestsGame extends Game.Default {
     // setup root layer for next test
     clearRoot();
 
-    GroupLayer root = graphics().rootLayer();
+    GroupLayer root = platform().graphics().rootLayer();
     root.add(createWhiteBackground());
 
-    log().info("Starting " + currentTest.getName());
-    log().info(" Description: " + currentTest.getDescription());
+    platform().log().info("Starting " + currentTest.getName());
+    platform().log().info(" Description: " + currentTest.getDescription());
     currentTest.init();
 
     if (currentTest.usesPositionalInputs()) {
       // slap on a Back button if the test is testing the usual means of backing out
-      ImageLayer back = Test.createButton("Back", new Runnable() {
+      ImageLayer back = currentTest.createButton("Back", new Runnable() {
         public void run () {
           displayMenuLater();
         }
       });
-      root.addAt(back, graphics().width() - back.width(), 0);
+      root.addAt(back, platform().graphics().width() - back.width(), 0);
     }
   }
 
@@ -279,20 +290,17 @@ public class TestsGame extends Game.Default {
   }
 
   protected void clearRoot() {
-    GroupLayer root = graphics().rootLayer();
+    GroupLayer root = platform().graphics().rootLayer();
     for (int ii = root.size()-1; ii >= 0; ii--) root.get(ii).destroy();
   }
 
   protected ImmediateLayer createWhiteBackground() {
-    ImmediateLayer bg = graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
+    ImmediateLayer bg = platform().graphics().createImmediateLayer(new ImmediateLayer.Renderer() {
       public void render(Surface surf) {
-        surf.setFillColor(0xFFFFFFFF).fillRect(0, 0, graphics().width(), graphics().height());
+        surf.setFillColor(0xFFFFFFFF).fillRect(0, 0, platform().graphics().width(), platform().graphics().height());
       }
     });
     bg.setDepth(Float.NEGATIVE_INFINITY); // render behind everything
     return bg;
   }
-
-  protected static TextFormat BUTTON_FMT = new TextFormat().withFont(
-    graphics().createFont("Helvetica", Font.Style.PLAIN, 24));
 }

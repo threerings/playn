@@ -15,13 +15,9 @@
  */
 package playn.tests.core;
 
+import playn.core.*;
 import pythagoras.f.FloatMath;
 
-import playn.core.CanvasImage;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.ImmediateLayer;
-import playn.core.Surface;
 import playn.core.gl.IndexedTrisShader;
 import playn.core.util.Callback;
 import static playn.core.PlayN.*;
@@ -32,6 +28,10 @@ import static playn.core.PlayN.*;
 public class ShaderTest extends Test {
 
   private float elapsed;
+
+  public ShaderTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

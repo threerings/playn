@@ -110,7 +110,7 @@ public class SWTPlatform extends JavaPlatform {
 
   @Override protected TouchImpl createTouch (Config config) {
     if (config.emulateTouch) {
-      return new SWTEmulatedTouch();
+      return new SWTEmulatedTouch(this);
     } else {
       return super.createTouch(config);
     }

@@ -31,6 +31,7 @@ class HtmlTouch extends TouchImpl {
   private boolean inTouchSequence = false;
 
   HtmlTouch(HtmlPlatform platform, Element rootElement) {
+    super(platform);
     this.platform = platform;
     this.rootElement = rootElement;
 
@@ -94,7 +95,7 @@ class HtmlTouch extends TouchImpl {
       float y = touch.getRelativeY(rootElement);
       Point xy = platform.graphics().transformMouse(x, y);
       int id = getTouchIdentifier(nativeEvent, t);
-      touches[t] = new Event.Impl(flags, PlayN.currentTime(), xy.x, xy.y, id);
+      touches[t] = new Event.Impl(flags, platform.time(), xy.x, xy.y, id);
     }
     return touches;
   }

@@ -19,13 +19,16 @@ import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.Window;
 
-import playn.core.Events;
-import playn.core.Key;
-import playn.core.KeyboardImpl;
-import playn.core.PlayN;
+import playn.core.*;
 import playn.core.util.Callback;
 
 class HtmlKeyboard extends KeyboardImpl {
+
+  private final Platform platform;
+
+  HtmlKeyboard(Platform platform) {
+    this.platform = platform;
+  }
 
   public void init() {
     // Key handlers.
@@ -34,7 +37,7 @@ class HtmlKeyboard extends KeyboardImpl {
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(
-            new Events.Flags.Impl(), PlayN.currentTime(), keyForCode(nativeEvent.getKeyCode()));
+            new Events.Flags.Impl(), platform.time(), keyForCode(nativeEvent.getKeyCode()));
           listener.onKeyDown(event);
           if (event.flags().getPreventDefault()) {
             nativeEvent.preventDefault();
@@ -47,7 +50,7 @@ class HtmlKeyboard extends KeyboardImpl {
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           TypedEvent.Impl event = new TypedEvent.Impl(
-            new Events.Flags.Impl(), PlayN.currentTime(), (char)nativeEvent.getCharCode());
+            new Events.Flags.Impl(), platform.time(), (char)nativeEvent.getCharCode());
           listener.onKeyTyped(event);
           if (event.flags().getPreventDefault()) {
             nativeEvent.preventDefault();
@@ -61,7 +64,7 @@ class HtmlKeyboard extends KeyboardImpl {
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(
-            new Events.Flags.Impl(), PlayN.currentTime(), keyForCode(nativeEvent.getKeyCode()));
+            new Events.Flags.Impl(), platform.time(), keyForCode(nativeEvent.getKeyCode()));
           listener.onKeyUp(event);
           if (event.flags().getPreventDefault()) {
             nativeEvent.preventDefault();

@@ -588,8 +588,8 @@ public interface Layer {
      * is shipped code. The layer returned is the one that has a size and is the deepest within
      * the graph and contains the coordinate.
      */
-    public static Layer.HasSize layerUnderPoint (float x, float y) {
-      GroupLayer root = PlayN.graphics().rootLayer();
+    public static Layer.HasSize layerUnderPoint (Platform platform, float x, float y) {
+      GroupLayer root = platform.graphics().rootLayer();
       Point p = new Point(x, y);
       root.transform().inverseTransform(p, p);
       p.x += root.originX();

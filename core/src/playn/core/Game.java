@@ -17,7 +17,7 @@ package playn.core;
 
 /**
  * Main game API. Most games will want to create an instance of {@link playn.core.Game.Default} and
- * pass it to {@link PlayN#run}.
+ * pass it to {@link Platform#run}.
  *
  * @see <a href="http://code.google.com/p/playn/wiki/GameLoop">Understanding the Game Loop</a>
  */
@@ -33,6 +33,8 @@ public interface Game {
    * simulation updates.
    */
   static abstract class Default implements Game {
+
+    private Platform platform;
 
     /**
      * Creates an instance of the default game implementation.
@@ -81,6 +83,22 @@ public interface Game {
     }
 
     @Override
+    public final void init(Platform platform) {
+      this.platform = platform;
+      init();
+    }
+
+    public Platform platform() {
+      return platform;
+    }
+
+    /**
+     * Called once on initialization. Most setup work should be performed in this method, as all
+     * PlayN subsystems are guaranteed to be available when it is called.
+     */
+    public abstract void init();
+
+    @Override
     public void tick(int elapsed) {
       // micro-optimization to avoid repeated field reads
       int nextUpdate = this.nextUpdate, updateRate = this.updateRate;
@@ -93,7 +111,7 @@ public interface Game {
         update(updates*updateRate);
         // calling update() may have taken > 1ms, so we need to re-read the clock to accurately
         // report the fraction of time that has elapsed between updates
-        elapsed = PlayN.tick();
+        elapsed = platform.tick();
       }
       float alpha = 1 - (nextUpdate - elapsed) / (float)updateRate;
       paint(alpha);
@@ -108,7 +126,7 @@ public interface Game {
    * Called once on initialization. Most setup work should be performed in this method, as all
    * PlayN subsystems are guaranteed to be available when it is called.
    */
-  void init();
+  void init(Platform platform);
 
   /**
    * Called on every frame tick, is responsible for performing all game logic and scene graph

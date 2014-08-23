@@ -15,13 +15,13 @@
  */
 package playn.core.gl;
 
+import playn.core.Platform;
 import pythagoras.f.Point;
 import pythagoras.f.Vector;
 
 import playn.core.ImmediateLayer;
 import playn.core.InternalTransform;
 import playn.core.Tint;
-import static playn.core.PlayN.*;
 
 public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
 
@@ -91,15 +91,15 @@ public class ImmediateLayerGL extends LayerGL implements ImmediateLayer {
     }
   }
 
-  public ImmediateLayerGL(GLContext ctx, Renderer renderer) {
+  public ImmediateLayerGL(final Platform platform, GLContext ctx, Renderer renderer) {
     this(ctx, renderer, new ImmediateSurfaceGL(ctx) {
         @Override
         public float width() {
-          return graphics().width();
+          return platform.graphics().width();
         }
         @Override
         public float height() {
-          return graphics().height();
+          return platform.graphics().height();
         }
     });
   }

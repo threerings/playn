@@ -15,18 +15,11 @@
  */
 package playn.tests.core;
 
+import playn.core.*;
 import pythagoras.f.FloatMath;
 
-import playn.core.Canvas;
-import playn.core.CanvasImage;
-import playn.core.Image;
-import playn.core.Font;
-import playn.core.ImageLayer;
-import playn.core.Layer;
-import playn.core.Path;
 import playn.core.util.Callback;
-import playn.core.TextFormat;
-import playn.core.TextLayout;
+
 import static playn.core.PlayN.*;
 
 public class CanvasTest extends Test {
@@ -38,6 +31,10 @@ public class CanvasTest extends Test {
   private ImageLayer tileLayer;
   private float elapsedMillis;
   private int lastSecs;
+
+  public CanvasTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

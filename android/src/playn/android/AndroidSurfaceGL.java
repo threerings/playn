@@ -35,11 +35,13 @@ public class AndroidSurfaceGL extends SurfaceGL
   implements AndroidGLContext.Refreshable
 {
   private File cachedPixels;
+  private final AndroidPlatform platform;
   private final File cacheDir;
 
-  AndroidSurfaceGL(File cacheDir, AndroidGLContext ctx, float width, float height) {
+  AndroidSurfaceGL(AndroidPlatform platform, AndroidGLContext ctx, float width, float height) {
     super(ctx, width, height);
-    this.cacheDir = cacheDir;
+    this.platform = platform;
+    this.cacheDir = platform.activity.getCacheDir();
     ctx.addRefreshable(this);
   }
 
@@ -73,7 +75,7 @@ public class AndroidSurfaceGL extends SurfaceGL
         cachedPixels.delete();
         cachedPixels = null;
       } catch (IOException e) {
-        PlayN.reportError("Error reading cached surface pixels from file.", e);
+        platform.reportError("Error reading cached surface pixels from file.", e);
       }
     }
   }
@@ -93,12 +95,12 @@ public class AndroidSurfaceGL extends SurfaceGL
         out.write(pixelBuffer.array());
         out.close();
       } catch (IOException e) {
-        PlayN.reportError("IOException writing cached Surface to file.", e);
+        platform.reportError("IOException writing cached Surface to file.", e);
         cachedPixels = null;
       }
       pixelBuffer = null;
     } catch (OutOfMemoryError e) {
-      PlayN.reportError("OutOfMemoryError reading cached Surface to buffer.", e);
+      platform.reportError("OutOfMemoryError reading cached Surface to buffer.", e);
       cachedPixels = null;
     }
     clearTexture();

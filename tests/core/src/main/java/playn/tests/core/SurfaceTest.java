@@ -6,17 +6,10 @@ package playn.tests.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import playn.core.*;
 import pythagoras.f.FloatMath;
 import pythagoras.f.Rectangle;
 
-import playn.core.AssetWatcher;
-import playn.core.GroupLayer;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.ImmediateLayer;
-import playn.core.Pattern;
-import playn.core.Surface;
-import playn.core.SurfaceImage;
 import static playn.core.PlayN.*;
 
 public class SurfaceTest extends Test {
@@ -25,6 +18,10 @@ public class SurfaceTest extends Test {
   private SurfaceImage paintUpped;
   private Rectangle dotBox;
   private int elapsed;
+
+  public SurfaceTest(Platform platform) {
+    super(platform);
+  }
 
   @Override
   public String getName() {

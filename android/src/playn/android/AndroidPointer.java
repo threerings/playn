@@ -15,12 +15,17 @@
  */
 package playn.android;
 
+import playn.core.Platform;
 import playn.core.PointerImpl;
 
 class AndroidPointer extends PointerImpl {
 
   // true when we are in a drag sequence (after pointer start but before pointer end)
   private boolean inDragSequence = false;
+
+  protected AndroidPointer(Platform platform) {
+    super(platform);
+  }
 
   // the methods below are called from the GL render thread
   void onPointerStart(Event.Impl event) {

@@ -38,6 +38,6 @@ public class TestsGameJava {
     platform.log().info("  [@Nx] specifies a scale factor: @2x, @1.5x");
     platform.log().info("  [test#] specifies a test to launch directly: test0, test12 ");
     TestsGame.args = args;
-    PlayN.run(new TestsGame());
+    platform.run(new TestsGame());
   }
 }

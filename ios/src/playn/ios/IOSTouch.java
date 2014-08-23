@@ -33,8 +33,9 @@ public class IOSTouch extends TouchImpl {
 
   private final IOSGraphics graphics;
 
-  public IOSTouch(IOSGraphics graphics) {
-    this.graphics = graphics;
+  public IOSTouch(IOSPlatform platform) {
+    super(platform);
+    this.graphics = platform.graphics();
   }
 
   void onTouchesBegan(NSSet touches, UIEvent event) {

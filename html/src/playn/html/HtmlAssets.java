@@ -233,7 +233,7 @@ public class HtmlAssets extends AbstractAssets<Void> {
 
       @Override
       public void onTimeout(XDomainRequest xdr) {
-        PlayN.log().error("xdr::onTimeout[" + fullPath + "]()");
+        platform.log().error("xdr::onTimeout[" + fullPath + "]()");
         callback.onFailure(
           new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()));
       }
@@ -241,33 +241,33 @@ public class HtmlAssets extends AbstractAssets<Void> {
       @Override
       public void onProgress(XDomainRequest xdr) {
         if (LOG_XHR_SUCCESS) {
-          PlayN.log().debug("xdr::onProgress[" + fullPath + "]()");
+          platform.log().debug("xdr::onProgress[" + fullPath + "]()");
         }
       }
 
       @Override
       public void onLoad(XDomainRequest xdr) {
         if (LOG_XHR_SUCCESS) {
-          PlayN.log().debug("xdr::onLoad[" + fullPath + "]()");
+          platform.log().debug("xdr::onLoad[" + fullPath + "]()");
         }
         callback.onSuccess(xdr.getResponseText());
       }
 
       @Override
       public void onError(XDomainRequest xdr) {
-        PlayN.log().error("xdr::onError[" + fullPath + "]()");
+        platform.log().error("xdr::onError[" + fullPath + "]()");
         callback.onFailure(
           new RuntimeException("Error getting " + fullPath + " : " + xdr.getStatus()));
       }
     });
 
     if (LOG_XHR_SUCCESS) {
-      PlayN.log().debug("xdr.open('GET', '" + fullPath + "')...");
+      platform.log().debug("xdr.open('GET', '" + fullPath + "')...");
     }
     xdr.open("GET", fullPath);
 
     if (LOG_XHR_SUCCESS) {
-      PlayN.log().debug("xdr.send()...");
+      platform.log().debug("xdr.send()...");
     }
     xdr.send();
   }
@@ -282,14 +282,14 @@ public class HtmlAssets extends AbstractAssets<Void> {
           int status = xhr.getStatus();
           // status code 0 will be returned for non-http requests, e.g. file://
           if (status != 0 && (status < 200 || status >= 400)) {
-            PlayN.log().error(
+            platform.log().error(
                 "xhr::onReadyStateChange[" + fullPath + "](readyState = " + readyState
                     + "; status = " + status + ")");
             callback.onFailure(
               new RuntimeException("Error getting " + fullPath + " : " + xhr.getStatusText()));
           } else {
             if (LOG_XHR_SUCCESS) {
-              PlayN.log().debug(
+              platform.log().debug(
                   "xhr::onReadyStateChange[" + fullPath + "](readyState = " + readyState
                       + "; status = " + status + ")");
             }
@@ -313,18 +313,18 @@ public class HtmlAssets extends AbstractAssets<Void> {
     });
 
     if (LOG_XHR_SUCCESS) {
-      PlayN.log().debug("xhr.open('GET', '" + fullPath + "')...");
+      platform.log().debug("xhr.open('GET', '" + fullPath + "')...");
     }
     xhr.open("GET", fullPath);
 
     if (LOG_XHR_SUCCESS) {
-      PlayN.log().debug("xhr.send()...");
+      platform.log().debug("xhr.send()...");
     }
     xhr.send();
   }
 
   private Sound adaptSound(String url) {
-    HtmlAudio audio = (HtmlAudio) PlayN.audio();
+    HtmlAudio audio = (HtmlAudio) platform.audio();
     HtmlSound sound = audio.createSound(url);
     return sound;
   }

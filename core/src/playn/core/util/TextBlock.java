@@ -15,13 +15,13 @@
  */
 package playn.core.util;
 
+import playn.core.Platform;
 import pythagoras.f.IRectangle;
 import pythagoras.f.Rectangle;
 
 import playn.core.Canvas;
 import playn.core.CanvasImage;
 import playn.core.TextLayout;
-import static playn.core.PlayN.graphics;
 
 /**
  * Encapsulates a block of multi-line text. This code handles all the fiddly "fonts sometimes
@@ -56,6 +56,8 @@ public class TextBlock {
     public abstract float getX(float lineWidth, float blockWidth);
   }
 
+  private final Platform platform;
+
   /** The individual lines of text in this block. Obtained by a call to {@link
    * Graphics#layoutText(String,playn.core.TextFormat,playn.core.TextWrap}}. */
   public final TextLayout[] lines;
@@ -71,8 +73,8 @@ public class TextBlock {
    * Returns the padding used by {@link #toImage} to ensure that anti-aliasing has room to do its
    * work.
    */
-  public static float pad() {
-    return 1/graphics().scaleFactor();
+  public float pad() {
+    return 1/platform.graphics().scaleFactor();
   }
 
   /** Computes the bounds of a block of text. The {@code x} component of the bounds may be
@@ -103,7 +105,8 @@ public class TextBlock {
   /**
    * Creates a text block with the supplied {@code lines}.
    */
-  public TextBlock (TextLayout[] lines) {
+  public TextBlock (Platform platform, TextLayout[] lines) {
+    this.platform = platform;
     this.lines = lines;
     this.bounds = getBounds(lines, new Rectangle());
   }
@@ -149,7 +152,7 @@ public class TextBlock {
    */
   public CanvasImage toImage(Align align, int fillColor) {
     float pad = pad();
-    CanvasImage image = graphics().createImage(bounds.width()+2*pad, bounds.height()+2*pad);
+    CanvasImage image = platform.graphics().createImage(bounds.width()+2*pad, bounds.height()+2*pad);
     image.canvas().setFillColor(fillColor);
     fill(image.canvas(), align, pad, pad);
     return image;

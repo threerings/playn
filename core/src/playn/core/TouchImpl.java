@@ -27,9 +27,15 @@ import pythagoras.f.Point;
 public class TouchImpl implements Touch {
 
   private boolean enabled = true;
-  private Dispatcher dispatcher = Dispatcher.SINGLE;
+  private Dispatcher dispatcher;
   private Listener listener;
   private Map<Integer,AbstractLayer> activeLayers = new HashMap<Integer,AbstractLayer>();
+  private final Platform platform;
+
+  public TouchImpl(Platform platform) {
+    this.platform = platform;
+    this.dispatcher = Dispatcher.single(platform);
+  }
 
   @Override
   public boolean hasTouch() {
@@ -58,7 +64,7 @@ public class TouchImpl implements Touch {
 
   @Override
   public void cancelLayerTouches(Layer except) {
-    double now = PlayN.currentTime();
+    double now = platform.time();
     Iterator<Map.Entry<Integer,AbstractLayer>> iter = activeLayers.entrySet().iterator();
     while (iter.hasNext()) {
       Map.Entry<Integer,AbstractLayer> entry = iter.next();
@@ -71,7 +77,7 @@ public class TouchImpl implements Touch {
   }
 
   public void setPropagateEvents(boolean propagate) {
-    dispatcher = Dispatcher.select(propagate);
+    dispatcher = Dispatcher.select(platform, propagate);
   }
 
   public void onTouchStart(Event.Impl[] touches) {
@@ -81,7 +87,7 @@ public class TouchImpl implements Touch {
     if (listener != null)
       listener.onTouchStart(touches);
 
-    GroupLayer root = PlayN.graphics().rootLayer();
+    GroupLayer root = platform.graphics().rootLayer();
     if (root.interactive()) {
       for (Event.Impl event : touches) {
         Point p = new Point(event.x(), event.y());

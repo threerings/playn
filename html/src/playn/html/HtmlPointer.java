@@ -30,6 +30,7 @@ class HtmlPointer extends PointerImpl implements Pointer {
   private boolean inDragSequence = false;
 
   HtmlPointer(HtmlPlatform platform, final Element rootElement) {
+    super(platform);
     this.platform = platform;
     // capture touch start on the root element, only.
     HtmlInput.captureEvent(rootElement, "touchstart", new EventHandler() {
@@ -115,12 +116,12 @@ class HtmlPointer extends PointerImpl implements Pointer {
     float x = HtmlInput.getRelativeX(nativeEvent, rootElement);
     float y = HtmlInput.getRelativeY(nativeEvent, rootElement);
     Point xy = platform.graphics().transformMouse(x, y);
-    return new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), xy.x, xy.y, false);
+    return new Event.Impl(new Events.Flags.Impl(), platform.time(), xy.x, xy.y, false);
   }
 
   private Event.Impl eventFromTouch(final Element rootElement, Touch touch) {
     float x = touch.getRelativeX(rootElement), y = touch.getRelativeY(rootElement);
     Point xy = platform.graphics().transformMouse(x, y);
-    return new Event.Impl(new Events.Flags.Impl(), PlayN.currentTime(), xy.x, xy.y, true);
+    return new Event.Impl(new Events.Flags.Impl(), platform.time(), xy.x, xy.y, true);
   }
 }

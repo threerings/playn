@@ -24,6 +24,7 @@ abstract class JavaMouse extends MouseImpl {
   private final JavaPointer pointer;
 
   public JavaMouse(JavaPlatform platform) {
+    super(platform);
     this.platform = platform;
     this.pointer = platform.pointer();
     assert pointer != null; // catch init ordering fiddly biz

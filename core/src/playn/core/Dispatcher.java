@@ -51,61 +51,71 @@ abstract class Dispatcher {
     }
   }
 
+  private final Platform platform;
+
+  Dispatcher(Platform platform) {
+    this.platform = platform;
+  }
+
   /** Dispatches events to a single layer. */
-  static final Dispatcher SINGLE = new Dispatcher() {
-    @Override
-    public <L, E extends Input.Impl> void dispatch(
-        AbstractLayer layer, Class<L> listenerType, E event, Interaction<L, E> interaction,
-        Interaction<L, E> cancel) {
-      tryInteract(layer, listenerType, interaction, localize(event, layer));
-    }
-  };
+  static Dispatcher single(Platform platform) {
+    return new Dispatcher(platform) {
+      @Override
+      public <L, E extends Input.Impl> void dispatch(
+              AbstractLayer layer, Class<L> listenerType, E event, Interaction<L, E> interaction,
+              Interaction<L, E> cancel) {
+        tryInteract(layer, listenerType, interaction, localize(event, layer));
+      }
+    };
+  }
 
   /** Dispatches events to a layer and all its parents. */
-  static final Dispatcher PROPAGATING = new Dispatcher() {
-    @Override
-    <L, E extends Input.Impl> void dispatch(
-        AbstractLayer inLayer, Class<L> listenerType, E event, Interaction<L, E> interaction,
-        Interaction<L, E> cancel) {
-      E localized = localize(event, inLayer);
-      CaptureState ecap = event.captureState;
-      if (ecap == null) {
-        // make no attempts to capture, etc; just dispatch to layer + parents
-        for (AbstractLayer ll = inLayer; ll != null; ll = (AbstractLayer)ll.parent()) {
-          tryInteract(ll, listenerType, interaction, localized);
-        }
-
-      } else {
-        Interaction<L, E> delegator = DELEGATOR.cast();
-        if (ecap.captured == null) {
-          // no capture yet, dispatch to layer + parents and check for capturings
-          DELEGATOR.prepare(interaction).mode = DelegatingInteraction.RECORD_CAPTURE;
-          boolean captured = false;
+  static Dispatcher propagating(Platform platform) {
+    return new Dispatcher(platform) {
+      @Override
+      <L, E extends Input.Impl> void dispatch(
+              AbstractLayer inLayer, Class<L> listenerType, E event, Interaction<L, E> interaction,
+              Interaction<L, E> cancel) {
+        E localized = localize(event, inLayer);
+        CaptureState ecap = event.captureState;
+        if (ecap == null) {
+          // make no attempts to capture, etc; just dispatch to layer + parents
           for (AbstractLayer ll = inLayer; ll != null; ll = (AbstractLayer)ll.parent()) {
-            tryInteract(ll, listenerType, delegator, localized);
-            captured = ecap.check(captured, ll);
+            tryInteract(ll, listenerType, interaction, localized);
           }
 
-          if (captured) {
-            if (cancel != null) {
-              // someone captured on this dispatch, cancel everything else
-              DELEGATOR.prepare(cancel).mode = DelegatingInteraction.EXCEPT_CAPTURED;
-              for (AbstractLayer ll = inLayer; ll != null; ll = (AbstractLayer)ll.parent()) {
-                tryInteract(ll, listenerType, delegator, localized);
-              }
-            } else {
-              // TODO: warn that capture is occurring for an unsupported event?
-            }
-          }
         } else {
-          // someone captured on a previous dispatch, divert all events to captured layer
-          // TODO: should we update the hit layer?
-          DELEGATOR.prepare(interaction).mode = DelegatingInteraction.ONLY_CAPTURED;
-          tryInteract(ecap.captured, listenerType, delegator, localized);
+          Interaction<L, E> delegator = DELEGATOR.cast();
+          if (ecap.captured == null) {
+            // no capture yet, dispatch to layer + parents and check for capturings
+            DELEGATOR.prepare(interaction).mode = DelegatingInteraction.RECORD_CAPTURE;
+            boolean captured = false;
+            for (AbstractLayer ll = inLayer; ll != null; ll = (AbstractLayer)ll.parent()) {
+              tryInteract(ll, listenerType, delegator, localized);
+              captured = ecap.check(captured, ll);
+            }
+
+            if (captured) {
+              if (cancel != null) {
+                // someone captured on this dispatch, cancel everything else
+                DELEGATOR.prepare(cancel).mode = DelegatingInteraction.EXCEPT_CAPTURED;
+                for (AbstractLayer ll = inLayer; ll != null; ll = (AbstractLayer)ll.parent()) {
+                  tryInteract(ll, listenerType, delegator, localized);
+                }
+              } else {
+                // TODO: warn that capture is occurring for an unsupported event?
+              }
+            }
+          } else {
+            // someone captured on a previous dispatch, divert all events to captured layer
+            // TODO: should we update the hit layer?
+            DELEGATOR.prepare(interaction).mode = DelegatingInteraction.ONLY_CAPTURED;
+            tryInteract(ecap.captured, listenerType, delegator, localized);
+          }
         }
       }
-    }
-  };
+    };
+  }
 
   static class DelegatingInteraction
       implements Interaction<Object, Input.Impl> {
@@ -153,16 +163,16 @@ abstract class Dispatcher {
 
   static final DelegatingInteraction DELEGATOR = new DelegatingInteraction();
 
-  static Dispatcher select(boolean propagating) {
-    return propagating ? PROPAGATING : SINGLE;
+  static Dispatcher select(Platform platform, boolean propagating) {
+    return propagating ? propagating(platform) : single(platform);
   }
 
-  static <L, E extends Input.Impl> void tryInteract (AbstractLayer layer,
+  <L, E extends Input.Impl> void tryInteract (AbstractLayer layer,
       Class<L> listenerType, Interaction<L, E> interaction, E event) {
     try {
       layer.interact(listenerType, interaction, event);
     } catch (Throwable t) {
-      PlayN.reportError("Interaction failure [layer=" + layer + ", iact=" + interaction +
+      platform.reportError("Interaction failure [layer=" + layer + ", iact=" + interaction +
                         ", event=" + event + "]", t);
     }
   }
