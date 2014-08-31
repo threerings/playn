@@ -35,6 +35,7 @@ public class AndroidPlatform extends AbstractPlatform {
   Game game;
   GameActivity activity;
   private boolean paused;
+  private boolean exited;
 
   private final AndroidAssets assets;
   private final AndroidAudio audio;
@@ -72,10 +73,15 @@ public class AndroidPlatform extends AbstractPlatform {
     // processing on the run queue, because the run queue isn't processed while we're paused; the
     // main thread will ensure they're run serially, but also that they don't linger until the next
     // time the app is resumed (if that happens at all)
-    if (paused)
-      activity.runOnUiThread(runnable);
-    else
+    if (paused) {
+      // Runnable cannot be started if platform was destroyed. This can cause concurrent GL-calls
+      // with another platform which can be active
+      if(!exited) {
+        activity.runOnUiThread(runnable);
+      }
+    } else {
       super.invokeLater(runnable);
+    }
   }
 
   @Override
@@ -202,6 +208,7 @@ public class AndroidPlatform extends AbstractPlatform {
   @Override
   protected void onExit() {
     super.onExit();
+    exited = true;
   }
 
   void update() {
