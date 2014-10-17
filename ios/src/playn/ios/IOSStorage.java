@@ -29,7 +29,6 @@ import cli.System.Data.IDataReader;
 import cli.MonoTouch.Foundation.NSFileManager;
 import cli.MonoTouch.Foundation.NSSearchPathDirectory;
 import cli.MonoTouch.Foundation.NSSearchPathDomain;
-import cli.MonoTouch.UIKit.UIDevice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,14 +47,9 @@ public class IOSStorage implements Storage {
   public IOSStorage(String storageFileName) {
     String dbDir = null;
     try {
-    	
-      if (UIDevice.get_CurrentDevice().CheckSystemVersion (8,0)) {
-        dbDir = NSFileManager.get_DefaultManager().GetUrls(
-        		  NSSearchPathDirectory.wrap(NSSearchPathDirectory.DocumentDirectory),
-    			  NSSearchPathDomain.wrap(NSSearchPathDomain.User))[0].get_Path();
-      } else {
-        dbDir = Environment.GetFolderPath(SpecialFolder.wrap(SpecialFolder.Personal));
-      }
+      dbDir = NSFileManager.get_DefaultManager().GetUrls(
+    			NSSearchPathDirectory.wrap(NSSearchPathDirectory.DocumentDirectory),
+    			NSSearchPathDomain.wrap(NSSearchPathDomain.User))[0].get_Path();
       String db = Path.Combine(dbDir, storageFileName);
       boolean needCreate = !File.Exists(db);
       if (needCreate)
