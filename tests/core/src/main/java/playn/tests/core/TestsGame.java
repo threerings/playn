@@ -113,6 +113,7 @@ public class TestsGame extends Game.Default {
     new SoundTest(),
     new NetTest(),
     new FullscreenTest(),
+    new GamepadTest(),
     /*new YourTest(),*/
   };
   private Test currentTest;

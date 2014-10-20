@@ -44,6 +44,8 @@ import cli.System.Threading.WaitCallback;
 
 import playn.core.AbstractPlatform;
 import playn.core.Game;
+import playn.core.Gamepads;
+import playn.core.GamepadsStub;
 import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.MouseStub;
@@ -204,6 +206,7 @@ public class IOSPlatform extends AbstractPlatform {
   private final IOSPointer pointer;
   private final IOSStorage storage;
   private final IOSTouch touch;
+  private final Gamepads gamepads = new GamepadsStub();
   private final IOSAssets assets;
 
   private Game game;
@@ -543,4 +546,10 @@ public class IOSPlatform extends AbstractPlatform {
     ORIENT_MAP.put(UIDeviceOrientation.wrap(UIDeviceOrientation.LandscapeRight),
                    UIInterfaceOrientation.wrap(UIInterfaceOrientation.LandscapeLeft));
   }
+
+  @Override
+  public Gamepads gamepads() {
+    return gamepads;
+  }
+  
 }

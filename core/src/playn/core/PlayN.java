@@ -220,6 +220,13 @@ public class PlayN {
   public static Touch touch() {
     return platform.touch();
   }
+  
+  /**
+   * Returns the {@link Gamepads} input service.
+   */
+  public static Gamepads gamepads() {
+    return platform.gamepads();
+  }
 
   /**
    * Returns the {@link Storage} storage service.

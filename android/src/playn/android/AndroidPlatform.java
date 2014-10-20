@@ -22,6 +22,8 @@ import android.util.Log;
 
 import playn.core.AbstractPlatform;
 import playn.core.Game;
+import playn.core.Gamepads;
+import playn.core.GamepadsStub;
 import playn.core.Json;
 import playn.core.Mouse;
 import playn.core.MouseStub;
@@ -44,6 +46,7 @@ public class AndroidPlatform extends AbstractPlatform {
   private final AndroidNet net;
   private final AndroidPointer pointer;
   private final AndroidStorage storage;
+  private final Gamepads gamepads = new GamepadsStub();
   private final TouchImpl touch;
   private final Json json;
   private final long start = System.nanoTime();
@@ -217,5 +220,10 @@ public class AndroidPlatform extends AbstractPlatform {
     if (game != null) {
       game.tick(tick());
     }
+  }
+
+  @Override
+  public Gamepads gamepads() {
+    return gamepads;
   }
 }

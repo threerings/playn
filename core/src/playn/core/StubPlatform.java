@@ -77,6 +77,7 @@ public class StubPlatform extends AbstractPlatform {
 
   private Touch touch = new TouchStub();
   private Mouse mouse = new MouseStub();
+  private Gamepads gamepads = new GamepadsStub();
   private Json json = new JsonImpl();
   private Pointer pointer = new PointerImpl() {};
   private final long start = System.currentTimeMillis();
@@ -187,5 +188,10 @@ public class StubPlatform extends AbstractPlatform {
   @Override
   public Storage storage() {
     return storage;
+  }
+
+  @Override
+  public Gamepads gamepads() {
+    return gamepads;
   }
 }
