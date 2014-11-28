@@ -22,7 +22,6 @@ import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.foundation.NSInvocation;
 import org.robovm.apple.foundation.NSNotificationCenter;
 import org.robovm.apple.foundation.NSObject;
-import org.robovm.apple.foundation.NSString;
 import org.robovm.apple.foundation.NSTimer;
 import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.glkit.GLKView;
@@ -34,8 +33,6 @@ import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientation;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIScreen;
-import org.robovm.apple.uikit.UIUserInterfaceIdiom;
-import org.robovm.apple.uikit.UIView;
 import org.robovm.apple.uikit.UIViewController;
 import org.robovm.apple.uikit.UIWindow;
 
@@ -377,7 +374,7 @@ public class RoboPlatform extends AbstractPlatform {
     lifecycleObservers.clear();
 
     // wait for the desired interval and then terminate the GL and AL systems
-    NSTimer.scheduledTimerWithTimeInterval$invocation$repeats$(
+    NSTimer.createScheduled(
       config.timeForTermination, new NSInvocation() {
         @Override public void invoke() {
           // stop the GL view
