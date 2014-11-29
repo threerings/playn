@@ -15,11 +15,10 @@ package playn.robovm;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.robovm.apple.coregraphics.CGRect;
-import org.robovm.apple.foundation.NSInvocation;
 import org.robovm.apple.foundation.NSNotificationCenter;
 import org.robovm.apple.foundation.NSObject;
 import org.robovm.apple.foundation.NSTimer;
@@ -35,6 +34,9 @@ import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIViewController;
 import org.robovm.apple.uikit.UIWindow;
+import org.robovm.objc.Selector;
+import org.robovm.objc.annotation.BindSelector;
+import org.robovm.rt.bro.annotation.Callback;
 
 import playn.core.*;
 import playn.core.json.JsonImpl;
@@ -373,19 +375,8 @@ public class RoboPlatform extends AbstractPlatform {
     }
     lifecycleObservers.clear();
 
-    // wait for the desired interval and then terminate the GL and AL systems
-    NSTimer.createScheduled(
-      config.timeForTermination, new NSInvocation() {
-        @Override public void invoke() {
-          // stop the GL view
-          // gameView.Stop();
-          // stop and release the AL resources (if audio was ever initialized)
-          if (audio != null) audio.terminate();
-          // clear out the platform in order to make sure the game creation flow can be repeated when
-          // it is used as a part of a larger application
-          PlayN.setPlatform(null);
-        }
-      }, false);
+    // terminate the GL and AL systems
+    ResourceCleaner.terminate(this);
   }
 
   private int getOSVersion () {
@@ -408,4 +399,35 @@ public class RoboPlatform extends AbstractPlatform {
     UIApplication.Notifications.observeWillTerminate(new Runnable() {
       public void run () { willTerminate(); }});
   }
+  private static class ResourceCleaner extends NSObject {
+	private final static Selector SEL = Selector.register("cleanRelatedResources:");
+	private RoboPlatform platform;
+	
+	private ResourceCleaner(RoboPlatform platform) {
+	  super();
+      this.platform = platform;
+	}
+	
+    // wait for the desired interval and then terminate the GL and AL systems
+	public static void terminate(RoboPlatform platform) {
+		NSTimer.createScheduled(platform.config.timeForTermination, new ResourceCleaner(platform), ResourceCleaner.SEL, null, false);
+	}
+	
+	@Callback @BindSelector("cleanRelatedResources:")
+	private static void cleanRelatedResources(ResourceCleaner self, Selector sel) {
+	  if (self.platform != null){
+	    // stop the GL view
+		// gameView.Stop(); 
+		  
+		// stop and release the AL resources (if audio was ever initialized)
+		if (self.platform.audio != null) self.platform.audio.terminate();
+	  }
+      
+      self.platform = null;
+      // clear out the platform in order to make sure the game creation flow can be repeated when
+      // it is used as a part of a larger application
+      PlayN.setPlatform(null);
+	}
+  }
+
 }
