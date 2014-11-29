@@ -80,6 +80,16 @@
       </snapshots>
     </repository>
   </repositories>
+  <!-- TEMP: remove this after there is a stable release available for Robovm -->
+  <pluginRepositories>
+    <pluginRepository>
+      <id>sonatype-plugin-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
 
   <!-- Common dependencies for all modules -->
   <dependencies>
