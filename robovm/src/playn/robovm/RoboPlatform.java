@@ -289,15 +289,13 @@ public class RoboPlatform extends AbstractPlatform {
     private RoboPlatform platform;
 
     private ResourceCleaner(RoboPlatform platform) {
-      super();
       this.platform = platform;
     }
 
-    // wait for the desired interval and then terminate the GL and AL
-    // systems
+    // wait for the desired interval and then terminate the GL and AL systems
     public static void terminate(RoboPlatform platform) {
       NSTimer.createScheduled(platform.config.timeForTermination, new ResourceCleaner(platform),
-          ResourceCleaner.SEL, null, false);
+                              ResourceCleaner.SEL, null, false);
     }
 
     @Callback @BindSelector("cleanRelatedResources:")
@@ -310,11 +308,9 @@ public class RoboPlatform extends AbstractPlatform {
       }
 
       self.platform = null;
-      // clear out the platform in order to make sure the game creation
-      // flow can be repeated when
+      // clear out the platform in order to make sure the game creation flow can be repeated when
       // it is used as a part of a larger application
       PlayN.setPlatform(null);
     }
   }
-
 }
