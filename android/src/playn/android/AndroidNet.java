@@ -40,15 +40,17 @@ import playn.core.util.Callback;
 
 class AndroidNet extends NetImpl {
 
-  AndroidNet(AndroidPlatform platform) {
+  final private int draft;
+  AndroidNet(AndroidPlatform platform, int draft) {
     super(platform);
+    this.draft = draft;
   }
 
   @Override
   public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new AndroidWebSocket(platform, url, listener);
+    return new AndroidWebSocket(platform, url, listener, draft);
   }
-
+  
   @Override
   protected void execute(final BuilderImpl req, final Callback<Response> callback) {
     platform.invokeAsync(new Runnable() {

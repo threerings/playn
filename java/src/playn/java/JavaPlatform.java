@@ -86,6 +86,9 @@ public class JavaPlatform extends AbstractPlatform {
 
     /** Stop processing frames while the app is "inactive", to better emulate iOS. */
     public boolean truePause;
+    
+    /** Configure the web socket RFC draft number: 10, 17, 75 or 76 */
+    public int wsDraft = 10;
   }
 
   /**
@@ -129,7 +132,7 @@ public class JavaPlatform extends AbstractPlatform {
 
   private final Config config;
   private final JavaAudio audio = new JavaAudio(this);
-  private final JavaNet net = new JavaNet(this);
+  private final JavaNet net;
   private final JavaStorage storage;
   private final JsonImpl json = new JsonImpl();
   private final JavaKeyboard keyboard;
@@ -159,6 +162,7 @@ public class JavaPlatform extends AbstractPlatform {
     } else {
       mouse = createMouse();
     }
+    net = new JavaNet(this, config.wsDraft);
 
     if (touch instanceof JavaEmulatedTouch || config.activationKey != null) {
       final Key pivotKey = (touch instanceof JavaEmulatedTouch) ? config.pivotKey : null;

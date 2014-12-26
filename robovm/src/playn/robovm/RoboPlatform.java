@@ -88,6 +88,9 @@ public class RoboPlatform extends AbstractPlatform {
     /** Dictates the name of the temporary file used by {@link RoboStorage}. Configure this if you
       * want to embed multiple games into your application. */
     public String storageFileName = "playn.db";
+   
+    /** Configure the web socket RFC draft number: 10, 17, 75 or 76 */
+    public int wsDraft = 10;
   }
 
   /** Enables games to respond to device orientation changes. */
