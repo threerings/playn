@@ -17,7 +17,7 @@ import java.io.File;
 
 import org.robovm.apple.avfoundation.AVAudioPlayer;
 import org.robovm.apple.avfoundation.AVAudioSession;
-import org.robovm.apple.foundation.NSError;
+import org.robovm.apple.foundation.NSErrorException;
 import org.robovm.apple.foundation.NSURL;
 
 import playn.core.AudioImpl;
@@ -39,7 +39,7 @@ public class RoboAudio extends AudioImpl {
     super(platform);
     this.platform = platform;
 
-    session = AVAudioSession.sharedInstance();
+    session = AVAudioSession.getSharedInstance();
     session.setActive(true, null); // TODO: options?
 
     oalDevice = alcOpenDevice(null);
@@ -85,12 +85,11 @@ public class RoboAudio extends AudioImpl {
     final RoboSoundAVAP sound = new RoboSoundAVAP();
     platform.invokeAsync(new Runnable() {
       public void run () {
-        NSError.NSErrorPtr error = new NSError.NSErrorPtr();
-        AVAudioPlayer player = new AVAudioPlayer(url, error);
-        if (error.get() == null) {
+        try {
+          AVAudioPlayer player = new AVAudioPlayer(url);
           dispatchLoaded(sound, player);
-        } else {
-          String errstr = error.get().toString();
+        } catch (NSErrorException e) {
+          String errstr = e.getError().toString();
           platform.log().warn("Error loading sound [" + url + ", " + errstr + "]");
           dispatchLoadError(sound, new Exception(errstr));
         }
