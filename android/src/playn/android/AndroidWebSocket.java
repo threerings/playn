@@ -20,6 +20,11 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.Draft_10;
+import org.java_websocket.drafts.Draft_17;
+import org.java_websocket.drafts.Draft_75;
+import org.java_websocket.drafts.Draft_76;
 import org.java_websocket.handshake.ServerHandshake;
 
 import playn.core.Net;
@@ -29,7 +34,7 @@ public class AndroidWebSocket implements Net.WebSocket {
 
   private final WebSocketClient socket;
 
-  public AndroidWebSocket(final Platform platform, String uri, final Listener listener) {
+  public AndroidWebSocket(final Platform platform, String uri, final Listener listener, int draft) {
     URI juri = null;
     try {
       juri = new URI(uri);
@@ -37,7 +42,7 @@ public class AndroidWebSocket implements Net.WebSocket {
       throw new RuntimeException(e);
     }
 
-    socket = new WebSocketClient(juri) {
+    socket = new WebSocketClient(juri, useDraft(draft)) {
       @Override
       public void onMessage(final ByteBuffer buffer) {
         platform.invokeLater(new Runnable() {
@@ -84,6 +89,18 @@ public class AndroidWebSocket implements Net.WebSocket {
       }
     };
     socket.connect();
+  }
+  
+  private Draft useDraft(int draft){
+    switch (draft) {
+      case 17:
+        return new Draft_17();
+      case 75:
+        return new Draft_75();
+      case 76:
+        return new Draft_76();
+    }
+    return new Draft_10();
   }
 
   @Override

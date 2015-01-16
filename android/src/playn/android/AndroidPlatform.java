@@ -48,7 +48,11 @@ public class AndroidPlatform extends AbstractPlatform {
   private final Json json;
   private final long start = System.nanoTime();
 
-  protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20) {
+  protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20){
+    this(activity, gl20, 10);
+  }
+  
+  protected AndroidPlatform(GameActivity activity, AndroidGL20 gl20, int wsDraft) {
     super(new AndroidLog(activity));
     this.activity = activity;
 
@@ -57,7 +61,7 @@ public class AndroidPlatform extends AbstractPlatform {
     assets = new AndroidAssets(this);
     json = new JsonImpl();
     keyboard = new AndroidKeyboard(this);
-    net = new AndroidNet(this);
+    net = new AndroidNet(this, wsDraft);
     pointer = new AndroidPointer();
     storage = new AndroidStorage(this);
     touch = new TouchImpl();

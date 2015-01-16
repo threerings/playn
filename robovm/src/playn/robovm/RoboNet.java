@@ -41,7 +41,7 @@ public class RoboNet extends NetImpl {
 
   @Override
   public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new RoboWebSocket(platform, url, listener);
+    return new RoboWebSocket(platform, url, listener, ((RoboPlatform) platform).config.wsDraft);
   }
 
   @Override

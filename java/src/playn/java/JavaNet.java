@@ -28,13 +28,16 @@ import playn.core.util.Callback;
 
 public class JavaNet extends NetImpl {
 
-  public JavaNet(JavaPlatform platform) {
+  final private int draft;
+  
+  public JavaNet(JavaPlatform platform, int draft) {
     super(platform);
+    this.draft = draft;
   }
 
   @Override
   public WebSocket createWebSocket(String url, WebSocket.Listener listener) {
-    return new JavaWebSocket(platform, url, listener);
+    return new JavaWebSocket(platform, url, listener, draft);
   }
 
   @Override
