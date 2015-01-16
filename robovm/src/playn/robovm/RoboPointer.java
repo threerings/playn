@@ -67,7 +67,7 @@ public class RoboPointer extends PointerImpl {
         _active = handle;
         CGPoint loc = touch.getLocationInView(touch.getView());
         // transform the point based on our current scale
-        IPoint xloc = platform.graphics().transformTouch((float)loc.x(), (float)loc.y());
+        IPoint xloc = platform.graphics().transformTouch((float)loc.getX(), (float)loc.getY());
         return new Event.Impl(
           new Events.Flags.Impl(), touch.getTimestamp() * 1000, xloc.x(), xloc.y(), true);
       }

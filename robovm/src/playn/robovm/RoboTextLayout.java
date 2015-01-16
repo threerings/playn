@@ -54,7 +54,8 @@ class RoboTextLayout extends AbstractTextLayout {
     for (int ii = 0; ii < layouts.length; ii++) {
       CTLine line = lines.get(ii, CTLine.class);
       CFRange range = line.getStringRange();
-      String ltext = text.substring((int)range.location(), (int)(range.location()+range.length()));
+      String ltext = text.substring((int)range.getLocation(),
+                                    (int)(range.getLocation()+range.getLength()));
       layouts[ii] = new RoboTextLayout(gfx, ltext, format, font, line);
     }
     return layouts;
