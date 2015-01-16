@@ -28,8 +28,8 @@ import playn.core.util.Callback;
 
 public class JavaNet extends NetImpl {
 
-  final private int draft;
-  
+  private final int draft;
+
   public JavaNet(JavaPlatform platform, int draft) {
     super(platform);
     this.draft = draft;

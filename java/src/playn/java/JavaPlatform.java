@@ -86,7 +86,7 @@ public class JavaPlatform extends AbstractPlatform {
 
     /** Stop processing frames while the app is "inactive", to better emulate iOS. */
     public boolean truePause;
-    
+
     /** Configure the web socket RFC draft number: 10, 17, 75 or 76 */
     public int wsDraft = 10;
   }

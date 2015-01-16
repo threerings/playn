@@ -90,18 +90,6 @@ public class RoboWebSocket implements Net.WebSocket {
     };
     socket.connect();
   }
-  
-  private Draft useDraft(int draft){
-    switch (draft) {
-      case 17:
-        return new Draft_17();
-      case 75:
-        return new Draft_75();
-      case 76:
-        return new Draft_76();
-    }
-    return new Draft_10();
-  }
 
   @Override
   public void close() {
@@ -124,5 +112,14 @@ public class RoboWebSocket implements Net.WebSocket {
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private Draft useDraft(int draft){
+    switch (draft) {
+    case 17: return new Draft_17();
+    case 75: return new Draft_75();
+    case 76: return new Draft_76();
+    }
+    return new Draft_10();
   }
 }

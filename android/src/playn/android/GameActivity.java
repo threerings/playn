@@ -174,7 +174,7 @@ public abstract class GameActivity extends Activity {
   protected boolean usePortraitOrientation() {
     return false;
   }
-  
+
   /**
    * Returns the orientation. Defaults to {@code ActivityInfo.SCREEN_ORIENTATION_PORTRAIT} or
    * {@code ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE} based off the response from
@@ -225,6 +225,11 @@ public abstract class GameActivity extends Activity {
     return 8;
   }
 
+  /** Returns the WebSocket draft version to use. */
+  protected int webSocketDraft() {
+    return 10;
+  }
+
   public GameViewGL gameView() {
     return gameView;
   }
@@ -232,10 +237,10 @@ public abstract class GameActivity extends Activity {
   boolean isHoneycombOrLater() {
     return android.os.Build.VERSION.SDK_INT >= 11;
   }
-  
+
   /**
    * Returns a new AndroidPlatform. This method is protected to provide subclasses a chance to
-   * adjust the platform. 
+   * adjust the platform.
    */
   protected AndroidPlatform createPlatform (AndroidGL20 gl) {
     return new AndroidPlatform(this, gl);
