@@ -17,6 +17,7 @@ import java.io.File;
 
 import org.robovm.apple.avfoundation.AVAudioPlayer;
 import org.robovm.apple.avfoundation.AVAudioSession;
+import org.robovm.apple.avfoundation.AVAudioSessionSetActiveOptions;
 import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.foundation.NSErrorException;
 import org.robovm.apple.foundation.NSURL;
@@ -41,7 +42,7 @@ public class RoboAudio extends AudioImpl {
     this.platform = platform;
 
     session = AVAudioSession.getSharedInstance();
-    session.setActive(true, null); // TODO: options?
+    session.setActive(true, AVAudioSessionSetActiveOptions.None);
 
     oalDevice = alcOpenDevice(null);
     if (oalDevice != 0) {
