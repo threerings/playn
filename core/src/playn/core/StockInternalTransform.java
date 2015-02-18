@@ -80,7 +80,7 @@ public class StockInternalTransform extends AffineTransform implements InternalT
   }
 
   @Override
-  public InternalTransform copy () {
+  public StockInternalTransform copy () {
     return new StockInternalTransform(m00, m01, m10, m11, tx, ty);
   }
 }
