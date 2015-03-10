@@ -372,7 +372,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public String glGetString(int id) {
-    return glc.getParameterString(id);
+    return gl.getParameterString(id);
   }
 
   @Override
