@@ -184,6 +184,22 @@
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.7</version>
+          <configuration>
+            <quiet>true</quiet>
+            <show>public</show>
+            <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
+            <links>
+              <link>http://docs.oracle.com/javase/7/docs/api/</link>
+              <link>http://threerings.github.io/react/apidocs/</link>
+              <link>http://samskivert.github.io/pythagoras/apidocs/</link>
+            </links>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>2.1.2</version>
         </plugin>
