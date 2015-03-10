@@ -17,7 +17,7 @@ import org.robovm.apple.coregraphics.CGBitmapContext;
 import org.robovm.apple.coregraphics.CGImage;
 import org.robovm.apple.coregraphics.CGRect;
 
-import org.robovm.rt.bro.ptr.VoidPtr;
+import org.robovm.rt.bro.ptr.IntPtr;
 
 import playn.core.gl.GL20Context;
 import static playn.core.gl.GL20.*;
@@ -115,7 +115,7 @@ public class RoboGLContext extends GL20Context {
     bctx.dispose();
   }
 
-  void updateTexture(int tex, int width, int height, VoidPtr data) {
+  void updateTexture(int tex, int width, int height, IntPtr data) {
     gl.glBindTexture(GL_TEXTURE_2D, tex);
     gl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     OpenGLES.glTexImage2Dp(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,

@@ -15,6 +15,14 @@
  */
 package playn.robovm;
 
+import static playn.robovm.OpenAL.AL_FORMAT_MONO16;
+import static playn.robovm.OpenAL.AL_FORMAT_MONO8;
+import static playn.robovm.OpenAL.AL_FORMAT_STEREO16;
+import static playn.robovm.OpenAL.AL_FORMAT_STEREO8;
+import static playn.robovm.OpenAL.AL_NO_ERROR;
+import static playn.robovm.OpenAL.alBufferData;
+import static playn.robovm.OpenAL.alGetError;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -23,8 +31,6 @@ import java.nio.ByteOrder;
 import org.robovm.apple.foundation.NSData;
 import org.robovm.apple.foundation.NSDataReadingOptions;
 import org.robovm.apple.foundation.NSRange;
-
-import static playn.robovm.OpenAL.*;
 
 /**
  * Loads CAFF audio data and uploads it to an OpenAL buffer.
@@ -152,5 +158,5 @@ public class CAFLoader {
   }
 
   private static final NSDataReadingOptions READ_OPTS = new NSDataReadingOptions(
-    NSDataReadingOptions.MappedRead.value()|NSDataReadingOptions.UncachedRead.value());
+    NSDataReadingOptions.MappedIfSafe.value()|NSDataReadingOptions.Uncached.value());
 }

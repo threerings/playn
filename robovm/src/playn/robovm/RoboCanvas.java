@@ -27,7 +27,7 @@ import org.robovm.apple.coregraphics.CGLineJoin;
 import org.robovm.apple.coregraphics.CGMutablePath;
 import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.coregraphics.CGTextEncoding;
-import org.robovm.rt.bro.ptr.VoidPtr;
+import org.robovm.rt.bro.ptr.IntPtr;
 
 import playn.core.Canvas;
 import playn.core.Gradient;
@@ -78,7 +78,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
     bctx.scaleCTM(ctx.scale.factor, -ctx.scale.factor);
   }
 
-  public VoidPtr data() {
+  public IntPtr data() {
     return bctx.getData();
   }
 
@@ -313,7 +313,7 @@ public class RoboCanvas extends AbstractCanvasGL<CGBitmapContext> {
   public Canvas setFillPattern(Pattern pattern) {
     currentState().gradient = null;
     // TODO: this anchors the fill pattern in the lower left; sigh
-    bctx.setFillColorWithColor(((RoboPattern) pattern).colorWithPattern);
+    bctx.setFillColor(((RoboPattern) pattern).colorWithPattern);
     return this;
   }
 
