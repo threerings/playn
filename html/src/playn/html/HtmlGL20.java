@@ -372,10 +372,7 @@ public final class HtmlGL20 implements playn.core.gl.GL20 {
 
   @Override
   public String glGetString(int id) {
-    // TODO: Where is getParameter()?
-    // String s = gl.getParameter(id);
-    //return s == null ? "" : s;
-    return "glGetString not implemented";
+    return glc.getParameterString(id);
   }
 
   @Override
