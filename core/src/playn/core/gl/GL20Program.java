@@ -71,7 +71,12 @@ public class GL20Program implements GLProgram {
   public GLShader.Uniform1f getUniform1f(String name) {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform1f() {
+      private float aCached = 0;
       public void bind(float a) {
+        if(aCached == a) {
+          return;
+        }
+        aCached = a;
         gl.glUniform1f(loc, a);
       }
     };
@@ -80,7 +85,13 @@ public class GL20Program implements GLProgram {
   public GLShader.Uniform2f getUniform2f(String name) {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform2f() {
+      private float aCached = 0, bCached = 0;
       public void bind(float a, float b) {
+        if(aCached == a && bCached == b) {
+          return;
+        }
+        aCached = a;
+        bCached = b;
         gl.glUniform2f(loc, a, b);
       }
     };
@@ -89,7 +100,14 @@ public class GL20Program implements GLProgram {
   public GLShader.Uniform3f getUniform3f(String name) {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform3f() {
+      private float aCached = 0, bCached = 0, cCached = 0;
       public void bind(float a, float b, float c) {
+        if(aCached == a && bCached == b && cCached == c) {
+          return;
+        }
+        aCached = a;
+        bCached = b;
+        cCached = c;
         gl.glUniform3f(loc, a, b, c);
       }
     };
@@ -98,7 +116,15 @@ public class GL20Program implements GLProgram {
   public GLShader.Uniform4f getUniform4f(String name) {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform4f() {
+      private float aCached = 0, bCached = 0, cCached = 0, dCached = 0;
       public void bind(float a, float b, float c, float d) {
+        if(aCached == a && bCached == b && cCached == c && dCached == d) {
+          return;
+        }
+        aCached = a;
+        bCached = b;
+        cCached = c;
+        dCached = d;
         gl.glUniform4f(loc, a, b, c, d);
       }
     };
@@ -108,7 +134,12 @@ public class GL20Program implements GLProgram {
   public GLShader.Uniform1i getUniform1i(String name) {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform1i() {
+      private int aCached = 0;
       public void bind(int a) {
+        if(aCached == a) {
+          return;
+        }
+        aCached = a;
         gl.glUniform1i(loc, a);
       }
     };
@@ -117,7 +148,13 @@ public class GL20Program implements GLProgram {
   public GLShader.Uniform2i getUniform2i(String name) {
     final int loc = gl.glGetUniformLocation(program, name);
     return (loc < 0) ? null : new GLShader.Uniform2i() {
+      private int aCached = 0, bCached = 0;
       public void bind(int a, int b) {
+        if(aCached == a && bCached == b) {
+          return;
+        }
+        aCached = a;
+        bCached = b;
         gl.glUniform2i(loc, a, b);
       }
     };
