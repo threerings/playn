@@ -73,9 +73,7 @@ public class GL20Program implements GLProgram {
     return (loc < 0) ? null : new GLShader.Uniform1f() {
       private float aCached = 0;
       public void bind(float a) {
-        if(aCached == a) {
-          return;
-        }
+        if (aCached == a) return;
         aCached = a;
         gl.glUniform1f(loc, a);
       }
@@ -87,9 +85,7 @@ public class GL20Program implements GLProgram {
     return (loc < 0) ? null : new GLShader.Uniform2f() {
       private float aCached = 0, bCached = 0;
       public void bind(float a, float b) {
-        if(aCached == a && bCached == b) {
-          return;
-        }
+        if (aCached == a && bCached == b) return;
         aCached = a;
         bCached = b;
         gl.glUniform2f(loc, a, b);
@@ -102,9 +98,7 @@ public class GL20Program implements GLProgram {
     return (loc < 0) ? null : new GLShader.Uniform3f() {
       private float aCached = 0, bCached = 0, cCached = 0;
       public void bind(float a, float b, float c) {
-        if(aCached == a && bCached == b && cCached == c) {
-          return;
-        }
+        if (aCached == a && bCached == b && cCached == c) return;
         aCached = a;
         bCached = b;
         cCached = c;
@@ -118,9 +112,7 @@ public class GL20Program implements GLProgram {
     return (loc < 0) ? null : new GLShader.Uniform4f() {
       private float aCached = 0, bCached = 0, cCached = 0, dCached = 0;
       public void bind(float a, float b, float c, float d) {
-        if(aCached == a && bCached == b && cCached == c && dCached == d) {
-          return;
-        }
+        if (aCached == a && bCached == b && cCached == c && dCached == d) return;
         aCached = a;
         bCached = b;
         cCached = c;
@@ -136,9 +128,7 @@ public class GL20Program implements GLProgram {
     return (loc < 0) ? null : new GLShader.Uniform1i() {
       private int aCached = 0;
       public void bind(int a) {
-        if(aCached == a) {
-          return;
-        }
+        if (aCached == a) return;
         aCached = a;
         gl.glUniform1i(loc, a);
       }
@@ -150,9 +140,7 @@ public class GL20Program implements GLProgram {
     return (loc < 0) ? null : new GLShader.Uniform2i() {
       private int aCached = 0, bCached = 0;
       public void bind(int a, int b) {
-        if(aCached == a && bCached == b) {
-          return;
-        }
+        if (aCached == a && bCached == b) return;
         aCached = a;
         bCached = b;
         gl.glUniform2i(loc, a, b);
