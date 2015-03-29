@@ -25,5 +25,4 @@
 
   <!-- bits for super devmode -->
   <add-linker name="xsiframe"/>
-  <set-configuration-property name="devModeRedirectEnabled" value="true"/>
 </module>
