@@ -1,8 +1,3 @@
-*.iml
-.DS_Store
-.classpath
-.project
-.settings
 target
 
 # /html/
@@ -11,4 +6,3 @@ target
 # /tests/
 /tests/android/assets
 /tests/ios/assets
-.idea/
