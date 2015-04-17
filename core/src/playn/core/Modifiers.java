@@ -3,6 +3,9 @@ package playn.core;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stores Keyboard modifiers used in {@link playn.core.Keyboard.Event}.
+ */
 public class Modifiers extends ArrayList<Key> {
 
   public Modifiers() {
