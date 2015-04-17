@@ -23,6 +23,7 @@ import playn.core.Events;
 import playn.core.Key;
 import playn.core.KeyboardImpl;
 import playn.core.PlayN;
+import playn.core.Modifiers;
 import playn.core.util.Callback;
 
 class HtmlKeyboard extends KeyboardImpl {

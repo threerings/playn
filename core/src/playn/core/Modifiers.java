@@ -10,8 +10,7 @@ public class Modifiers extends ArrayList<Key> {
   }
 
   public Modifiers(List<Key> modifiers) {
-    super();
-    addAll(modifiers);
+    super(modifiers);
   }
 
   public boolean isAltPressed() {
