@@ -23,6 +23,7 @@ import org.lwjgl.input.Keyboard;
 
 import playn.core.Events;
 import playn.core.Key;
+import playn.core.Modifiers;
 import playn.core.util.Callback;
 
 public class JavaLWJGLKeyboard extends JavaKeyboard {
@@ -49,6 +50,7 @@ public class JavaLWJGLKeyboard extends JavaKeyboard {
 
   @Override
   void update() {
+    Modifiers modifiers = extractModifiers();
     while (Keyboard.next()) {
       double time = (double) (Keyboard.getEventNanoseconds() / 1000);
       int keyCode = Keyboard.getEventKey();
@@ -56,17 +58,39 @@ public class JavaLWJGLKeyboard extends JavaKeyboard {
       if (Keyboard.getEventKeyState()) {
         Key key = translateKey(keyCode);
         if (key != null)
-          dispatch(new Event.Impl(new Events.Flags.Impl(), time, key), down);
+          dispatch(new Event.Impl(new Events.Flags.Impl(), time, key, modifiers), down);
         char keyChar = Keyboard.getEventCharacter();
         if (!Character.isISOControl(keyChar))
           dispatch(new TypedEvent.Impl(new Events.Flags.Impl(), time, keyChar), typed);
       } else {
         Key key = translateKey(keyCode);
         if (key != null)
-          dispatch(new Event.Impl(new Events.Flags.Impl(), time, key), up);
+          dispatch(new Event.Impl(new Events.Flags.Impl(), time, key, modifiers), up);
       }
     }
     super.update();
+  }
+
+  private Modifiers extractModifiers() {
+    Modifiers modifiers = new Modifiers();
+
+    if(Keyboard.isKeyDown(Keyboard.KEY_LMENU)
+        || Keyboard.isKeyDown(Keyboard.KEY_RMENU)) {
+      modifiers.add(Key.ALT);
+    }
+    if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)
+        || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
+      modifiers.add(Key.CONTROL);
+    }
+    if(Keyboard.isKeyDown(Keyboard.KEY_LMETA)
+        || Keyboard.isKeyDown(Keyboard.KEY_RMETA)) {
+      modifiers.add(Key.META);
+    }
+    if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)
+        || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+      modifiers.add(Key.SHIFT);
+    }
+    return modifiers;
   }
 
   private Key translateKey(int keyCode) {

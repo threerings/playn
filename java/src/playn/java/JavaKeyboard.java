@@ -21,6 +21,7 @@ import java.util.List;
 
 import playn.core.Events;
 import playn.core.Key;
+import playn.core.Modifiers;
 
 public abstract class JavaKeyboard implements playn.core.Keyboard {
 
@@ -49,11 +50,11 @@ public abstract class JavaKeyboard implements playn.core.Keyboard {
    * @param pressed whether the key was pressed or released, ignored if key is null
    * @param typedCh the character that was typed, ignored if key is not null
    */
-  public void post(Key key, boolean pressed, char typedCh) {
+  public void post(Key key, boolean pressed, char typedCh, Modifiers modifiers) {
     queue.add(
       key == null ?
       new Queued<TypedEvent>(new TypedEvent.Impl(new Events.Flags.Impl(), 0, typedCh), typed) :
-      new Queued<Event>(new Event.Impl(new Events.Flags.Impl(), 0, key), pressed ? down : up));
+      new Queued<Event>(new Event.Impl(new Events.Flags.Impl(), 0, key, modifiers), pressed ? down : up));
   }
 
   @Override

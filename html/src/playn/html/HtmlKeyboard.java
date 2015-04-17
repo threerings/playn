@@ -34,7 +34,9 @@ class HtmlKeyboard extends KeyboardImpl {
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(
-            new Events.Flags.Impl(), PlayN.currentTime(), keyForCode(nativeEvent.getKeyCode()));
+            new Events.Flags.Impl(), PlayN.currentTime(), keyForCode(nativeEvent.getKeyCode()),
+              extractModifiers(nativeEvent)
+          );
           listener.onKeyDown(event);
           if (event.flags().getPreventDefault()) {
             nativeEvent.preventDefault();
@@ -61,7 +63,9 @@ class HtmlKeyboard extends KeyboardImpl {
       public void handleEvent(NativeEvent nativeEvent) {
         if (listener != null) {
           Event.Impl event = new Event.Impl(
-            new Events.Flags.Impl(), PlayN.currentTime(), keyForCode(nativeEvent.getKeyCode()));
+            new Events.Flags.Impl(), PlayN.currentTime(), keyForCode(nativeEvent.getKeyCode()),
+              extractModifiers(nativeEvent)
+          );
           listener.onKeyUp(event);
           if (event.flags().getPreventDefault()) {
             nativeEvent.preventDefault();
@@ -79,6 +83,23 @@ class HtmlKeyboard extends KeyboardImpl {
   @Override
   public void getText(TextType textType, String label, String initVal, Callback<String> callback) {
     callback.onSuccess(Window.prompt(label, initVal));
+  }
+
+  private static Modifiers extractModifiers(NativeEvent nativeEvent) {
+    Modifiers modifiers = new Modifiers();
+    if(nativeEvent.getAltKey()) {
+      modifiers.add(Key.ALT);
+    }
+    if(nativeEvent.getCtrlKey()) {
+      modifiers.add(Key.CONTROL);
+    }
+    if(nativeEvent.getMetaKey()) {
+      modifiers.add(Key.META);
+    }
+    if(nativeEvent.getShiftKey()) {
+      modifiers.add(Key.SHIFT);
+    }
+    return modifiers;
   }
 
   private static Key keyForCode(int keyCode) {
