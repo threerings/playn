@@ -33,8 +33,7 @@ class KeyEventHandler {
   public void onKeyDown(int keyCode, KeyEvent nativeEvent) {
     long time = nativeEvent.getEventTime();
     final Keyboard.Event event = new Keyboard.Event.Impl(
-      new Events.Flags.Impl(), time, keyForCode(keyCode),
-        extractModifiers(nativeEvent));
+      new Events.Flags.Impl(), time, keyForCode(keyCode), extractModifiers(nativeEvent));
     platform.invokeLater(new Runnable() {
       @Override
       public void run() {
@@ -69,18 +68,10 @@ class KeyEventHandler {
 
   private Modifiers extractModifiers(KeyEvent nativeEvent) {
     Modifiers modifiers = new Modifiers();
-    if(nativeEvent.isAltPressed()) {
-      modifiers.add(Key.ALT);
-    }
-    if(nativeEvent.isCtrlPressed()) {
-      modifiers.add(Key.CONTROL);
-    }
-    if(nativeEvent.isShiftPressed()) {
-      modifiers.add(Key.SHIFT);
-    }
-    if(nativeEvent.isMetaPressed()) {
-      modifiers.add(Key.META);
-    }
+    if (nativeEvent.isAltPressed()) modifiers.add(Key.ALT);
+    if (nativeEvent.isCtrlPressed()) modifiers.add(Key.CONTROL);
+    if (nativeEvent.isShiftPressed()) modifiers.add(Key.SHIFT);
+    if (nativeEvent.isMetaPressed()) modifiers.add(Key.META);
     return modifiers;
   }
 

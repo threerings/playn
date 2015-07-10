@@ -73,21 +73,16 @@ public class JavaLWJGLKeyboard extends JavaKeyboard {
 
   private Modifiers extractModifiers() {
     Modifiers modifiers = new Modifiers();
-
-    if(Keyboard.isKeyDown(Keyboard.KEY_LMENU)
-        || Keyboard.isKeyDown(Keyboard.KEY_RMENU)) {
+    if (Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU)) {
       modifiers.add(Key.ALT);
     }
-    if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)
-        || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
+    if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
       modifiers.add(Key.CONTROL);
     }
-    if(Keyboard.isKeyDown(Keyboard.KEY_LMETA)
-        || Keyboard.isKeyDown(Keyboard.KEY_RMETA)) {
+    if (Keyboard.isKeyDown(Keyboard.KEY_LMETA) || Keyboard.isKeyDown(Keyboard.KEY_RMETA)) {
       modifiers.add(Key.META);
     }
-    if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)
-        || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+    if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
       modifiers.add(Key.SHIFT);
     }
     return modifiers;

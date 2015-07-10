@@ -88,18 +88,10 @@ class HtmlKeyboard extends KeyboardImpl {
 
   private static Modifiers extractModifiers(NativeEvent nativeEvent) {
     Modifiers modifiers = new Modifiers();
-    if(nativeEvent.getAltKey()) {
-      modifiers.add(Key.ALT);
-    }
-    if(nativeEvent.getCtrlKey()) {
-      modifiers.add(Key.CONTROL);
-    }
-    if(nativeEvent.getMetaKey()) {
-      modifiers.add(Key.META);
-    }
-    if(nativeEvent.getShiftKey()) {
-      modifiers.add(Key.SHIFT);
-    }
+    if (nativeEvent.getAltKey()) modifiers.add(Key.ALT);
+    if (nativeEvent.getCtrlKey()) modifiers.add(Key.CONTROL);
+    if (nativeEvent.getMetaKey()) modifiers.add(Key.META);
+    if (nativeEvent.getShiftKey()) modifiers.add(Key.SHIFT);
     return modifiers;
   }
 
