@@ -19,6 +19,7 @@ import org.eclipse.swt.SWT;
 
 import playn.core.Events;
 import playn.core.Key;
+import playn.core.Modifiers;
 import playn.core.util.Callback;
 
 public class SWTKeyboard extends JavaKeyboard {
@@ -43,7 +44,8 @@ public class SWTKeyboard extends JavaKeyboard {
       public void handleEvent (org.eclipse.swt.widgets.Event event) {
         Key key = translateKey(event.keyCode);
         if (key != null) {
-          dispatch(new Event.Impl(new Events.Flags.Impl(), event.time, key), down);
+          dispatch(new Event.Impl(new Events.Flags.Impl(), event.time, key,
+              extractModifiers(event)), down);
         } else {
           System.err.println("KEY? " + event.keyCode + " / " + event.character);
         }
@@ -58,10 +60,28 @@ public class SWTKeyboard extends JavaKeyboard {
       public void handleEvent (org.eclipse.swt.widgets.Event event) {
         Key key = translateKey(event.keyCode);
         if (key != null) {
-          dispatch(new Event.Impl(new Events.Flags.Impl(), event.time, key), up);
+          dispatch(new Event.Impl(new Events.Flags.Impl(), event.time, key,
+              extractModifiers(event)), up);
         }
       }
     });
+  }
+
+  private Modifiers extractModifiers(org.eclipse.swt.widgets.Event event) {
+    Modifiers modifiers = new Modifiers();
+    if((event.stateMask & SWT.ALT) == SWT.ALT){
+      modifiers.add(Key.ALT);
+    }
+    if((event.stateMask & SWT.CTRL) == SWT.CTRL){
+      modifiers.add(Key.CONTROL);
+    }
+    if((event.stateMask & SWT.SHIFT) == SWT.SHIFT){
+      modifiers.add(Key.SHIFT);
+    }
+    if((event.stateMask & SWT.COMMAND) == SWT.COMMAND){
+      modifiers.add(Key.META);
+    }
+    return modifiers;
   }
 
   public Key translateKey(int keyCode) {
