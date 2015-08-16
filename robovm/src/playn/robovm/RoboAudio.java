@@ -42,7 +42,11 @@ public class RoboAudio extends AudioImpl {
     this.platform = platform;
 
     session = AVAudioSession.getSharedInstance();
-    session.setActive(true, AVAudioSessionSetActiveOptions.None);
+    try {
+      session.setActive(true, AVAudioSessionSetActiveOptions.None);
+    } catch (NSErrorException nse) {
+      platform.log().warn("Unable to initialize audio session", nse);
+    }
 
     oalDevice = alcOpenDevice(null);
     if (oalDevice != 0) {
