@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.robovm.apple.foundation.NSBundle;
 import org.robovm.apple.foundation.NSData;
@@ -46,6 +47,13 @@ public class RoboAssets extends AbstractAssets<UIImage> {
    */
   public void setPathPrefix(String pathPrefix) {
     this.assetRoot = new File(bundleRoot, pathPrefix);
+  }
+
+  /**
+   * Returns the asset at {@code path} as an input stream.
+   */
+  public InputStream getResource (String path) throws IOException {
+      return new FileInputStream(resolvePath(path));
   }
 
   @Override
