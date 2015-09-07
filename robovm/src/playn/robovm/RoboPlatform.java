@@ -137,7 +137,7 @@ public class RoboPlatform extends AbstractPlatform {
   private final long gameStart = System.nanoTime();
   private final ExecutorService pool = Executors.newFixedThreadPool(3);
 
-  final int osVersion = getOSVersion();
+  public final int osVersion = getOSVersion();
   final Config config;
 
   protected RoboPlatform(CGRect bounds, Config config) {
