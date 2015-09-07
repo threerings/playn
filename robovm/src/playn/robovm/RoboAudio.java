@@ -163,6 +163,10 @@ public class RoboAudio extends AudioImpl {
     }
   }
 
+  void delete(RoboSoundOAL sound) {
+    alDeleteBuffer(sound.bufferId());
+  }
+
   void setLooping(int sourceIdx, RoboSoundOAL sound, boolean looping) {
     if (active[sourceIdx] == sound) {
       alSourcei(sources[sourceIdx], AL_LOOPING, looping ? AL_TRUE : AL_FALSE);
