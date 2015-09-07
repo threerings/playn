@@ -27,7 +27,7 @@ public class RoboGLContext extends GL20Context {
   public static final boolean CHECK_ERRORS = false;
 
   private final RoboPlatform platform;
-  private int defaultFramebuffer = -1; // initted in viewDidInit
+  private int defaultFramebuffer = -1; // initted in viewDidAppear
   // private UIDeviceOrientation orient;
 
   public RoboGLContext(RoboPlatform platform, RoboGL20 gl, float scaleFactor) {
@@ -36,16 +36,15 @@ public class RoboGLContext extends GL20Context {
     init();
   }
 
-  void viewDidInit(int width, int height) {
-    // Apple re-disables GL_BLEND &c between our call to init() and the eventual call to
-    // viewDidInit(); why why why? I want my six hours spend on bullshit debugging back!
+  void viewDidAppear() {
+    // Apple re-disables GL_BLEND &c between our call to init() and the eventual call to this
+    // method; why why why? I want my six hours spend on bullshit debugging back!
     gl.glDisable(GL_CULL_FACE);
     gl.glEnable(GL_BLEND);
     gl.glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     gl.glClearColor(0, 0, 0, 1);
 
     defaultFramebuffer = gl.glGetInteger(GL_FRAMEBUFFER_BINDING);
-    setSize(width, height);
   }
 
   // boolean setOrientation(UIDeviceOrientation orientation) {

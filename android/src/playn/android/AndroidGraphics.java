@@ -54,7 +54,6 @@ public class AndroidGraphics extends GraphicsGL {
   private final Map<Pair<String,Font.Style>,String[]> ligatureHacks =
     new HashMap<Pair<String,Font.Style>,String[]>();
 
-  private int screenWidth, screenHeight;
   private ScaleFunc canvasScaleFunc = new ScaleFunc() {
     public Scale computeScale (float width, float height, Scale gfxScale) {
       return gfxScale;
@@ -72,12 +71,10 @@ public class AndroidGraphics extends GraphicsGL {
     rootLayer = new GroupLayerGL(ctx);
   }
 
-  void onSizeChanged(int viewWidth, int viewHeight) {
-    screenWidth = MathUtil.iceil(viewWidth / ctx.scale.factor);
-    screenHeight = MathUtil.iceil(viewHeight / ctx.scale.factor);
-    platform.log().info("Updating size " + viewWidth + "x" + viewHeight + " / " + ctx.scale.factor +
-                        " -> " + screenWidth + "x" + screenHeight);
-    ctx.setSize(screenWidth, screenHeight);
+  void onSizeChanged(int pixelWidth, int pixelHeight) {
+    ctx.setSize(pixelWidth, pixelHeight);
+    platform.log().info("Updating size " + pixelWidth + "x" + pixelHeight +
+                        " / " + ctx.scale.factor + " -> " + screenWidth() + "x" + screenHeight());
   }
 
   /**
@@ -188,12 +185,12 @@ public class AndroidGraphics extends GraphicsGL {
 
   @Override
   public int screenHeight() {
-    return screenHeight;
+    return ctx.viewHeight;
   }
 
   @Override
   public int screenWidth() {
-    return screenWidth;
+    return ctx.viewWidth;
   }
 
   @Override

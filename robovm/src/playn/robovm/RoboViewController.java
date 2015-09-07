@@ -104,10 +104,10 @@ public class RoboViewController extends GLKViewController implements GLKViewCont
   @Override // from ViewController
   public void viewDidAppear(boolean animated) {
     super.viewDidAppear(animated);
-    CGRect bounds = getView().getBounds();
     // platform.log().debug("viewDidAppear(" + animated + "): " + bounds);
     EAGLContext.setCurrentContext(view.getContext());
-    platform.graphics().ctx.viewDidInit((int)bounds.getWidth(), (int)bounds.getHeight());
+    platform.graphics().ctx.viewDidAppear();
+    platform.graphics().setSize(getView().getBounds());
   }
 
   @Override // from ViewController
@@ -125,9 +125,8 @@ public class RoboViewController extends GLKViewController implements GLKViewCont
   @Override // from ViewController
   public void didRotate(UIInterfaceOrientation fromOrient) {
     super.didRotate(fromOrient);
-    CGRect bounds = getView().getBounds();
     // platform.log().debug("didRotate(" + fromOrient + "): " + bounds);
-    platform.graphics().setSize((int)bounds.getWidth(), (int)bounds.getHeight());
+    platform.graphics().setSize(getView().getBounds());
     platform.didRotate(fromOrient);
   }
 

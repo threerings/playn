@@ -47,9 +47,8 @@ public class RoboGraphics extends GraphicsGL {
 
   private final RoboPlatform platform;
   private final GroupLayerGL rootLayer;
-  private final float touchScale;
+  private final float deviceScale;
   private final Point touchTemp = new Point();
-  private int screenWidth, screenHeight;
 
   // a scratch bitmap context used for measuring text
   private static final int S_SIZE = 10;
@@ -60,23 +59,17 @@ public class RoboGraphics extends GraphicsGL {
   public RoboGraphics(RoboPlatform platform, CGRect bounds) {
     this.platform = platform;
 
-    float deviceScale = (float)(/*(platform.osVersion >= 8) ?
-      UIScreen.getMainScreen().getNativeScale() :*/ // TODO: enable when RoboVM supports API
-      UIScreen.getMainScreen().getScale());
+    float deviceScale = (float)((platform.osVersion >= 8) ?
+                                UIScreen.getMainScreen().getNativeScale() :
+                                UIScreen.getMainScreen().getScale());
 
     boolean isPad = UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad;
     boolean useHalfSize = isPad && platform.config.iPadLikePhone;
     float viewScale = (useHalfSize ? 2 : 1) * deviceScale;
 
-    int screenWidth = (int)bounds.getWidth(), screenHeight = (int)bounds.getHeight();
-    if (useHalfSize) {
-      screenWidth /= 2;
-      screenHeight /= 2;
-    }
-
-    this.touchScale = deviceScale;
+    this.deviceScale = deviceScale;
     ctx = new RoboGLContext(platform, new RoboGL20(), viewScale);
-    setSize(screenWidth, screenHeight);
+    setSize(bounds);
     rootLayer = new GroupLayerGL(ctx);
   }
 
@@ -113,12 +106,12 @@ public class RoboGraphics extends GraphicsGL {
 
   @Override
   public int screenHeight() {
-    return screenHeight;
+    return ctx.viewHeight;
   }
 
   @Override
   public int screenWidth() {
-    return screenWidth;
+    return ctx.viewWidth;
   }
 
   @Override
@@ -151,15 +144,13 @@ public class RoboGraphics extends GraphicsGL {
       CGImageAlphaInfo.PremultipliedLast.value()));
   }
 
-  void setSize(int screenWidth, int screenHeight) {
-    this.screenWidth = screenWidth;
-    this.screenHeight = screenHeight;
-    ctx.setSize(screenWidth, screenHeight);
+  void setSize(CGRect bounds) {
+    ctx.setSize((int)(bounds.getWidth() * deviceScale), (int)(bounds.getHeight() * deviceScale));
   }
 
   IPoint transformTouch(float x, float y) {
     return ctx.rootTransform().inverseTransform(
-      touchTemp.set(x*touchScale, y*touchScale), touchTemp);
+      touchTemp.set(x*deviceScale, y*deviceScale), touchTemp);
   }
 
   void paint() {

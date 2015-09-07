@@ -87,14 +87,14 @@ public abstract class GLContext {
   public final Scale scale;
 
   /**
-   * Sets the view width to the specified width and height (in pixels). The framebuffer will
-   * potentially be larger than this size if a HiDPI scale factor is in effect.
+   * Sets the frame buffer to the specified width and height (in pixels). The view will potentially
+   * be smaller than this size if a HiDPI scale factor is in effect.
    */
-  public final void setSize(int width, int height) {
-    viewWidth = width;
-    viewHeight = height;
-    curFbufWidth = defaultFbufWidth = scale.scaledCeil(width);
-    curFbufHeight = defaultFbufHeight = scale.scaledCeil(height);
+  public final void setSize(int pixelWidth, int pixelHeight) {
+    viewWidth = scale.invScaledFloor(pixelWidth);
+    viewHeight = scale.invScaledFloor(pixelHeight);
+    curFbufWidth = defaultFbufWidth = pixelWidth;
+    curFbufHeight = defaultFbufHeight = pixelHeight;
     viewConfigChanged();
   }
 
