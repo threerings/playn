@@ -91,10 +91,9 @@ public class JavaGraphics extends GraphicsGL {
   /**
    * Changes the size of the PlayN window.
    */
-  public void setSize(int width, int height, boolean fullscreen) {
-    int swidth = ctx.scale.scaledCeil(width), sheight = ctx.scale.scaledCeil(height);
-    setDisplayMode(swidth, sheight, fullscreen);
-    ctx.setSize(width, height);
+  public void setSize(int pixelWidth, int pixelHeight, boolean fullscreen) {
+    setDisplayMode(pixelWidth, pixelHeight, fullscreen);
+    ctx.setSize(pixelWidth, pixelHeight);
   }
 
   protected void setDisplayMode(int width, int height, boolean fullscreen) {
@@ -210,8 +209,7 @@ public class JavaGraphics extends GraphicsGL {
 
   protected void init() {
     DisplayMode mode = Display.getDisplayMode();
-    ctx.setSize(ctx.scale.invScaledFloor(mode.getWidth()),
-                ctx.scale.invScaledFloor(mode.getHeight()));
+    ctx.setSize(mode.getWidth(), mode.getHeight());
     ctx.init();
   }
 
