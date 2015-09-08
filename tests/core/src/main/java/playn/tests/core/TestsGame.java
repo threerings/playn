@@ -96,6 +96,7 @@ public class TestsGame extends Game.Default {
     new SubImageTest(),
     new ClippedGroupTest(),
     new CanvasStressTest(),
+    new SoundTest(),
     new PauseResumeTest(),
     new ImmediateTest(),
     new TextTest(),
@@ -110,7 +111,6 @@ public class TestsGame extends Game.Default {
     new PointerMouseTouchTest(),
     new MouseWheelTest(),
     new ShaderTest(),
-    new SoundTest(),
     new NetTest(),
     new FullscreenTest(),
     /*new YourTest(),*/
@@ -294,5 +294,5 @@ public class TestsGame extends Game.Default {
   }
 
   protected static TextFormat BUTTON_FMT = new TextFormat().withFont(
-    graphics().createFont("Helvetica", Font.Style.PLAIN, 24));
+    graphics().createFont("Helvetica", Font.Style.PLAIN, 18));
 }

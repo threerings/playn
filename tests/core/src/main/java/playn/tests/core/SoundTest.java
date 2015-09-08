@@ -44,9 +44,17 @@ public class SoundTest extends Test {
     lfanfare.setLooping(true);
     x = addLoopButtons("Fanfare", lfanfare, x);
 
-    Sound bling = loadSound("sounds/bling");
-    bling.setLooping(true);
-    x = addLoopButtons("Bling", bling, x);
+    final Sound bling = loadSound("sounds/bling");
+    x = addButton("Play Bling", new Runnable() {
+      public void run() {
+        bling.play();
+        addAction("Played Bling.");
+      }
+    }, x, 100);
+
+    Sound lbling = loadSound("sounds/bling");
+    lbling.setLooping(true);
+    x = addLoopButtons("Bling", lbling, x);
 
     graphics().rootLayer().addAt(graphics().createImageLayer(_actionsImage), 50, 150);
   }
