@@ -16,7 +16,7 @@
 package playn.robovm;
 
 import org.robovm.apple.avfoundation.AVAudioPlayer;
-import org.robovm.apple.avfoundation.AVAudioPlayerDelegate;
+import org.robovm.apple.avfoundation.AVAudioPlayerDelegateAdapter;
 import org.robovm.apple.foundation.NSError;
 
 import playn.core.AbstractSound;
@@ -27,12 +27,7 @@ import playn.core.AbstractSound;
  */
 public class RoboSoundAVAP extends AbstractSound<AVAudioPlayer> {
 
-  private AVAudioPlayerDelegate delegate = new AVAudioPlayerDelegate() {
-    public void didFinishPlaying(AVAudioPlayer player, boolean flag) {}
-    public void decodeErrorDidOccur(AVAudioPlayer player, NSError error) {}
-    public void beginInterruption(AVAudioPlayer player) {}
-    public void endInterruptionWithOptions(AVAudioPlayer player, long flags) {}
-    public void endInterruptionWithFlags(AVAudioPlayer player, long flags) {}
+  private AVAudioPlayerDelegateAdapter delegate = new AVAudioPlayerDelegateAdapter() {
     public void endInterruption(AVAudioPlayer player) {
       impl.setCurrentTime(0);
       impl.prepareToPlay();

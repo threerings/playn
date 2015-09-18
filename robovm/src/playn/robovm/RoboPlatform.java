@@ -30,6 +30,7 @@ import org.robovm.apple.uikit.UIScreen;
 import org.robovm.apple.uikit.UIWindow;
 import org.robovm.objc.Selector;
 import org.robovm.objc.annotation.BindSelector;
+import org.robovm.objc.block.VoidBlock1;
 import org.robovm.rt.bro.annotation.Callback;
 
 import playn.core.*;
@@ -299,43 +300,20 @@ public class RoboPlatform extends AbstractPlatform {
   void willTerminate () {
     // let the app know that we're terminating
     onExit();
-    // shutdown the GL and AL systems
-    ResourceCleaner.terminate(this);
+    // shutdown the GL and AL systems after our configured delay
+    new NSTimer(config.timeForTermination, new VoidBlock1<NSTimer>() {
+      public void invoke (NSTimer timer) {
+        // shutdown the GL view completely
+        EAGLContext.setCurrentContext(null);
+        // stop and release the AL resources (if audio was ever initialized)
+        if (audio != null) audio.terminate();
+      }
+    }, null, false);
   }
 
   private int getOSVersion () {
     String systemVersion = UIDevice.getCurrentDevice().getSystemVersion();
     int version = Integer.parseInt(systemVersion.split("\\.")[0]);
     return version;
-  }
-
-  private static class ResourceCleaner extends NSObject {
-    private final static Selector SEL = Selector.register("cleanRelatedResources:");
-    private RoboPlatform platform;
-
-    private ResourceCleaner(RoboPlatform platform) {
-      this.platform = platform;
-    }
-
-    // wait for the desired interval and then terminate the GL and AL systems
-    public static void terminate(RoboPlatform platform) {
-      NSTimer.createScheduled(platform.config.timeForTermination, new ResourceCleaner(platform),
-                              ResourceCleaner.SEL, null, false);
-    }
-
-    @Callback @BindSelector("cleanRelatedResources:")
-    private static void cleanRelatedResources(ResourceCleaner self, Selector sel) {
-      if (self.platform != null) {
-        // shutdown the GL view completely
-        EAGLContext.setCurrentContext(null);
-        // stop and release the AL resources (if audio was ever initialized)
-        if (self.platform.audio != null) self.platform.audio.terminate();
-      }
-
-      self.platform = null;
-      // clear out the platform in order to make sure the game creation flow can be repeated when
-      // it is used as a part of a larger application
-      PlayN.setPlatform(null);
-    }
   }
 }

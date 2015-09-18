@@ -61,7 +61,7 @@ public class RoboAssets extends AbstractAssets<UIImage> {
     final RoboAsyncImage image = new RoboAsyncImage(platform.graphics().ctx, width, height);
     platform.net().req(url).execute(new Callback<Net.Response>() {
       public void onSuccess (Net.Response rsp) {
-        image.setImage(UIImage.create(new NSData(rsp.payload())), Scale.ONE);
+        image.setImage(new UIImage(new NSData(rsp.payload())), Scale.ONE);
       }
       public void onFailure (Throwable cause) {
         image.setError(cause);
@@ -120,7 +120,7 @@ public class RoboAssets extends AbstractAssets<UIImage> {
       if (!fullPath.exists()) continue;
 
       // platform.log().debug("Loading image: " + fullPath);
-      UIImage img = UIImage.create(fullPath);
+      UIImage img = new UIImage(fullPath);
       if (img != null) return recv.imageLoaded(img, rsrc.scale);
 
       // note this error if this is the lowest resolution image, but fall back to lower resolution
