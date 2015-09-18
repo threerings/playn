@@ -301,14 +301,14 @@ public class RoboPlatform extends AbstractPlatform {
     // let the app know that we're terminating
     onExit();
     // shutdown the GL and AL systems after our configured delay
-    new NSTimer(config.timeForTermination, new VoidBlock1<NSTimer>() {
+    NSTimer.createScheduled(config.timeForTermination, new VoidBlock1<NSTimer>() {
       public void invoke (NSTimer timer) {
         // shutdown the GL view completely
         EAGLContext.setCurrentContext(null);
         // stop and release the AL resources (if audio was ever initialized)
         if (audio != null) audio.terminate();
       }
-    }, null, false);
+    }, false);
   }
 
   private int getOSVersion () {
