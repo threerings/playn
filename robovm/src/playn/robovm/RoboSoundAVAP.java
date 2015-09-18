@@ -38,6 +38,7 @@ public class RoboSoundAVAP extends AbstractSound<AVAudioPlayer> {
   @Override
   public void onLoaded(AVAudioPlayer impl) {
     super.onLoaded(impl);
+    impl.setDelegate(delegate);
   }
 
   @Override
