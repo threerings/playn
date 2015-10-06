@@ -58,7 +58,7 @@ public class RoboAssets extends AbstractAssets<UIImage> {
 
   @Override
   public Image getRemoteImage(String url, float width, float height) {
-    final RoboAsyncImage image = new RoboAsyncImage(platform.graphics().ctx, width, height);
+    final RoboAsyncImage image = new RoboAsyncImage(platform.graphics().ctx, width, height, url);
     platform.net().req(url).execute(new Callback<Net.Response>() {
       public void onSuccess (Net.Response rsp) {
         image.setImage(new UIImage(new NSData(rsp.payload())), Scale.ONE);
@@ -109,7 +109,7 @@ public class RoboAssets extends AbstractAssets<UIImage> {
 
   @Override
   protected AsyncImage<UIImage> createAsyncImage(float width, float height) {
-    return new RoboAsyncImage(platform.graphics().ctx, width, height);
+    return new RoboAsyncImage(platform.graphics().ctx, width, height, "none");
   }
 
   @Override

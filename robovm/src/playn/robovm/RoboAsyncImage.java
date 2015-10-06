@@ -30,13 +30,15 @@ import playn.core.util.Callbacks;
 public class RoboAsyncImage extends RoboImage implements AsyncImage<UIImage> {
 
   private final float preWidth, preHeight;
+  private final String source;
   private List<Callback<? super Image>> callbacks;
   private Throwable error;
 
-  public RoboAsyncImage (GLContext ctx, float preWidth, float preHeight) {
+  public RoboAsyncImage (GLContext ctx, float preWidth, float preHeight, String source) {
     super(ctx, null, Scale.ONE);
     this.preWidth = preWidth;
     this.preHeight = preHeight;
+    this.source = source;
   }
 
   @Override
@@ -76,5 +78,9 @@ public class RoboAsyncImage extends RoboImage implements AsyncImage<UIImage> {
     this.error = error;
     this.image = new UIImage().getCGImage(); // TODO: create error image
     callbacks = Callbacks.dispatchFailureClear(callbacks, error);
+  }
+
+  @Override public String toString () {
+    return "RoboAsyncImage<" + source + ", " + preWidth + "x" + preHeight + ">";
   }
 }
