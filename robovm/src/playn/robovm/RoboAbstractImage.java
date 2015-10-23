@@ -71,6 +71,8 @@ public abstract class RoboAbstractImage extends ImageGL<CGBitmapContext> impleme
   @Override
   public void getRgb(int startX, int startY, int width, int height, int[] rgbArray, int offset,
                      int scanSize) {
+    if (width <= 0 || height <= 0) return;
+
     int bytesPerRow = 4 * width;
     CGBitmapContext context = CGBitmapContext.create(
       width, height, 8, bytesPerRow, CGColorSpace.createDeviceRGB(),

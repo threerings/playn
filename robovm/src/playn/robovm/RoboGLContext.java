@@ -100,7 +100,7 @@ public class RoboGLContext extends GL20Context {
 
   void updateTexture(int tex, CGImage image) {
     int width = (int)image.getWidth(), height = (int)image.getHeight();
-    if (width == 0 || height == 0) {
+    if (width <= 0 || height <= 0) {
       platform.log().warn(
         "Ignoring texture update for empty image (" + width + "x" + height + ").");
       return;
