@@ -99,8 +99,10 @@ public class InternalJsonWriterTest {
   @Test
   public void testWriteToSystemOutLikeStream() {
     ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    PrintStream ps = new PrintStream(bytes);
     new JsonAppendableWriter(
-      new PrintStream(bytes)).object().value("a", 1).value("b", 2).end().done();
+      ps).object().value("a", 1).value("b", 2).end().done();
+    ps.flush();
     assertEquals("{\"a\":1,\"b\":2}", new String(bytes.toByteArray(), Charset.forName("UTF-8")));
   }
 
