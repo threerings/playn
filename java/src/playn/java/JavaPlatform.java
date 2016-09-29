@@ -53,6 +53,10 @@ public class JavaPlatform extends AbstractPlatform {
     /** Dictates the name of the temporary file used by {@link JavaStorage}. Configure this if you
      * want to run multiple sessions without overwriting one another's storage. */
     public String storageFileName = "playn";
+    
+    /** If set, assets will be loaded file system using specified  directories.
+     */
+    public File[] assetsDirectories;
 
     /** The width of the PlayN window, in pixels. */
     public int width = 640;
@@ -140,7 +144,7 @@ public class JavaPlatform extends AbstractPlatform {
   private final TouchImpl touch;
   private final JavaGraphics graphics;
   private final JavaMouse mouse;
-  private final JavaAssets assets = new JavaAssets(this);
+  private final JavaAssets assets;
   private final Keyboard.Listener keyListener;
   private boolean active = true;
 
@@ -150,6 +154,11 @@ public class JavaPlatform extends AbstractPlatform {
   public JavaPlatform(Config config) {
     super(new JavaLog());
     this.config = config;
+    if(null != config.assetsDirectories && config.assetsDirectories.length > 0) {
+        assets = new JavaFilesystemAssets(this, config.assetsDirectories);
+    } else {
+        assets = new JavaAssets(this);
+    }
     if (!config.headless) {
       unpackNatives();
     }
