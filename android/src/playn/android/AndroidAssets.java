@@ -119,7 +119,7 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
    * anywhere, but the expansion APK is the main place where this would be implemented).
    *
    * <p>The loader will be passed paths that have been normalized and have the {@code assetPrefix}
-   * (see {@link #setPathpPrefix}) already prepended to them.
+   * (see {@link #setPathPrefix}) already prepended to them.
    */
   public void setExpansionLoader(ExpansionLoader loader) {
     expansionLoader = loader;
