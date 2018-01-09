@@ -34,9 +34,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 
-import com.android.vending.expansion.zipfile.APKExpansionSupport;
-import com.android.vending.expansion.zipfile.ZipResourceFile;
-
 import playn.core.AbstractAssets;
 import playn.core.AsyncImage;
 import playn.core.Image;
@@ -61,11 +58,19 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
     void adjustOptions(String path, BitmapOptions options);
   }
 
+  /** See {@link #setExpansionLoader}. */
+  public interface ExpansionLoader {
+    /** Opens a file descriptor to the asset at {@code path}. */
+    AssetFileDescriptor openFd (String path);
+    /** Opens an input stream to the asset at {@code path}. */
+    InputStream openStream (String path);
+  }
+
   private final AndroidPlatform platform;
   private final AssetManager assetMgr;
   private String pathPrefix = ""; // 'assets/' is always prepended by AssetManager
   private Scale assetScale = null;
-  private ZipResourceFile expansionFile = null;
+  private ExpansionLoader expansionLoader = null;
 
   private BitmapOptionsAdjuster optionsAdjuster = new BitmapOptionsAdjuster() {
     public void adjustOptions(String path, BitmapOptions options) {} // noop!
@@ -91,32 +96,6 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
   }
 
   /**
-   * Configures assets to be loaded from existing expansion files. Android supports two expansion
-   * files, a main and patch file. The versions for each are passed to this method. If you are not
-   * using either of the files, supply {@code 0} for the version. Both files will be searched for
-   * resources.
-   *
-   * <p>Expansion resources do not make an assumption that the resources are in a directory named
-   * 'assets' in contrast to the Android resource manager. Use {@link setPathPrefix(String)} to
-   * configure the path within the expansion files.</p>
-   *
-   * <p>Expansion files are expected to be existing and zipped, following the
-   * <a href="http://developer.android.com/google/play/expansion-files.html">Android expansion
-   * file guidelines</a>.</p>
-   *
-   * <p>Due to Android limitations, fonts and typefaces can not be loaded from expansion files.
-   * Fonts should be kept within the default Android assets directory so they may be loaded via the
-   * AssetManager.</p>
-   *
-   * @throws IOException if any expansion files are missing.
-   */
-  public void setExpansionFile(int mainVersion, int patchVersion) throws IOException {
-    expansionFile = APKExpansionSupport.getAPKExpansionZipFile(
-      platform.activity, mainVersion, patchVersion);
-    if (expansionFile == null) throw new FileNotFoundException("Missing APK expansion zip files");
-  }
-
-  /**
    * Configures the default scale to use for assets. This allows one to use higher resolution
    * imagery than the device might normally. For example, one can supply scale 2 here, and
    * configure the graphics scale to 1.25 in order to use iOS Retina graphics (640x960) on a WXGA
@@ -133,6 +112,17 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
    */
   public void setBitmapOptionsAdjuster(BitmapOptionsAdjuster optionsAdjuster) {
     this.optionsAdjuster = optionsAdjuster;
+  }
+
+  /**
+   * Configures a loader that obtains resources from an (already downloaded) expansion APK (or
+   * anywhere, but the expansion APK is the main place where this would be implemented).
+   *
+   * <p>The loader will be passed paths that have been normalized and have the {@code assetPrefix}
+   * (see {@link #setPathpPrefix}) already prepended to them.
+   */
+  public void setExpansionLoader(ExpansionLoader loader) {
+    expansionLoader = loader;
   }
 
   @Override
@@ -239,8 +229,9 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
 
   protected AssetFileDescriptor openAssetFd(String path) throws IOException {
     String fullPath = normalizePath(pathPrefix + path);
-    return (expansionFile == null) ? assetMgr.openFd(fullPath) :
-      expansionFile.getAssetFileDescriptor(fullPath);
+    return (expansionLoader == null) ?
+      assetMgr.openFd(fullPath) :
+      expansionLoader.openFd(fullPath);
   }
 
   protected Scale assetScale () {
@@ -253,9 +244,9 @@ public class AndroidAssets extends AbstractAssets<Bitmap> {
    */
   protected InputStream openAsset(String path) throws IOException {
     String fullPath = normalizePath(pathPrefix + path);
-    InputStream is = (expansionFile == null) ?
+    InputStream is = (expansionLoader == null) ?
       assetMgr.open(fullPath, AssetManager.ACCESS_STREAMING) :
-      expansionFile.getInputStream(fullPath);
+      expansionLoader.openStream(fullPath);
     if (is == null)
       throw new FileNotFoundException("Missing resource: " + fullPath);
     return is;
