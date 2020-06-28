@@ -48,8 +48,8 @@
     <gwt.version>2.7.0</gwt.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
     <lwjgl.version>2.9.3</lwjgl.version>
-    <robovm.version>1.8.0</robovm.version>
-    <robovm.maven.version>1.8.0</robovm.maven.version>
+    <robovm.version>2.3.7</robovm.version>
+    <robovm.maven.version>2.3.7</robovm.maven.version>
     <!--
       GWT log levels:
       ERROR, WARN, INFO, TRACE, DEBUG, SPAM, or ALL
@@ -158,10 +158,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.3.2</version>
+          <version>3.7.0</version>
           <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
+            <source>1.7</source>
+            <target>1.7</target>
+            <release>8</release>
             <showDeprecation>true</showDeprecation>
             <showWarnings>true</showWarnings>
             <compilerArgs>
